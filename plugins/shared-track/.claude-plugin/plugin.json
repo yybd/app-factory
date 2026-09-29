@@ -1,6 +1,6 @@
 {
   "name": "shared-track",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Cross-surface: the app's profile as the single source of truth, the listing metadata written from it for both stores, price reconciliation across every place a price appears, the release orchestrator, the naming decision made once for every surface, and the copy pass every customer-facing text runs through.",
   "license": "MIT",
   "defaultEnabled": false,

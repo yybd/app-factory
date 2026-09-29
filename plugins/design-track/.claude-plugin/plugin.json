@@ -1,6 +1,6 @@
 {
   "name": "design-track",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Visual craft for any HTML interface — typography, colour, motion and spatial composition. Generic: a Capacitor app's UI is HTML and CSS as much as a website is.",
   "license": "MIT AND Apache-2.0",
   "defaultEnabled": false,

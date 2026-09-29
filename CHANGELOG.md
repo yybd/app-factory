@@ -14,6 +14,11 @@ skill does.
 
 ## Unreleased
 
+## 0.4.0
+
+A minor bump: two Android skills do something they did not do before. The first
+release from the public repository.
+
 - **`play-store-ship` (android-track): `--draft`.** An app that has never been
   published accepts only draft releases — the commit fails with HTTP 400 "Only
   releases with status draft may be created on draft app." `publish_aab.py --draft`
