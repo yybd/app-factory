@@ -14,5 +14,7 @@ not a bug.
 | [1 — guards for a multi-repo agent](1-cross-repo-guards.he.md) | the case for blocking a write into a repo the session is not standing in. About grove, not about this repo. |
 | [2 — skills and tracks](2-skills-and-tracks.he.md) | why one large instruction file does not hold, and what replaces it |
 
-Both end with a placeholder where a link to the public repository goes. Neither has been
-published.
+Both were revised on 2026-09-29, when the two repositories went public: the link is in
+place, the guard messages quoted in the first are real ones, and the second describes
+per-repo tracks through `enable.py` rather than a registry every user must have. Neither
+has been published yet; the plan for where and when is kept outside the repository.
