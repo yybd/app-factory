@@ -1,0 +1,42 @@
+{
+  "_comment": "Where one run of store-metadata-writer lands, and how each place closes. Read by $GROVE/tools/close.py. Derived from the skill's own workflow: it writes per-locale listing text for BOTH stores into the hub, and a session that writes Apple's and reports 'done' has left Play's half uncommitted in the same repo.",
+  "operation": "store-metadata-writer",
+  "operates_from": "the app's repo, usually — the profile and the README it reads are there, and the files it writes are not",
+  "state": {
+    "command": "python3 ${CLAUDE_PLUGIN_ROOT}/skills/copy-edit/scripts/measure_copy.py $APP_HUB/<slug>/store/",
+    "why": "Every field this operation writes has a hard per-store character limit, and the measurer already knows all of them. 'Did every locale get written' and 'does every field still fit' are one question at the end of this operation, and the delivery sync will refuse the upload on either."
+  },
+  "places": [
+    {
+      "id": "app-hub",
+      "root": "$APP_HUB",
+      "paths": [
+        "<slug>/store/apple/metadata/**",
+        "<slug>/store/apple/release-notes/**",
+        "<slug>/store/apple/iap/**",
+        "<slug>/store/play/metadata/**",
+        "<slug>/store/play/changelogs/**",
+        "<slug>/store/play/iap/**"
+      ],
+      "close": "commit",
+      "note": "One commit for the whole listing, both stores. Splitting it by store is how one of them is left behind: the two are written from the same profile in the same pass, and a half-written listing reads as complete."
+    },
+    {
+      "id": "app-repo",
+      "root": "the app's own repo",
+      "paths": [
+        "fastlane/**"
+      ],
+      "close": "none",
+      "note": "The repo's fastlane/ tree is DISPOSABLE — the delivery skills rsync it from the hub and it is gitignored in a studio setup. If it is committed in this repo, it is stale the moment the hub changes. Nothing to close here; say so rather than leaving the reader to wonder."
+    }
+  ],
+  "commits": "per-place",
+  "commit_scope": "declared-only",
+  "push": "never",
+  "_push_note": "Listing text is not published by a commit. `app-store-deliver` / `play-store-deliver` send it, and only when the version is not already in review.",
+  "order": [
+    "app-hub (the source of truth, and the only place that needs a commit)"
+  ],
+  "_order_why": "There is one writable place. It is declared anyway, because `close.py --op` can only report on an operation that declared itself — and an operation with one place still gets forgotten when the session ends somewhere else."
+}

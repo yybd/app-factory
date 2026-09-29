@@ -1,0 +1,10 @@
+{
+  "name": "android-track",
+  "version": "0.3.0",
+  "description": "Android and Google Play: running a debug build on a device, keystore and credentials, policy compliance, listing metadata, media, icons, shipping the AAB, and replying to reviews.",
+  "license": "MIT",
+  "defaultEnabled": false,
+  "author": {
+    "name": "App Factory"
+  }
+}

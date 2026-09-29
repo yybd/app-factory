@@ -1,0 +1,6 @@
+#!/bin/sh
+# Installed by `python3 factory/check_commit_message.py --install`, which points
+# core.hooksPath here. Git passes the message file as $1; a non-zero exit stops the
+# commit. `git commit --no-verify` skips this, deliberately.
+root=$(git rev-parse --show-toplevel) || exit 0
+exec python3 "$root/factory/check_commit_message.py" "$1"

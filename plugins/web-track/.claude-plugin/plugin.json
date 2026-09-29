@@ -1,0 +1,10 @@
+{
+  "name": "web-track",
+  "version": "0.3.0",
+  "description": "Building a website and keeping it found: the page's structure and conversion architecture before any visual work, the Web Interface Guidelines audit of the result, and the search, indexing and funnel read on the live sites.",
+  "license": "MIT",
+  "defaultEnabled": false,
+  "author": {
+    "name": "App Factory"
+  }
+}

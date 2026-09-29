@@ -1,0 +1,29 @@
+# Every check that needs no installation, on every push.
+#
+# Why not `deploy.py`: deploy installs — it copies plugins into the machine's cache and
+# writes settings. A runner has neither, so deploy would report problems that are not
+# problems. `factory/ci.py` is the half that is true of a bare checkout, and running it
+# here is the only thing that exercises the fresh-clone path on every change.
+name: check
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # Pillow is the one dependency the shipped scripts have, and three of them refuse
+      # to start without it. `check_scripts.py` treats that as "checked statically only"
+      # rather than a failure — correct for a person running it on a bare machine, and
+      # wrong for the gate, which would then never exercise those three at all. So the
+      # runner installs it, and CI checks all 57.
+      - run: python3 -m pip install --quiet Pillow
+      - run: python3 factory/ci.py --metrics

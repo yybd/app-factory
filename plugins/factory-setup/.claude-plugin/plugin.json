@@ -1,0 +1,10 @@
+{
+  "name": "factory-setup",
+  "version": "0.3.0",
+  "description": "The one track that is on everywhere: it says when a repo looks like an app and no track is enabled in it — the failure that otherwise looks exactly like a skill deciding it was not relevant.",
+  "license": "MIT",
+  "defaultEnabled": true,
+  "author": {
+    "name": "App Factory"
+  }
+}

@@ -1,0 +1,5 @@
+# Prettier reflows markdown and, on Hebrew text with inline code, moves emphasis
+# markers across the backticks. See .editorconfig for what that did to docs/007 on
+# 2026-09-08. The line breaks here are deliberate — they keep a diff to the sentence
+# that changed instead of lighting up a whole paragraph.
+*.md

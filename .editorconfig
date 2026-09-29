@@ -1,0 +1,21 @@
+# Markdown here is hand-wrapped Hebrew with inline code and emphasis, and an
+# auto-formatter mangles it. On 2026-09-08 one reflowed docs/007 and moved the `**`
+# markers across the backticks — `**`git -C` works…**` became `` `git -C` **works…** ``,
+# which is a different sentence, and one emphasis span was left unclosed. Nothing
+# failed; it just renders wrong and reads wrong, silently.
+#
+# 44 of the 99 markdown files here carry that pattern, SKILL.md files included — and a
+# mangled SKILL.md is worse than a mangled document, because an agent follows it.
+
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+
+[*.md]
+# the two that matter: never re-wrap, and never strip the trailing double-space
+# that markdown uses for a hard line break
+max_line_length = off
+trim_trailing_whitespace = false

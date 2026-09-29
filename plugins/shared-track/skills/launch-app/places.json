@@ -1,0 +1,58 @@
+{
+  "_comment": "Where a first launch lands. It spans more places than any other operation here — and unlike the others it spans them over DAYS, which is why it keeps its own state file rather than relying on a session's memory.",
+  "operation": "launch-app",
+  "operates_from": "anywhere; the operation moves between repos by design and says so at each step",
+  "state": {
+    "command": "read $APP_HUB/<slug>/README.md",
+    "why": "The launch's own state file: what is done, what is blocked, what decision is still open. It is the answer to 'where did this stop', and it is written by this skill at every stage boundary — a launch that spans three repos and several days cannot be reconstructed from git logs."
+  },
+  "places": [
+    {
+      "id": "app-hub",
+      "root": "$APP_HUB",
+      "paths": [
+        "<slug>/README.md",
+        "<slug>/profile.md",
+        "<slug>/profile.*.md",
+        "<slug>/store/**",
+        "<slug>/media/**"
+      ],
+      "close": "commit",
+      "note": "The state file is committed at every stage boundary, not at the end. A launch abandoned mid-stage with an uncommitted state file is a launch nobody can resume."
+    },
+    {
+      "id": "app-repo",
+      "root": "the app's own repo",
+      "paths": [
+        "README.md",
+        "the project's own identity and version files"
+      ],
+      "close": "commit",
+      "note": "app-identity owns these; this operation only sequences it. The commit belongs to the app repo in the app's terms."
+    },
+    {
+      "id": "site",
+      "root": "$SITE",
+      "type": "another repo's skills",
+      "close": "person",
+      "enter": true,
+      "why_enter": "The privacy page and the app's web presence are written by the SITE's own skills, which load only inside that repo. Writing there from here lands the file and bypasses the skill whose job it was — the failure is silent, which is why the guard refuses it. The launch stops, says what remains, and gives the exact next step."
+    },
+    {
+      "id": "the stores",
+      "type": "api",
+      "close": "person",
+      "note": "A submission is the owner's decision and the one step here that cannot be undone. Report what is ready; let them press it."
+    }
+  ],
+  "commits": "per-place",
+  "commit_scope": "declared-only",
+  "push": "never",
+  "order": [
+    "app-repo (identity first — everything downstream quotes the name)",
+    "app-hub (profile, then listing and media)",
+    "site (privacy page early: the App Store will not accept a submission without a URL that resolves)",
+    "the stores · site publish (the parts only a person can finish)"
+  ],
+  "_order_why": "Content before whatever points at it, with one exception that is not one: the privacy page is written EARLY, not because the site leads, but because the store submission is blocked without it."
+}

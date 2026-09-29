@@ -1,0 +1,64 @@
+{
+  "_comment": "Where one run of price-sync lands, and how each place closes. Read by $GROVE/tools/close.py. This is the list that used to exist only as a sentence inside SKILL.md — a price lives in eight places, and a session that updates five of them and reports 'done' is the failure this file exists to make impossible. Written 2026-09-10 from the skill's own workflow, not from its description.",
+  "operation": "price-sync",
+  "operates_from": "anywhere — the operation spans every place below, so no single one of them is where it 'lives'",
+  "state": {
+    "command": "python3 ${CLAUDE_PLUGIN_ROOT}/skills/price-sync/scripts/verify_prices.py",
+    "why": "The state reader ships with the skill and is authoritative for the half that matters: it compares prices.json against every document, every .storekit and every page that states a price, which is where every price bug so far came from. close.py runs it rather than re-deriving any of it. The live store read is a separate, optional step — a price that is wrong in the store is rarer than one that is wrong in a file copied from another file."
+  },
+  "places": [
+    {
+      "id": "app-hub",
+      "root": "$APP_HUB",
+      "paths": [
+        "prices.json",
+        "<slug>/profile*.md",
+        "<slug>/store/**",
+        "<slug>/media/**"
+      ],
+      "close": "commit",
+      "note": "prices.json is settled FIRST and is the only file allowed to state a price on its own authority; everything else is propagated from it. Store metadata edited here is a hub change and nothing more until app-store-deliver sends it — and not at all while the version is WAITING_FOR_REVIEW or IN_REVIEW, which would pull the submission out of the queue."
+    },
+    {
+      "id": "app-repos",
+      "root": "$DEV_ROOT/Capacitor/<app> · $DEV_ROOT/tauri/<app>",
+      "paths": [
+        "**/*.storekit"
+      ],
+      "close": "commit",
+      "note": "One commit per app repo, in that repo's own terms. A .storekit only drives local StoreKit testing, so a stale one breaks nothing visible — which is exactly why it is the occurrence that gets forgotten."
+    },
+    {
+      "id": "site",
+      "root": "$SITE",
+      "paths": [
+        "the pages listed in `site_paths` in prices.json"
+      ],
+      "close": "commit, then `npm run content`, then `npm run ship`",
+      "enter": true,
+      "why_enter": "Site copy lives in content/en.json, which the site repo's own .claude/owns.json marks `warn`: editing it without running the sync leaves the deployed pages serving the old text. And committing is not publishing here — the site's hosting projects sit on that repo with git deployment switched off, so `npm run ship` is the only thing that puts a price change in front of a customer. This is the place where the twelve-hour wrong price happened."
+    },
+    {
+      "id": "app-store-connect",
+      "type": "api",
+      "close": "person",
+      "note": "Prices ARE editable through the API, and this operation still does not touch them: changing what a customer pays is the owner's decision, not something done while tidying files. Report the misalignment and the exact value; let the owner act."
+    },
+    {
+      "id": "lemon-squeezy",
+      "type": "dashboard",
+      "close": "person",
+      "note": "The API serves GET and HEAD on products and variants — verified, not assumed. There is no write path at all, so this place can only ever be closed by a person at a dashboard. Give them the exact values to type, then re-run the verifier to confirm it landed."
+    }
+  ],
+  "commits": "per-place",
+  "commit_scope": "declared-only",
+  "push": "never",
+  "_push_note": "A push publishes a whole branch. This operation touches three repos it may not be standing in; it prints what each push would publish and leaves the decision.",
+  "order": [
+    "app-hub (prices.json first — everything else derives from it)",
+    "app-repos · site (propagate)",
+    "site publish · the two external places (the parts only a person or a separate tool can finish)"
+  ],
+  "_order_why": "Content before what points at it. prices.json is the authority, so a document corrected before it is corrected against a number that may still change."
+}

@@ -1,0 +1,375 @@
+{
+  "_source": "https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications",
+  "_checked": "2026-09-11",
+  "_why": "One table, read by the scripts and rendered into the reference documents. It lived in seven places and they had already drifted: 1290x2796 was filed under 6.7\" in one and 6.9\" in another, and Apple says 6.9\". Nobody could have noticed, because each copy is correct-looking on its own.",
+  "_rules": "PNG or JPG, RGB, no alpha. App Store Connect rejects any dimension not listed here exactly.",
+  "screenshots": {
+    "iphone": [
+      {
+        "family": "6.9\"",
+        "devices": "iPhone Air, 17 Pro Max, 16 Pro Max, 16 Plus, 15 Pro Max, 15 Plus, 14 Pro Max",
+        "sizes": [
+          [
+            1320,
+            2868
+          ],
+          [
+            1290,
+            2796
+          ],
+          [
+            1260,
+            2736
+          ]
+        ]
+      },
+      {
+        "family": "6.5\"",
+        "devices": "iPhone 14 Plus, 13 Pro Max, 12 Pro Max, 11 Pro Max, 11, XS Max, XR",
+        "sizes": [
+          [
+            1284,
+            2778
+          ],
+          [
+            1242,
+            2688
+          ]
+        ]
+      },
+      {
+        "family": "6.1\" / 6.3\"",
+        "devices": "iPhone 16, 15, 14 Pro, 13 Pro, 13, 12 Pro, 12, 11 Pro, XS, X",
+        "sizes": [
+          [
+            1206,
+            2622
+          ],
+          [
+            1179,
+            2556
+          ]
+        ]
+      },
+      {
+        "family": "5.5\"",
+        "devices": "iPhone 8 Plus, 7 Plus, 6s Plus",
+        "sizes": [
+          [
+            1242,
+            2208
+          ]
+        ]
+      },
+      {
+        "family": "4.7\"",
+        "devices": "iPhone SE 2nd/3rd gen, 8, 7, 6s",
+        "sizes": [
+          [
+            750,
+            1334
+          ]
+        ]
+      },
+      {
+        "family": "4\"",
+        "devices": "iPhone SE 1st gen",
+        "sizes": [
+          [
+            640,
+            1136
+          ]
+        ]
+      }
+    ],
+    "ipad": [
+      {
+        "family": "13\"",
+        "devices": "iPad Pro 13\", iPad Pro 12.9\"",
+        "sizes": [
+          [
+            2064,
+            2752
+          ],
+          [
+            2048,
+            2732
+          ]
+        ]
+      },
+      {
+        "family": "12.9\" / 11\" / 10.5\"",
+        "devices": "iPad Pro 11\", iPad Air 13\"/11\", iPad 11\"/10.9\", iPad mini",
+        "sizes": [
+          [
+            1668,
+            2420
+          ],
+          [
+            1668,
+            2224
+          ]
+        ]
+      },
+      {
+        "family": "9.7\"",
+        "devices": "older iPad",
+        "sizes": [
+          [
+            1536,
+            2048
+          ],
+          [
+            768,
+            1024
+          ]
+        ]
+      }
+    ],
+    "mac": [
+      {
+        "family": "16:10",
+        "devices": "any Mac",
+        "sizes": [
+          [
+            1280,
+            800
+          ],
+          [
+            1440,
+            900
+          ],
+          [
+            2560,
+            1600
+          ],
+          [
+            2880,
+            1800
+          ]
+        ]
+      }
+    ],
+    "appletv": [
+      {
+        "family": "tvOS",
+        "devices": "Apple TV",
+        "sizes": [
+          [
+            1920,
+            1080
+          ],
+          [
+            3840,
+            2160
+          ]
+        ]
+      }
+    ],
+    "visionpro": [
+      {
+        "family": "visionOS",
+        "devices": "Apple Vision Pro",
+        "sizes": [
+          [
+            3840,
+            2160
+          ]
+        ]
+      }
+    ],
+    "watch": [
+      {
+        "family": "Ultra 3",
+        "devices": "Apple Watch Ultra 3",
+        "sizes": [
+          [
+            422,
+            514
+          ]
+        ]
+      },
+      {
+        "family": "Ultra 2 / Ultra",
+        "devices": "Apple Watch Ultra 2, Ultra",
+        "sizes": [
+          [
+            410,
+            502
+          ]
+        ]
+      },
+      {
+        "family": "Series 11 / 10",
+        "devices": "Apple Watch Series 11, 10",
+        "sizes": [
+          [
+            416,
+            496
+          ]
+        ]
+      },
+      {
+        "family": "Series 9 / 8 / 7",
+        "devices": "Apple Watch Series 9, 8, 7",
+        "sizes": [
+          [
+            396,
+            484
+          ]
+        ]
+      },
+      {
+        "family": "Series 6 / 5 / 4 / SE",
+        "devices": "Apple Watch Series 6, 5, 4, SE 3, SE",
+        "sizes": [
+          [
+            368,
+            448
+          ]
+        ]
+      },
+      {
+        "family": "Series 3",
+        "devices": "Apple Watch Series 3",
+        "sizes": [
+          [
+            312,
+            390
+          ]
+        ]
+      }
+    ]
+  },
+  "_watch_note": "For Apple Watch the SAME size must be used across every localization.",
+  "previews": {
+    "iphone": [
+      [
+        886,
+        1920
+      ],
+      [
+        1920,
+        886
+      ],
+      [
+        1080,
+        1920
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "ipad": [
+      [
+        1200,
+        1600
+      ],
+      [
+        1600,
+        1200
+      ]
+    ],
+    "mac": [
+      [
+        1920,
+        1080
+      ]
+    ]
+  },
+  "_preview_rules": "15-30 seconds, 30fps, H.264 High@4.0, and a conformant stereo AAC track — App Store Connect rejects a preview with missing or non-conformant audio.",
+  "iap_review_screenshot": {
+    "min": [
+      640,
+      920
+    ],
+    "note": "One image per in-app purchase, showing the purchase in context."
+  },
+  "icons": {
+    "_note": "The App Store marketing icon and the source every other size is generated from. An Apple spec like the screenshot sizes, and it lived only in app-icon-generator.",
+    "source": [
+      1024,
+      1024
+    ],
+    "_source_note": "1024x1024, RGB, no alpha, no rounded corners — Apple applies the mask."
+  },
+  "not_store_sizes": {
+    "_note": "Dimensions written in this track ON PURPOSE that are NOT accepted store sizes: capture inputs, window geometry, and the counter-examples the documents use to explain why a raw grab cannot be uploaded. Listed so the consistency check can tell a deliberate mention from a wrong claim, each with the reason it is here.",
+    "sizes": [
+      {
+        "size": [
+          1440,
+          952
+        ],
+        "why": "a Mac window grab INCLUDING the title bar — the documents' worked example of a size that must be padded before upload"
+      },
+      {
+        "size": [
+          2880,
+          1904
+        ],
+        "why": "the @2x of the above, same reason"
+      },
+      {
+        "size": [
+          1600,
+          900
+        ],
+        "why": "a capture window geometry passed to capture_mac.sh, not an upload size"
+      },
+      {
+        "size": [
+          1234,
+          5678
+        ],
+        "why": "the regex example inside render_specs.py itself"
+      }
+    ]
+  },
+  "certificates": {
+    "_note": "Which Apple certificate does which job. Written out identically in apple_creds.py and diagnose_signing.py — and already not identically: three descriptions were worded differently between the two copies, which is the shape of a table on its way to disagreeing with itself.",
+    "types": [
+      {
+        "prefix": "Apple Development",
+        "does": "development — run and debug on devices"
+      },
+      {
+        "prefix": "iPhone Developer",
+        "does": "legacy development"
+      },
+      {
+        "prefix": "Mac Developer",
+        "does": "legacy macOS development"
+      },
+      {
+        "prefix": "Apple Distribution",
+        "does": "App Store / Mac App Store app signing"
+      },
+      {
+        "prefix": "iPhone Distribution",
+        "does": "legacy App Store distribution"
+      },
+      {
+        "prefix": "3rd Party Mac Developer Application",
+        "does": "legacy Mac App Store app"
+      },
+      {
+        "prefix": "3rd Party Mac Developer Installer",
+        "does": "Mac App Store installer (.pkg)"
+      },
+      {
+        "prefix": "Mac Installer Distribution",
+        "does": "Mac App Store installer (.pkg)"
+      },
+      {
+        "prefix": "Developer ID Application",
+        "does": "direct distribution app (DMG / notarize)"
+      },
+      {
+        "prefix": "Developer ID Installer",
+        "does": "direct distribution installer (.pkg)"
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "//": "Markdown here is hand-wrapped Hebrew with inline code; a formatter moves the emphasis markers and changes what a sentence says. See .editorconfig. wordWrap shows long lines without rewriting the file.",
+  "[markdown]": {
+    "editor.formatOnSave": false,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "editor.wordWrap": "on"
+  },
+  "prettier.documentSelectors": []
+}

@@ -1,0 +1,21 @@
+[
+  {
+    "date": "2026-09-08",
+    "skills": 32,
+    "chars": 28186,
+    "tokens": 8053,
+    "note": "seeded retroactively from the placement measurement; the source is documented there"
+  },
+  {
+    "date": "2026-09-09",
+    "skills": 39,
+    "chars": 35411,
+    "tokens": 10117
+  },
+  {
+    "date": "2026-09-11",
+    "skills": 38,
+    "chars": 34767,
+    "tokens": 9933
+  }
+]

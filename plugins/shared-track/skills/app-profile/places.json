@@ -1,0 +1,25 @@
+{
+  "_comment": "Where one run of app-profile lands. It runs from the APP's repo and writes only into the hub — the single most common cross-repo shape in this factory, and the one where a session sees a clean `git status` while the work sits uncommitted somewhere it is not standing.",
+  "operation": "app-profile",
+  "operates_from": "the app's repo — that is where the source it reads lives",
+  "places": [
+    {
+      "id": "app-hub",
+      "root": "$APP_HUB",
+      "paths": [
+        "<slug>/profile.md",
+        "<slug>/profile.*.md",
+        "<slug>/media/apple/**"
+      ],
+      "close": "commit",
+      "note": "The profile and its owner-facing translation are one change and one commit: the translation is a derived mirror, and committing the English without it leaves the two saying different things with nothing to notice."
+    }
+  ],
+  "commits": "per-place",
+  "commit_scope": "declared-only",
+  "push": "never",
+  "order": [
+    "app-hub"
+  ],
+  "_order_why": "One place, and it is never the place the session is standing in. That is the whole reason this file exists."
+}

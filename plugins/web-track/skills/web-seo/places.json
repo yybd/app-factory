@@ -1,0 +1,30 @@
+{
+  "_comment": "Where one SEO pass lands. Most of what this operation produces is a report and changes nothing — but the parts that do change something are split across two repos and a snapshot nobody would think to commit.",
+  "operation": "web-seo",
+  "operates_from": "the site's repo",
+  "places": [
+    {
+      "id": "site",
+      "root": "$SITE",
+      "paths": [
+        "the pages, sitemap, robots and metadata the audit named"
+      ],
+      "close": "commit, then the project's own publish command",
+      "enter": true,
+      "why_enter": "Committing is not publishing: a site whose hosting has git deployment switched off serves the old page until the publish command runs. An SEO fix that is committed and not deployed is a fix that does not exist, and the next audit will report the same finding."
+    },
+    {
+      "id": "measurement",
+      "type": "api",
+      "close": "person",
+      "note": "Search Console indexing requests and any analytics change are the owner's, and rate-limited. Give the exact URLs; let them submit."
+    }
+  ],
+  "commits": "per-place",
+  "commit_scope": "declared-only",
+  "push": "never",
+  "order": [
+    "site (fix, commit, publish, then verify the live page — in that order)"
+  ],
+  "_order_why": "Verification before the publish reads the old page and passes, which is the most convincing way to be wrong."
+}

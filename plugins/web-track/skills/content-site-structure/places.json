@@ -1,0 +1,34 @@
+{
+  "_comment": "Where a scaffold lands. Everything this operation produces is written into ONE repo — the site being scaffolded — and that repo is not the one a factory session is usually standing in. A tree created and never committed is the failure mode: it survives the session, it is invisible in the factory's own git status, and the next session finds half a site nobody remembers creating.",
+  "operation": "content-site-structure",
+  "operates_from": "the site repo being scaffolded",
+  "places": [
+    {
+      "id": "site",
+      "root": "the site repo named by the user",
+      "paths": [
+        "locales.json",
+        "src/text/**",
+        "src/data/**",
+        "src/media/**",
+        "src/i18n/**",
+        "src/content.config.ts",
+        "src/pages/**",
+        "src/layouts/**",
+        "scripts/check_content.py",
+        "package.json",
+        "astro.config.mjs"
+      ],
+      "close": "commit — one commit, in that repo's own terms",
+      "enter": true,
+      "why_enter": "The scaffold is the repo's first structural commit and the thing every later session builds on. Left uncommitted it is indistinguishable from a tree someone abandoned."
+    }
+  ],
+  "commits": "per-place",
+  "commit_scope": "declared-only",
+  "push": "never",
+  "order": [
+    "site (scaffold, run scripts/check_content.py, then commit — in that order)"
+  ],
+  "_order_why": "Committing a tree the validator has not seen commits the gaps too, and the first run is the one that catches a language folder that was declared and never created."
+}

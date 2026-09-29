@@ -1,0 +1,76 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "app-factory",
+  "description": "The app skills: seven tracks that build, describe and ship mobile apps to the App Store and Google Play — profile and copy, store metadata and media, signing, release and price sync. Each track is opt-in per repo: `factory-setup` reads the repo and writes its own .claude/settings.json, so App Store skills never load in a website. For many repos at once there is a separate marketplace, grove, which this one does not require.",
+  "owner": {
+    "name": "App Factory"
+  },
+  "plugins": [
+    {
+      "name": "factory-setup",
+      "description": "The one track that is on everywhere: it says when a repo looks like an app and no track is enabled in it — the failure that otherwise looks exactly like a skill deciding it was not relevant.",
+      "source": "./plugins/factory-setup",
+      "category": "setup",
+      "author": {
+        "name": "App Factory"
+      }
+    },
+    {
+      "name": "apple-track",
+      "description": "Apple: App Store and direct macOS distribution — identity, signing, compliance, metadata, media, icons, ASO, localization, shipping.",
+      "source": "./plugins/apple-track",
+      "category": "apple",
+      "author": {
+        "name": "App Factory"
+      }
+    },
+    {
+      "name": "android-track",
+      "description": "Android and Google Play: running a debug build on a device, keystore and credentials, policy compliance, listing metadata, media, icons, shipping the AAB, and replying to reviews.",
+      "source": "./plugins/android-track",
+      "category": "android",
+      "author": {
+        "name": "App Factory"
+      }
+    },
+    {
+      "name": "capacitor-track",
+      "description": "Capacitor apps: the strings that live in JS and HTML, and the WebView traps that only show up on a device.",
+      "source": "./plugins/capacitor-track",
+      "category": "capacitor",
+      "author": {
+        "name": "App Factory"
+      }
+    },
+    {
+      "name": "shared-track",
+      "description": "Cross-surface: the app's profile as the single source of truth, the listing metadata written from it for both stores, price reconciliation across every place a price appears, the release orchestrator, the naming decision made once for every surface, and the copy pass every customer-facing text runs through.",
+      "source": "./plugins/shared-track",
+      "category": "cross-store",
+      "author": {
+        "name": "App Factory"
+      }
+    },
+    {
+      "name": "design-track",
+      "description": "Visual craft for any HTML interface — typography, colour, motion and spatial composition. Generic: a Capacitor app's UI is HTML and CSS as much as a website is.",
+      "source": "./plugins/design-track",
+      "category": "design",
+      "author": {
+        "name": "App Factory"
+      }
+    },
+    {
+      "name": "web-track",
+      "description": "Building a website and keeping it found: the page's structure and conversion architecture before any visual work, the Web Interface Guidelines audit of the result, and the search, indexing and funnel read on the live sites.",
+      "source": "./plugins/web-track",
+      "category": "web",
+      "author": {
+        "name": "App Factory"
+      }
+    }
+  ],
+  "metadata": {
+    "version": "0.3.0"
+  }
+}

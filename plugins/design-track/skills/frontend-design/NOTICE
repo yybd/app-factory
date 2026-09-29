@@ -1,0 +1,44 @@
+frontend-design
+===============
+
+This skill is a MODIFIED version of the `frontend-design` skill from Anthropic's
+`anthropics/skills` repository:
+
+    https://github.com/anthropics/skills/tree/main/skills/frontend-design
+
+Licensed under the Apache License, Version 2.0. The full terms are in `LICENSE.txt`
+beside this file — the copy that ships with the upstream skill, fetched from it
+unchanged.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+
+Modifications made in this repository
+-------------------------------------
+
+Section 4(b) of the License requires modified files to carry prominent notice that
+they were changed. `SKILL.md` and `references/techniques.md` are changed from
+upstream. The changes:
+
+  * **The `DESIGN.md` carve-out** (`SKILL.md`) — a committed brand spec in the
+    project overrides this skill's own font and colour rules. Not upstream.
+  * **"posters"** added to the description's list of surfaces.
+  * **A References section** pointing at `references/techniques.md`.
+  * **`references/techniques.md`** — not upstream; written here.
+  * The body is based on an earlier revision of the upstream skill. Upstream has
+    since been rewritten and now reads differently; this copy has not been rebased
+    onto it.
+
+The rest of this repository is MIT-licensed (see `LICENSE` at the repository root).
+That licence does not extend to this directory, and `design-track`'s `plugin.json`
+says so.

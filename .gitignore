@@ -1,0 +1,18 @@
+# Python bytecode from the skills' helper scripts — regenerated on every run
+__pycache__/
+*.py[cod]
+
+# macOS
+.DS_Store
+
+# the dashboard is a view, not a source — regenerate it, do not commit it
+factory/dashboard/dashboard.html
+
+# The registry is grove's — `$GROVE/tools/registry.json`, machine data about which repos
+# exist in THIS tree — and nothing here ships a copy or a template of it. Everything in
+# this repo reaches it through `factory/grove.py`, never through a path.
+#
+# This entry stays because a `factory/registry.json` is easy to create by hand (a symlink
+# to grove's, which is how one machine here was set up) and must never be committed:
+# it names real repos. It is ignored, not expected — no script reads it.
+factory/registry.json

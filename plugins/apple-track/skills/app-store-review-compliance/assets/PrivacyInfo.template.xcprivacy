@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  PrivacyInfo.xcprivacy template.
+  Add this file to the app target (and to any first-party bundled framework
+  that needs its own). Fill in only what is TRUE for the app — do not declare
+  data collection or tracking that does not happen.
+
+  NSPrivacyTracking: true only if the app tracks per the ATT definition.
+  NSPrivacyTrackingDomains: domains used for tracking (must be empty if
+    NSPrivacyTracking is false).
+  NSPrivacyCollectedDataTypes: each data type collected, why, and whether it is
+    linked to identity / used for tracking. See Apple's data-type constants.
+  NSPrivacyAccessedAPITypes: one entry per Required-Reason API category the code
+    uses, each with approved reason code(s).
+-->
+<plist version="1.0">
+<dict>
+    <key>NSPrivacyTracking</key>
+    <false/>
+
+    <key>NSPrivacyTrackingDomains</key>
+    <array/>
+
+    <key>NSPrivacyCollectedDataTypes</key>
+    <array/>
+
+    <key>NSPrivacyAccessedAPITypes</key>
+    <array>
+        <!-- Example: UserDefaults access. Remove if not used; the scanner
+             reports which categories the code actually triggers. -->
+        <dict>
+            <key>NSPrivacyAccessedAPIType</key>
+            <string>NSPrivacyAccessedAPICategoryUserDefaults</string>
+            <key>NSPrivacyAccessedAPITypeReasons</key>
+            <array>
+                <string>CA92.1</string>
+            </array>
+        </dict>
+    </array>
+</dict>
+</plist>
