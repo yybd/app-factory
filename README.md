@@ -8,6 +8,11 @@ Play, and outside them. Each one loads only where it is wanted.
 They are Claude Code plugins. You enable the tracks a repo needs, and a session opened
 there carries them; a session opened anywhere else does not.
 
+> **Built for Claude Code, and tested only there.** The scripts the skills run are
+> ordinary command-line tools any agent can call, but the loading — tracks, the
+> marketplace, `enable.py` — is Claude Code's plugin system, and most skills find their
+> scripts through `${CLAUDE_PLUGIN_ROOT}`, which only Claude Code sets.
+
 ```bash
 claude plugin marketplace add yybd/app-factory
 cd ~/code/my-app && python3 ~/.claude/plugins/marketplaces/app-factory/factory/enable.py

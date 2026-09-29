@@ -8,6 +8,11 @@
 הם תוספים של Claude Code. מפעילים את המסלולים שריפו צריך, וסשן שנפתח שם נושא אותם;
 סשן שנפתח במקום אחר לא.
 
+> **נבנה ל-Claude Code, ונבדק רק שם.** הסקריפטים שהסקילים מריצים הם כלי שורת פקודה
+> רגילים שכל סוכן יכול לקרוא להם, אבל הטעינה — המסלולים, ה-marketplace ו-`enable.py` —
+> היא מערכת התוספים של Claude Code, ורוב הסקילים מוצאים את הסקריפטים שלהם דרך
+> `${CLAUDE_PLUGIN_ROOT}`, שרק Claude Code מגדיר.
+
 ```bash
 claude plugin marketplace add yybd/app-factory
 cd ~/code/my-app && python3 ~/.claude/plugins/marketplaces/app-factory/factory/enable.py
