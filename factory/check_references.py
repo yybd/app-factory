@@ -149,9 +149,9 @@ _ANCHORS = None
 
 
 def VARS():
-    """One table, defined in grove_repo, shared with deploy. See anchors() there.
+    """One table, defined in guards_repo, shared with deploy. See anchors() there.
 
-    Empty when grove is not on this machine — a build runner has this repo and nothing
+    Empty when RepoGuards is not on this machine — a build runner has this repo and nothing
     else. Every `$ANCHOR` path then lands in UNSET and is reported rather than failed,
     which is the same answer this checker already gives for an anchor a tree has not
     set up yet. Crashing here would fail the whole check over a variable it cannot know.
@@ -161,11 +161,11 @@ def VARS():
         _ANCHORS = {}
         try:
             sys.path.insert(0, HERE)
-            from grove import scripts as _gs
+            from repo_guards import scripts as _gs
             g = _gs()
             if g:
                 sys.path.insert(0, g)
-                import grove_repo as fr
+                import guards_repo as fr
                 _ANCHORS = fr.anchors() or {}
         except Exception:
             pass

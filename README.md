@@ -108,7 +108,7 @@ listing text and its website are different repos, and a session stands in exactl
 them. Work left in another is not missing — it is invisible, which is how "done" gets
 said over a clean `git status`.
 
-That is [grove](https://github.com/yybd/cross-repo-guards): one registry that decides
+That is [RepoGuards](https://github.com/yybd/repo-guards): one registry that decides
 which tracks load where, and guards that refuse a write into a repo the session is not
 standing in. It is a separate marketplace, it is optional, and nothing here requires it.
 

@@ -115,7 +115,7 @@ Zero disagreements, or a written reason for each one that remains.
 
 `places.json`, beside this file, is the same list in a form a machine can read: the five
 places, how each one closes, which one must be entered rather than written from outside,
-and the order. `python3 $GROVE/tools/close.py --op price-sync` prints
+and the order. `python3 $REPO_GUARDS/tools/close.py --op price-sync` prints
 it and then runs the verifier, so "did every place get closed" and "do they still agree"
 are one question with one answer.
 

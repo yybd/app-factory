@@ -109,7 +109,7 @@ the exact paths it writes.
 
 This is worth knowing because a session sees one `git status`. Work left in another repo
 is not missing; it is **invisible**. The skills that do this declare their places for
-exactly that reason, and grove — a separate, optional marketplace — adds guards that
+exactly that reason, and RepoGuards — a separate, optional marketplace — adds guards that
 refuse a write into a repo the session is not in unless it was declared.
 
 ---

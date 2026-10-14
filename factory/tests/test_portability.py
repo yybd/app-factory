@@ -5,11 +5,11 @@
 The half of this question that belongs here is the one about the skills. A skill is
 **copied to the next machine verbatim and read as instruction**, so a path like
 `~/Developer/app-hub` inside one is not a convenience — it is a lie told to whoever
-installs it next. `$APP_HUB` is the form that survives, and grove's deploy is what makes
+installs it next. `$APP_HUB` is the form that survives, and RepoGuards' deploy is what makes
 the variable real.
 
 The other half — that a relative root in the registry resolves against the tree's base,
-and that the same registry works under a different base — is grove's, and its own
+and that the same registry works under a different base — is RepoGuards', and its own
 `tools/tests/test_portability.py` asks it by building a second machine in a tempdir.
 Asking it twice, in two repos, is how two answers to one question drift apart.
 """
@@ -121,26 +121,26 @@ def main():
               "; ".join(f"{w} [{n}]" for w, n in hits[:4])
               + (f" … +{len(hits) - 4}" if len(hits) > 4 else ""))
 
-    # The anchors a skill is allowed to stand on are the ones grove actually writes.
+    # The anchors a skill is allowed to stand on are the ones RepoGuards actually writes.
     # A skill saying `$STORE_ROOT` is as unportable as a hardcoded path — it expands to
     # nothing, silently, and the skill reads as if it named a directory.
     print("\n-- and the anchors they stand on --")
-    from grove import scripts as grove_scripts
-    gs = grove_scripts()
+    from repo_guards import scripts as guards_scripts
+    gs = guards_scripts()
     if not gs:
         # Not a failure: a build runner has a checkout and nothing else, and this half of
-        # the test needs grove to say which anchors a deploy actually writes. Skipped
+        # the test needs RepoGuards to say which anchors a deploy actually writes. Skipped
         # loudly, so it cannot quietly stop being checked anywhere.
-        print("· skipped — grove is not on this machine, so the anchor list is unknown")
+        print("· skipped — RepoGuards is not on this machine, so the anchor list is unknown")
     else:
         sys.path.insert(0, gs)
-        import grove_repo as fr
+        import guards_repo as fr
         # The anchors a skill here is entitled to stand on. The live registry's names are
         # added, but they cannot be the whole answer: on a FRESH CLONE the registry holds
         # only examples, so `$APP_HUB` would be reported as invented in exactly the
         # installation where a newcomer runs this first. These six are the contract —
         # written by a deploy on any tree that has them, and documented in the README.
-        CONTRACT = {"DEV_ROOT", "GROVE", "APP_FACTORY", "APP_HUB", "SITE", "KEYS_ROOT"}
+        CONTRACT = {"DEV_ROOT", "REPO_GUARDS", "APP_FACTORY", "APP_HUB", "SITE", "KEYS_ROOT"}
         known = set(fr.anchors(None) or {}) | CONTRACT
         # Shell variables a skill defines in its own snippet, and the plugin runtime's
         # own. They look identical to an anchor and are not one.

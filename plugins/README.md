@@ -23,7 +23,7 @@ marketplace (`app-factory`). One directory per track.
 ## Two facts that decide everything else
 
 **1. Which repos load which track is decided by the registry**, through each repo's own
-`.claude/settings.json`. The registry is grove's, and `python3 factory/deploy.py` is what
+`.claude/settings.json`. The registry is RepoGuards', and `python3 factory/deploy.py` is what
 turns it into those files.
 
 **2. What loads is not this folder — it is a snapshot of it.** Installation copied the
@@ -43,8 +43,8 @@ updating when a byte comparison says the copy is still stale.
 That mechanism — the two registrations, why old versions
 stay under `.in_use/`, what enters a session's context and what does not, the two routes
 to enabling a track globally, and the guard that notices when the copy and the repo have
-diverged — is one subject and it is documented once, in **grove**: its `plugins/README.md`.
-Grove owns the deployment and ships the guard; describing it again here would be two
+diverged — is one subject and it is documented once, in **RepoGuards**: its `plugins/README.md`.
+RepoGuards owns the deployment and ships the guard; describing it again here would be two
 accounts of one thing, drifting.
 
 **What belongs to this repo** is what those tracks contain, which track a repo should

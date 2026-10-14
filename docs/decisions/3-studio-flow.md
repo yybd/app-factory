@@ -36,7 +36,7 @@ The mechanics are global · the content is in the hub · the site is in the site
 
 **Nothing is global.** The skills live in `$APP_FACTORY/plugins/`, installed as a
 marketplace, and each track is enabled **per repo** — in that repo's own
-`.claude/settings.json`, written by `factory/enable.py` or by grove's registry. A repo
+`.claude/settings.json`, written by `factory/enable.py` or by RepoGuards' registry. A repo
 that enabled nothing loads nothing. The exceptions are a site repo's own skills, which
 are tied to its tree and never leave it.
 

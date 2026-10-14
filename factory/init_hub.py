@@ -25,14 +25,14 @@ import argparse, json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from grove import scripts as _grove_scripts, MISSING as _GROVE_MISSING   # noqa: E402
+from repo_guards import scripts as _guards_scripts, MISSING as _GUARDS_MISSING   # noqa: E402
 
 
-class _Grove:
-    """grove_repo, resolved on first use instead of at import.
+class _Guards:
+    """guards_repo, resolved on first use instead of at import.
 
-    This block used to call `sys.exit()` at module level when grove was not on the
-    machine. That is the right answer for a run — this script reads grove's registry
+    This block used to call `sys.exit()` at module level when RepoGuards was not on the
+    machine. That is the right answer for a run — this script reads RepoGuards' registry
     and cannot work without it — but it is the wrong answer for `--help`, which
     exited the same way. So on a machine with only this repo, the script could not
     even say what it was for, and `check_scripts.py`'s usage check failed on it.
@@ -44,17 +44,17 @@ class _Grove:
     _mod = None
 
     def __getattr__(self, name):
-        if _Grove._mod is None:
-            s = _grove_scripts()
+        if _Guards._mod is None:
+            s = _guards_scripts()
             if not s:
-                sys.exit("\u2717 " + _GROVE_MISSING)
+                sys.exit("\u2717 " + _GUARDS_MISSING)
             sys.path.insert(0, s)
-            import grove_repo
-            _Grove._mod = grove_repo
-        return getattr(_Grove._mod, name)
+            import guards_repo
+            _Guards._mod = guards_repo
+        return getattr(_Guards._mod, name)
 
 
-fr = _Grove()
+fr = _Guards()
 
 # What the skills look for at the hub root, and what depends on each. Kept here rather
 # than in prose so the report and `--create` can never describe different things.
@@ -205,7 +205,7 @@ def report(root):
     if not os.path.isdir(root):
         print("  ✗ does not exist.\n")
         print("  Create it:            python3 factory/init_hub.py --create")
-        print("  Or point at one:      edit `app-hub` in $GROVE/tools/registry.json")
+        print("  Or point at one:      edit `app-hub` in $REPO_GUARDS/tools/registry.json")
         print("\n  32 of the 39 skills can read it — and every one works without it.")
         return 1
     missing = [(f, why) for f, why, _ in ROOT_FILES if not os.path.exists(os.path.join(root, f))]
@@ -263,12 +263,12 @@ def create(root, slug=None):
 
 
 def hub_root():
-    """$APP_HUB, else $DEV_ROOT/app-hub, else where grove's registry says.
+    """$APP_HUB, else $DEV_ROOT/app-hub, else where RepoGuards' registry says.
 
     `app-hub` is the name the skills assume. The environment is read first because it
     is the contract the skills themselves read (`docs/contracts/hub.md`), and because
     a machine with only this repo has no registry — QUICKSTART's "you do not need
-    grove" was false at exactly this line.
+    RepoGuards" was false at exactly this line.
     """
     env = os.environ.get("APP_HUB")
     if env:
@@ -276,7 +276,7 @@ def hub_root():
     base = os.environ.get("DEV_ROOT")
     if base:
         return os.path.join(os.path.expanduser(base), "app-hub")
-    if not _grove_scripts():
+    if not _guards_scripts():
         return None
     try:
         with open(fr.registry_path(), encoding="utf-8") as f:

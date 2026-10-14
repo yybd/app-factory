@@ -57,7 +57,7 @@ set -euo pipefail
 
 slug="${1:-}"; version="${2:-}"; app_repo="${3:-}"
 # The hub's location is $APP_HUB, written into the environment by the deploy from
-# grove's registry; $DEV_ROOT/app-hub is the layout the install instructions produce.
+# RepoGuards' registry; $DEV_ROOT/app-hub is the layout the install instructions produce.
 # A hardcoded home-directory path is neither, and was the default here — correct on
 # the machine it was written on, silently wrong on every other, and invisible to
 # test_portability, which used to scan only .md and .json.

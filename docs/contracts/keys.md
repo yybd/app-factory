@@ -85,10 +85,10 @@ only one: set it in your shell, or in `~/.claude/settings.json` under `env`, and
 resolver and every tool here reads it. `factory/init_keys.py --create` makes the folder
 and tells you what to set.
 
-Two fallbacks exist for a tree that has grove: `keys_root` in its registry, relative to
+Two fallbacks exist for a tree that has RepoGuards: `keys_root` in its registry, relative to
 the tree's base, and failing that a `keys` folder beside the other repos —
 `factory/deploy.py` then writes the variable into the machine's settings so a shell has
-it too. Neither is required, and nothing here fails for want of grove.
+it too. Neither is required, and nothing here fails for want of RepoGuards.
 
 ## What this does not protect against
 

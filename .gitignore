@@ -8,11 +8,11 @@ __pycache__/
 # the dashboard is a view, not a source — regenerate it, do not commit it
 factory/dashboard/dashboard.html
 
-# The registry is grove's — `$GROVE/tools/registry.json`, machine data about which repos
+# The registry is RepoGuards' — `$REPO_GUARDS/tools/registry.json`, machine data about which repos
 # exist in THIS tree — and nothing here ships a copy or a template of it. Everything in
-# this repo reaches it through `factory/grove.py`, never through a path.
+# this repo reaches it through `factory/repo_guards.py`, never through a path.
 #
 # This entry stays because a `factory/registry.json` is easy to create by hand (a symlink
-# to grove's, which is how one machine here was set up) and must never be committed:
+# to RepoGuards', which is how one machine here was set up) and must never be committed:
 # it names real repos. It is ignored, not expected — no script reads it.
 factory/registry.json

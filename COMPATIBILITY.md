@@ -70,7 +70,7 @@ All of them are named — never held — in `$KEYS_ROOT/credentials.json`. See
 | | What it adds | Without it |
 |---|---|---|
 | **a data repo** ("hub") | one source of truth for listing text, media and prices across several apps | the app repo's own `fastlane/` is the source of truth, and the delivery skills detect that |
-| **grove** | per-repo track allocation from one registry, and guards against writing into the wrong repo | `factory/enable.py` enables tracks per repo; the guards are what you give up |
+| **RepoGuards** | per-repo track allocation from one registry, and guards against writing into the wrong repo | `factory/enable.py` enables tracks per repo; the guards are what you give up |
 | **a website** | a privacy URL you control, and app pages | the stores need a privacy URL that **resolves**; where it is hosted is nobody's business |
 
 ---

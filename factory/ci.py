@@ -13,8 +13,8 @@ there would report problems that are not problems.
 
 What is left when you remove the machine is what a **push** should be gated on: the
 checks that read files, and the tests. That set is this file, and it runs **without
-grove** — a runner that has only this repo still gets an answer, and the one check that
-genuinely needs grove says out loud that it was skipped.
+RepoGuards** — a runner that has only this repo still gets an answer, and the one check that
+genuinely needs RepoGuards says out loud that it was skipped.
 
 **It installs nothing and touches no settings.**
 """
@@ -191,7 +191,7 @@ def main():
         skipped = sum(1 for ln in out.splitlines() if ln.startswith("· skipped"))
         note = f"{n} checks" + (f", {skipped} skipped" if skipped else "")
         # A test that ran zero checks and exited 0 is not a pass; it is a test that
-        # did not happen. On a runner without grove `test_init_hub` skips itself
+        # did not happen. On a runner without RepoGuards `test_init_hub` skips itself
         # entirely, and it showed as ✓ in every CI run — a gate that never closed.
         # Not a failure (the skip is legitimate and says why), but not a tick either.
         sym = "✓" if rc == 0 and n else ("✗" if rc else "·")

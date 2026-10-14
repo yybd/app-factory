@@ -12,7 +12,7 @@ python3 factory/ci.py
 ```
 
 Everything that needs no installation: the checkers, the tests, the manifests. It runs
-without grove and without a hub — a clean checkout gets an answer. It is what CI runs,
+without RepoGuards and without a hub — a clean checkout gets an answer. It is what CI runs,
 and a change that does not pass it is not ready.
 
 After changing anything under `plugins/` or the registry:

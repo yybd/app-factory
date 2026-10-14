@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Turn on the right tracks for one repo — without needing grove.
+"""Turn on the right tracks for one repo — without needing RepoGuards.
 
     cd <your app repo>
     python3 <this file>            # look, propose, ask
@@ -19,7 +19,7 @@ machine, which is how a website session ends up carrying App Store skills. The f
 per-repo enablement, and Claude Code supports it: `enabledPlugins` in the repo's own
 `.claude/settings.json` turns a track on there and nowhere else.
 
-Grove does this from a central registry, which is the right answer for someone with ten
+RepoGuards does this from a central registry, which is the right answer for someone with ten
 repos. For one app it is two extra installs and a registry to learn, and that is where a
 reader following the README gave up — or worse, did not, and ended with a machine where
 no skill loaded and nothing said so.

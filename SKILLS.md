@@ -14,9 +14,9 @@ For how loading and deployment work, see [HOW-IT-WORKS.md](HOW-IT-WORKS.md).
 
 Skills are grouped into tracks, and a track is enabled **per repo**, in that repo's own
 `.claude/settings.json` — written by `factory/enable.py`, or from one central registry
-when grove is installed.
+when RepoGuards is installed.
 
-**The guards are not here.** `grove` is its own marketplace and is **optional**. It
+**The guards are not here.** `RepoGuards` is its own marketplace and is **optional**. It
 decides where tracks load from one central registry, which is the right answer once you
 work across several repos. Without it, `factory/enable.py` enables tracks per repo.
 
@@ -82,7 +82,7 @@ loads no skills, and looks identical to a repo where the skills decided they wer
 relevant. Both are silence. The hook says so once per repo, and the skill turns the
 right tracks on.
 
-With grove installed, its `register-project` and `deploy` skills do the same job from a
+With RepoGuards installed, its `register-project` and `deploy` skills do the same job from a
 central registry, for someone working across many repos. Neither is required.
 
 ### Local skills

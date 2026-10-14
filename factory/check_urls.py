@@ -25,14 +25,14 @@ import argparse, os, re, sys, urllib.error, urllib.request
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from grove import scripts as _grove_scripts, MISSING as _GROVE_MISSING   # noqa: E402
+from repo_guards import scripts as _guards_scripts, MISSING as _GUARDS_MISSING   # noqa: E402
 
 
-class _Grove:
-    """grove_repo, resolved on first use instead of at import.
+class _Guards:
+    """guards_repo, resolved on first use instead of at import.
 
-    This block used to call `sys.exit()` at module level when grove was not on the
-    machine. That is the right answer for a run — this script reads grove's registry
+    This block used to call `sys.exit()` at module level when RepoGuards was not on the
+    machine. That is the right answer for a run — this script reads RepoGuards' registry
     and cannot work without it — but it is the wrong answer for `--help`, which
     exited the same way. So on a machine with only this repo, the script could not
     even say what it was for, and `check_scripts.py`'s usage check failed on it.
@@ -44,17 +44,17 @@ class _Grove:
     _mod = None
 
     def __getattr__(self, name):
-        if _Grove._mod is None:
-            s = _grove_scripts()
+        if _Guards._mod is None:
+            s = _guards_scripts()
             if not s:
-                sys.exit("\u2717 " + _GROVE_MISSING)
+                sys.exit("\u2717 " + _GUARDS_MISSING)
             sys.path.insert(0, s)
-            import grove_repo
-            _Grove._mod = grove_repo
-        return getattr(_Grove._mod, name)
+            import guards_repo
+            _Guards._mod = guards_repo
+        return getattr(_Guards._mod, name)
 
 
-fr = _Grove()
+fr = _Guards()
 
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/120.0 Safari/537.36")
@@ -65,14 +65,14 @@ TIMEOUT = 10
 def hub_data():
     """The hub's DATA.md, where the studio's URLs are declared. None when there is none.
 
-    $APP_HUB first, then $DEV_ROOT/app-hub, then grove's registry — the same order the
-    skills use, so a machine without grove gets the same answer they do.
+    $APP_HUB first, then $DEV_ROOT/app-hub, then RepoGuards' registry — the same order the
+    skills use, so a machine without RepoGuards gets the same answer they do.
     """
     root = os.environ.get("APP_HUB")
     root = os.path.expanduser(root) if root else None
     if not root and os.environ.get("DEV_ROOT"):
         root = os.path.join(os.path.expanduser(os.environ["DEV_ROOT"]), "app-hub")
-    if not root and _grove_scripts():
+    if not root and _guards_scripts():
         try:
             import json
             with open(fr.registry_path(), encoding="utf-8") as f:

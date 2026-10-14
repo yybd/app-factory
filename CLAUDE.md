@@ -3,23 +3,23 @@
 # Factory rules
 
 Loaded **in addition to** `~/.claude/CLAUDE.md`, not instead of it. On this machine that
-file points at grove's own global rules rather than at anything here; on a
-machine without grove it is whatever the user wrote. Either way the global rules apply,
+file points at RepoGuards' own global rules rather than at anything here; on a
+machine without RepoGuards it is whatever the user wrote. Either way the global rules apply,
 and what follows adds to them.
 
-**Grove is the other half of the maintainer's setup, and it is optional for everyone
+**RepoGuards is the other half of the maintainer's setup, and it is optional for everyone
 else.** The guards, the registry, the anchors and `close.py` live in the
 `cross-repo-guards` repo and install as their own marketplace. This repo is the app
 skills: what builds, describes and ships an app. Anything below about crossing a repo
-boundary is grove's, and is named here only because it applies while you work in this
+boundary is RepoGuards', and is named here only because it applies while you work in this
 one — a person who installed the skills alone runs none of it.
 
 ## The tools in this repo
 
-`factory/README.md` indexes every script and says which need grove. The four that come
+`factory/README.md` indexes every script and says which need RepoGuards. The four that come
 up constantly: **`factory/ci.py`** (everything checkable without installing — run it
 before saying anything is done), **`factory/deploy.py`** (this machine's copies; needs
-grove), **`factory/enable.py`** (tracks for one repo; a shim for
+RepoGuards), **`factory/enable.py`** (tracks for one repo; a shim for
 `plugins/factory-setup/scripts/enable.py`, which is the file that ships), and
 **`factory/bump_version.py`** (the version, in all eight places, plus the release steps).
 
@@ -60,7 +60,7 @@ there are two steps nobody takes for you, and one of them is opening a new sessi
 2026-09-09 this happened twice in one hour: a guard was fixed, committed, reported as
 fixed — and the machine went on running the broken code.
 
-**After any change under `plugins/` or to grove's registry (`$GROVE/tools/registry.json`):**
+**After any change under `plugins/` or to RepoGuards' registry (`$REPO_GUARDS/tools/registry.json`):**
 
 ```bash
 python3 factory/deploy.py
@@ -68,7 +68,7 @@ python3 factory/deploy.py
 
 It syncs the settings files from the registry, refreshes the installed copies,
 installs the `commit-msg` hook, and verifies. `--check` answers "is everything in
-place?" without changing anything. The equivalent inside a session is `/grove:deploy`.
+place?" without changing anything. The equivalent inside a session is `/repo-guards:deploy`.
 
 The hook is there because `core.hooksPath` is per-clone git config and is never
 committed: a fresh checkout has the commit-message check off and nothing says so.
@@ -85,10 +85,10 @@ deployment, and with the sentence that it takes effect **in the next session**.
 
 **A session sees one `git status`.** What you left open anywhere else is not missing —
 it is **invisible**, which is how "done" gets said over a clean status while the rest
-sits open. The answer lives in grove:
+sits open. The answer lives in RepoGuards:
 
 ```bash
-python3 $GROVE/tools/close.py
+python3 $REPO_GUARDS/tools/close.py
 ```
 
 It reports every place the session touched, stages only paths the session actually
@@ -132,11 +132,11 @@ Its first run found two READMEs saying 40 skills and 35.
 
 ## The guards
 
-**They are grove's, and they are on while you work here.** `honor_ownership` refuses a
+**They are RepoGuards', and they are on while you work here.** `honor_ownership` refuses a
 write to a path a place declared in its own `.claude/owns.json`; `scope_foreign_commits`
 refuses `commit -a`, `add .` and `push` into a repo this session is not standing in, and
 hands back that repo's `git status` when it allows a foreign write. The rest report.
 
 What that means for this repo: **a skill that writes into another repo must name exact
 paths**, and a skill that owns files should say so in that repo's `owns.json`. The full
-account, the pipelines, and what the guards cannot see are in grove.
+account, the pipelines, and what the guards cannot see are in RepoGuards.

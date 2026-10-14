@@ -14,14 +14,14 @@ SCRIPT = os.path.join(FACTORY, "init_hub.py")
 
 
 def main():
-    # init_hub resolves the hub's root through grove_repo, so without grove there is
+    # init_hub resolves the hub's root through guards_repo, so without RepoGuards there is
     # nothing to test rather than something failing. Skipped loudly: a build runner has
     # this repo alone, and a test that quietly reports success there would be worse than
     # one that is not run.
     sys.path.insert(0, FACTORY)
-    from grove import scripts as grove_scripts
-    if not grove_scripts():
-        print("· skipped — grove is not on this machine, and init_hub reads its registry")
+    from repo_guards import scripts as guards_scripts
+    if not guards_scripts():
+        print("· skipped — RepoGuards is not on this machine, and init_hub reads its registry")
         return 0
 
     base = os.path.realpath(tempfile.mkdtemp(prefix="factory-hub-test-"))
@@ -41,7 +41,7 @@ def main():
         # registry path.
         env = {k: v for k, v in os.environ.items() if k not in ("APP_HUB", "DEV_ROOT")}
         p = subprocess.run([sys.executable, SCRIPT] + list(args), capture_output=True,
-                           text=True, timeout=30, env=dict(env, GROVE_REGISTRY=reg, **extra))
+                           text=True, timeout=30, env=dict(env, REPO_GUARDS_REGISTRY=reg, **extra))
         return p.returncode, p.stdout + p.stderr
 
     try:
@@ -52,7 +52,7 @@ def main():
         check("--create" in out, "and offers to create it")
         check("registry.json" in out, "or to point the registry elsewhere")
         check(not os.path.exists(gone), "reporting creates nothing")
-        # A machine without grove sets $APP_HUB and has no registry; the variable must
+        # A machine without RepoGuards sets $APP_HUB and has no registry; the variable must
         # be the answer, and the registry must not even be consulted.
         elsewhere = os.path.join(base, "elsewhere")
         rc, out = run(gone, APP_HUB=elsewhere)

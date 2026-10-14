@@ -132,7 +132,7 @@ is overhead, and every skill that can use a hub works without one: the repo's ow
 `fastlane/` is the source of truth instead, and the delivery skills detect that and say
 so. When you want one: `python3 $AF/factory/init_hub.py --create`.
 
-**Grove.** A separate marketplace that decides which tracks load where from one central
+**RepoGuards.** A separate marketplace that decides which tracks load where from one central
 registry, and guards a session from writing into a repo it is not standing in. It is
 the right answer once you are working across several repos at once. It is not required,
 and nothing here depends on it.

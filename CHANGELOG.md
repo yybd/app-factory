@@ -14,6 +14,19 @@ skill does.
 
 ## Unreleased
 
+## 0.4.1
+
+A patch: no skill does anything different. Grove, the optional multi-repo layer, is
+now called RepoGuards (its 0.2.0), and every reference here follows.
+
+- **The anchor is `$REPO_GUARDS`.** `$GROVE` is still read, and RepoGuards 0.2.0 still
+  writes it, for one release.
+- **The module that finds it is `factory/repo_guards.py`** (formerly grove.py). It finds the checkout beside this
+  repo as `repo-guards` (a fresh clone) or `cross-repo-guards` (an older one), and
+  imports `guards_repo` from it — so it needs RepoGuards 0.2.0 or later.
+- **The commands are `/repo-guards:deploy` and `/repo-guards:register-project`.**
+- Links point at `github.com/yybd/repo-guards`; the old address redirects.
+
 ## 0.4.0
 
 A minor bump: two Android skills do something they did not do before. The first

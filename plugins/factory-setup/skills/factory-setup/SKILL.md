@@ -94,7 +94,7 @@ nothing at all. Enable it where you actually work — a monorepo with an app in
   checkout makes the credentials folder; `factory/init_hub.py` makes a hub, if you
   want one.
 - For many repos at once, and for the guards that keep a session from writing into the
-  wrong one, that is [grove](https://github.com/yybd/cross-repo-guards) — a separate
+  wrong one, that is [RepoGuards](https://github.com/yybd/repo-guards) — a separate
   marketplace this one does not require.
 
 ## Related skills

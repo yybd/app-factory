@@ -50,13 +50,13 @@ what to do instead.
 
 A website's own skills — building a page for an app, translating a cluster, writing a
 reference page — are **local to that repo** and are not part of the factory. That is the
-rule from `docs/skills/1-skill-placement` (in grove) applied
+rule from `docs/skills/1-skill-placement` (in RepoGuards) applied
 honestly: they act entirely inside one tree and cannot run anywhere else, so shipping them
 globally would load them in every session that will never use them.
 
 Seven shipped skills *refer* to a website skill by name. That is the correct cross-plugin
 form — the caller names the skill, and the skill resolves its own paths when it runs. See
-`3-script-references` (in grove).
+`3-script-references` (in RepoGuards).
 
 ---
 

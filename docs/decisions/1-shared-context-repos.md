@@ -9,7 +9,7 @@
 
 ## The question
 
-Grove's placement rule — *where a skill lives*, in its `docs/skills/` — says **global**
+RepoGuards' placement rule — *where a skill lives*, in its `docs/skills/` — says **global**
 if it needs to load everywhere, **local** if the skill is *"tied to one tree and cannot
 run anywhere else at all"*.
 
@@ -91,7 +91,7 @@ reconciles a price across all of them at once.
 **Hence: the copies in `app-hub` are redundant, and this repo is the source of
 truth.** And not merely redundant — `store-metadata-writer` there was measured to have
 **diverged and broken**: it referred to `~/.claude/skills/copy-edit/scripts/measure_copy.py`,
-a path deleted in the migration. Grove's version uses `${CLAUDE_PLUGIN_ROOT}` and
+a path deleted in the migration. RepoGuards' version uses `${CLAUDE_PLUGIN_ROOT}` and
 is correct.
 
 ---
@@ -146,4 +146,4 @@ in it**, and that is a correction needed anyway.
 | **"A skill that touches the hub belongs to the hub"** | 31 of 35 touch it. The rule would have emptied this repo |
 | **"A skill that serves all the apps is global"** | close, but wrong at the edge: a skill that maintains the hub's **structure** serves them all and still acts on one tree, and belongs there |
 | **Keeping a copy in each repo "for convenience"** | *"it does no harm there" is not a criterion* — this repo's own rule. And it was measured to do harm: two of the copies had diverged, and one of them was broken |
-| **Duplicating deliberately and syncing** | syncing between repos is exactly what staleness — measured in grove's cross-repo docs — shows does not happen |
+| **Duplicating deliberately and syncing** | syncing between repos is exactly what staleness — measured in RepoGuards' cross-repo docs — shows does not happen |

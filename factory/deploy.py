@@ -11,17 +11,17 @@ still running the old copy.
     python3 factory/deploy.py           sync, refresh the copies, verify
     python3 factory/deploy.py --check   report only, change nothing
 
-**This is the maintainer's tool, and it needs grove.** Step 1 reads grove's registry
+**This is the maintainer's tool, and it needs RepoGuards.** Step 1 reads RepoGuards' registry
 to decide which repo loads which track, so without that checkout the run stops — which
 is correct for the person editing this repo and wrong for anyone else, so: **nobody
 installing these skills ever runs this.** They run `claude plugin install`, and
 `factory/enable.py` for the per-repo setting. That distinction was in no document, and
-the failure message read as "go install grove".
+the failure message read as "go install RepoGuards".
 
 Four steps, in this order, because each one's output is the next one's input:
 
 1. **The registry into the settings files.** Which tracks a repo loads is declared in
-   grove's registry and written into each repo's .claude/settings.json. Do this
+   RepoGuards' registry and written into each repo's .claude/settings.json. Do this
    first: refreshing a copy before the settings that decide whether it loads at all
    just means doing it twice.
 
@@ -52,16 +52,16 @@ import argparse, glob, json, os, shutil, subprocess, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-import grove as _grove                                         # noqa: E402
-SCRIPTS = _grove.scripts()
-GROVE = _grove.root()
+import repo_guards as _guards                                         # noqa: E402
+SCRIPTS = _guards.scripts()
+GUARDS_ROOT = _guards.root()
 MARKETPLACE = "app-factory"
-# warn_stale_plugin_cache is grove's and answers about grove unless told otherwise. It is
+# warn_stale_plugin_cache is RepoGuards' and answers about RepoGuards unless told otherwise. It is
 # imported in-process below, so the environment has to say which repo and which
-# marketplace BEFORE that import — set after the fact, it compares grove against grove
+# marketplace BEFORE that import — set after the fact, it compares RepoGuards against RepoGuards
 # and reports "everything matches" about a tree it never looked at.
-os.environ.setdefault("GROVE_REPO", REPO)
-os.environ.setdefault("GROVE_MARKETPLACE", MARKETPLACE)
+os.environ.setdefault("REPO_GUARDS_REPO", REPO)
+os.environ.setdefault("REPO_GUARDS_MARKETPLACE", MARKETPLACE)
 INSTALLED = os.path.expanduser("~/.claude/plugins/installed_plugins.json")
 CACHE = os.path.expanduser("~/.claude/plugins/cache")
 if SCRIPTS:
@@ -160,17 +160,17 @@ def main():
     a = ap.parse_args()
     problems = 0
 
-    # The registry, the guards and the anchors are grove's. This repo is a marketplace
+    # The registry, the guards and the anchors are RepoGuards'. This repo is a marketplace
     # that stands on them, and runs THEIR control plane against its own checkout rather
     # than keeping a second copy — two copies of one answer is how the two drift.
-    if not GROVE:
-        print("✗ " + _grove.MISSING)
+    if not GUARDS_ROOT:
+        print("✗ " + _guards.MISSING)
         return 2
-    env = dict(os.environ, GROVE_REPO=REPO, GROVE_MARKETPLACE="app-factory",
-               GROVE_PLUGINS=os.path.join(REPO, "plugins"))
+    env = dict(os.environ, REPO_GUARDS_REPO=REPO, REPO_GUARDS_MARKETPLACE="app-factory",
+               REPO_GUARDS_PLUGINS=os.path.join(REPO, "plugins"))
 
     print("── 1. the registry → the settings files ──")
-    rc, out = sh([sys.executable, _grove.tool("sync_project_settings.py")]
+    rc, out = sh([sys.executable, _guards.tool("sync_project_settings.py")]
                  + (["--check"] if a.check else []), env=env)
     # Everything except the rows that say "already synced". Printing only the last three
     # lines meant that with 11 registered repos you saw two arbitrary "=" rows, and a
@@ -289,7 +289,7 @@ def main():
     # no reason to be told about one on every deploy. An app in the registry is what makes
     # it relevant, because every app skill reads it.
     try:
-        with open(os.path.join(GROVE, "tools", "registry.json"), encoding="utf-8") as f:
+        with open(os.path.join(GUARDS_ROOT, "tools", "registry.json"), encoding="utf-8") as f:
             _reg = json.load(f)
         _has_apps = any(not k.startswith("_") and isinstance(v, dict)
                         for k, v in (_reg.get("apps") or {}).items())
@@ -353,7 +353,7 @@ def main():
             if ln.strip() and not ln.startswith(("Checked ", "Outside the standard library")):
                 print("   " + ln.rstrip())
         problems += 1
-    rc, out = sh([sys.executable, _grove.tool("verify_guards.py")], env=env)
+    rc, out = sh([sys.executable, _guards.tool("verify_guards.py")], env=env)
     for ln in out.splitlines():
         if ln.startswith(("  ✗", "✗")) or "failed" in ln:
             print("   " + ln.strip())

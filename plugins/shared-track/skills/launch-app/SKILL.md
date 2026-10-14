@@ -77,7 +77,7 @@ has been leaking into `profile.md` — "Waiting on the next App Store version re
 Measured 2026-09-09: **19 apps in the hub, one README.** The one that exists was
 written by hand during a launch that hit real friction, and no one wrote the other
 eighteen. A state file that depends on human discipline becomes eighteen empty files
-and one stale one, which is worse than none — see the cross-repo docs in grove.
+and one stale one, which is worse than none — see the cross-repo docs in RepoGuards.
 
 So: **update it as each stage closes, in the same session that closed it.** Not at
 the end, not "when there is something to report". A stage that closed and was not
@@ -154,7 +154,7 @@ first run, and no auto-updater at all because Sparkle is macOS-only.
   route, 3 gates 6 and therefore gates the release.
 
 **Three of these force a session move**, and they alternate: app repo → site → app
-repo → site. That is not a flaw to route around — it is the cross-repo problem grove documents, the
+repo → site. That is not a flaw to route around — it is the cross-repo problem RepoGuards documents, the
 problem this whole factory is built on. Do not try to make it atomic.
 
 ## At every hand-off, do three things

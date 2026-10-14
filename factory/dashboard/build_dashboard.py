@@ -26,21 +26,21 @@ PLUGINS = os.path.join(ROOT, "plugins")
 # as protected on the strength of an empty leftover directory — the same wrong answer
 # the guard was giving, in a second copy of the rule.
 sys.path.insert(0, os.path.join(ROOT, "factory"))
-from grove import scripts as _grove_scripts, MISSING as _GROVE_MISSING   # noqa: E402
-_s = _grove_scripts()
+from repo_guards import scripts as _guards_scripts, MISSING as _GUARDS_MISSING   # noqa: E402
+_s = _guards_scripts()
 if not _s:
-    # The dashboard is a view over grove's registry — which repos are protected, what
+    # The dashboard is a view over RepoGuards' registry — which repos are protected, what
     # each session pays — and has no meaning on a machine with one repo and no
     # registry. Saying that is better than the generic message, which read as "install
-    # grove" to a reader the QUICKSTART had just told did not need it.
-    sys.exit("\u2717 the dashboard reads grove's registry (which repos exist, what each "
-             "enables), so it needs grove.\n  It is the maintainer's view of a "
-             "multi-repo tree; nothing a single repo needs is in it.\n  " + _GROVE_MISSING)
+    # RepoGuards" to a reader the QUICKSTART had just told did not need it.
+    sys.exit("\u2717 the dashboard reads RepoGuards' registry (which repos exist, what each "
+             "enables), so it needs RepoGuards.\n  It is the maintainer's view of a "
+             "multi-repo tree; nothing a single repo needs is in it.\n  " + _GUARDS_MISSING)
 sys.path.insert(0, _s)
-from grove_repo import (projects as reg_projects, apps as reg_apps, has_local_skills,  # noqa: E402
+from guards_repo import (projects as reg_projects, apps as reg_apps, has_local_skills,  # noqa: E402
                         resolve_root, registry_path)
-# The registry is grove's, and grove_repo is the one thing that knows where it sits —
-# $GROVE_REGISTRY, else the checkout it finds. This used to be a hardcoded
+# The registry is RepoGuards', and guards_repo is the one thing that knows where it sits —
+# $REPO_GUARDS_REGISTRY, else the checkout it finds. This used to be a hardcoded
 # `factory/registry.json`, which resolves only on a machine where someone had made that
 # path a symlink by hand: it is gitignored and ships with no clone, so the dashboard was
 # the one script here that could not run on a fresh install.
@@ -103,7 +103,7 @@ def collect_cost():
     """What a track costs a session that loads it, per track.
 
     A skill's DESCRIPTION sits in context always; its body is read only when the skill
-    fires. So this counts descriptions — see docs/skills/2-global-cost.md in grove, which
+    fires. So this counts descriptions — see docs/skills/2-global-cost.md in RepoGuards, which
     prices the two and measures the ratio.
 
     Counted from the repo, not from the installed copies: the question a factory
@@ -335,7 +335,7 @@ def render(skills, cost, prev, projects, apps, remote, out):
 
     # Cost goes above the skill inventory on purpose: the inventory says what exists,
     # this says what it charges for existing, and the second is the one nobody asks.
-    # NOT "every session": since the split these tracks are opt-in per repo — only grove
+    # NOT "every session": since the split these tracks are opt-in per repo — only RepoGuards
     # is on everywhere. This is the bill a repo pays for the tracks the registry gave it.
     tot_c = sum(r["chars"] for r in cost)
     tot_t = round(tot_c / CHARS_PER_TOKEN)
@@ -361,7 +361,7 @@ def render(skills, cost, prev, projects, apps, remote, out):
              "for the exact number. Counted from the repo, not from the installed copies, which may lag. "
              "A track loads only where the registry enables it; the total below is a repo "
              "that carries all of them. "
-             "Background: <code>docs/skills/2-global-cost.md</code>, in grove.</div>")
+             "Background: <code>docs/skills/2-global-cost.md</code>, in RepoGuards.</div>")
     p.append("<div class=scroll><table><tr><th>track</th><th>skills</th>"
              "<th>description chars</th><th>≈ tokens</th><th>share</th><th></th></tr>")
     for r in cost:
@@ -451,7 +451,7 @@ def main():
     ap.add_argument("-o", "--out", default=os.path.join(ROOT, "factory", "dashboard", "dashboard.html"))
     a = ap.parse_args()
     if not REGISTRY:
-        sys.exit("✗ " + _GROVE_MISSING)
+        sys.exit("✗ " + _GUARDS_MISSING)
     try:
         reg = json.load(open(REGISTRY, encoding="utf-8"))
     except Exception as e:

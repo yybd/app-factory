@@ -104,7 +104,7 @@ cd ~/code/my-app && python3 ~/.claude/plugins/marketplaces/app-factory/factory/e
 בחנות והאתר שלה הם ריפואים שונים, וסשן עומד בדיוק באחד מהם. עבודה שנשארה באחר אינה
 חסרה — היא **בלתי נראית**, וכך נאמר "סיימתי" מעל `git status` נקי.
 
-זה [grove](https://github.com/yybd/cross-repo-guards): רישום אחד שמחליט אילו מסלולים
+זה [RepoGuards](https://github.com/yybd/repo-guards): רישום אחד שמחליט אילו מסלולים
 נטענים איפה, ושומרים שמסרבים לכתיבה לריפו שהסשן לא עומד בו. זה מרקטפלייס נפרד, הוא
 אופציונלי, ושום דבר כאן לא דורש אותו.
 

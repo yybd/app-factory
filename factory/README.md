@@ -2,15 +2,15 @@
 
 Not a skill. The parts of this repo that are not themselves skills: deployment of
 the tracks, the checkers that run inside it, and the initialisers for what the shipping
-skills read. The registry and the guards moved to grove; `grove.py` is how this repo
+skills read. The registry and the guards moved to RepoGuards; `RepoGuards.py` is how this repo
 finds them.
 
 ## Every script here
 
-Two audiences, and the split is whether grove is needed. **A person who installed the
+Two audiences, and the split is whether RepoGuards is needed. **A person who installed the
 skills** runs only the first group; everything below it is the maintainer's.
 
-| | | needs grove |
+| | | needs RepoGuards |
 |---|---|---|
 | `enable.py` | turn tracks on for one repo (a shim — the tool ships in `plugins/factory-setup/scripts/`) | no |
 | `init_keys.py` | create the credentials folder, or point at an existing one | no, with `$KEYS_ROOT` |
@@ -29,7 +29,7 @@ skills** runs only the first group; everything below it is the maintainer's.
 | | | |
 | `deploy.py` | put this repo onto this machine: settings, cache, the commit-msg hook, verify | **yes** |
 | `dashboard/build_dashboard.py` | the maintainer's view of the whole tree | **yes** |
-| `grove.py` | find the grove checkout, or say it is not here | — |
+| `RepoGuards.py` | find the RepoGuards checkout, or say it is not here | — |
 
 ## The invariant
 
@@ -59,23 +59,23 @@ is the session in when I need it?"** — and that is the distinction that is eas
 miss: **writing reaches everywhere** through an absolute path, **loading does not**.
 The file will never stop you; the missing skill will, silently.
 
-## The registry — `$GROVE/tools/registry.json`
+## The registry — `$REPO_GUARDS/tools/registry.json`
 
-It is grove's file, and this repo reads it rather than keeping one: which repos exist in
+It is RepoGuards' file, and this repo reads it rather than keeping one: which repos exist in
 the tree, which tracks each loads, and — the part that matters here — the apps, with repo
 path, hub slug and the bundle id / package name per store. That is what makes
 `change_directory` and task-spawning reliable, and what the dashboard reads.
 
-`deploy.py` finds it through `factory/grove.py`, which tries `$GROVE`, then a
+`deploy.py` finds it through `factory/repo_guards.py`, which tries `$REPO_GUARDS`, then a
 `cross-repo-guards` checkout beside this one, then the installed plugin copy.
 
-## The guards are grove's
+## The guards are RepoGuards'
 
-Seven of them, shipped in the `grove` plugin and enabled at user scope, so they run in
+Seven of them, shipped in the `RepoGuards` plugin and enabled at user scope, so they run in
 every repo whether or not it is registered. Two block — a write to a path another place
 declared, and `commit -a` / `add .` / `push` into a repo the session is not standing in —
 and five report. Their pipelines, their fail-open rule and the reasoning behind each are
-in grove, next to the code.
+in RepoGuards, next to the code.
 
 **What concerns this repo** is the far side of the same boundary: a skill here that
 writes into another repo must name exact paths, because a sweep is refused by design.

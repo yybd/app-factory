@@ -8,7 +8,7 @@
 
 ## What is different here
 
-Grove's plan covers the same four cadences and the same clean-room argument; this one is
+RepoGuards' plan covers the same four cadences and the same clean-room argument; this one is
 about what is peculiar to a repo whose content is **38 skills that a model reads and
 follows**. Three things follow from that, and none of them is true of a guard:
 
@@ -28,9 +28,9 @@ follows**. Three things follow from that, and none of them is true of a guard:
 
 | when | what | who triggers it | cost |
 |---|---|---|---|
-| **every turn** | grove's Stop guards, in whatever repo you are standing in | automatic | milliseconds |
+| **every turn** | RepoGuards' Stop guards, in whatever repo you are standing in | automatic | milliseconds |
 | **every change to `plugins/`** | `python3 factory/deploy.py` — the registry into settings, the repo into the installed copies, then verification | a person | seconds |
-| **every push** | `python3 factory/ci.py` — everything that needs no installation, **and no grove** | GitHub Actions | ~20s |
+| **every push** | `python3 factory/ci.py` — everything that needs no installation, **and no RepoGuards** | GitHub Actions | ~20s |
 | **before a submission** | `python3 factory/check_urls.py --slug <app>` | a person | seconds, and it needs the network |
 | **monthly** | the list in *What no machine can check* | a person | an hour |
 
@@ -40,14 +40,14 @@ python3 factory/ci.py --metrics   # …and the numbers as JSON
 python3 factory/ci.py --record    # …appended to factory/metrics.jsonl
 ```
 
-**`ci.py` runs without grove on purpose** — a runner has this repo and nothing else — and
+**`ci.py` runs without RepoGuards on purpose** — a runner has this repo and nothing else — and
 that is also its limit. What runs there: every path written as a filename, every script
 parsed with its imports resolved, every bilingual pair, and that no skill names a machine
 path. What is **skipped, loudly**: the hub pipeline, and the check that every `$ANCHOR` a
-skill stands on is one a deploy actually writes. Both read grove's registry.
+skill stands on is one a deploy actually writes. Both read RepoGuards' registry.
 
 **Closing that gap needs a credential**, and it has not been taken: a runner could clone
-grove, but a private repo needs a token stored as a secret, and the two checks it would
+RepoGuards, but a private repo needs a token stored as a secret, and the two checks it would
 buy are cheap to run by hand. `deploy.py` on a real machine runs all of them, which is
 where they are covered today. Worth revisiting if either repo goes public — a public
 checkout needs no token.

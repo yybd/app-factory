@@ -1,5 +1,5 @@
 {
-  "_comment": "Where one run of store-metadata-writer lands, and how each place closes. Read by $GROVE/tools/close.py. Derived from the skill's own workflow: it writes per-locale listing text for BOTH stores into the hub, and a session that writes Apple's and reports 'done' has left Play's half uncommitted in the same repo.",
+  "_comment": "Where one run of store-metadata-writer lands, and how each place closes. Read by $REPO_GUARDS/tools/close.py. Derived from the skill's own workflow: it writes per-locale listing text for BOTH stores into the hub, and a session that writes Apple's and reports 'done' has left Play's half uncommitted in the same repo.",
   "operation": "store-metadata-writer",
   "operates_from": "the app's repo, usually — the profile and the README it reads are there, and the files it writes are not",
   "state": {

@@ -14,7 +14,7 @@ Three properties are held deliberately, and each is checked rather than promised
   writes a `.gitignore` that refuses everything *before* it creates a folder.
 - **Nothing outward-facing happens without confirmation.** Every upload, submission and
   publish is shown and asked about first. Nothing pushes a git branch.
-- **Nothing writes into a repo the session is not standing in.** That guard is grove's
+- **Nothing writes into a repo the session is not standing in.** That guard is RepoGuards'
   and optional; what is not optional is that a skill here names exact paths rather than
   sweeping a directory.
 

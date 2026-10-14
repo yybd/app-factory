@@ -78,11 +78,11 @@ def imported(tree):
 _LOCAL = None
 
 
-# What this repo imports out of grove. Real modules, in another checkout — so when grove
+# What this repo imports out of RepoGuards. Real modules, in another checkout — so when RepoGuards
 # is not on this machine (a build runner has this repo alone) they are known-absent
 # rather than missing. Reporting them would fail eight scripts over something this repo
 # cannot fix, which is the noise that gets a checker skipped.
-FROM_GROVE = {"grove_repo", "warn_stale_plugin_cache"}
+FROM_GUARDS = {"guards_repo", "warn_stale_plugin_cache"}
 
 # Third-party packages these skills legitimately use. Declared rather than discovered,
 # because `find_spec` cannot tell "not installed on THIS machine" from "a typo": on a
@@ -117,19 +117,19 @@ def local_module(name):
     if _LOCAL is None:
         _LOCAL = set()
         roots = [REPO]
-        # grove carries `grove_repo`, which several scripts here import through
+        # RepoGuards carries `guards_repo`, which several scripts here import through
         # sys.path.insert. It is not in this repo and it is not third-party either —
         # reporting it as missing would be the false alarm that gets a checker skipped.
         sys.path.insert(0, HERE)
         try:
-            from grove import scripts as _grove_scripts
-            g = _grove_scripts()
+            from repo_guards import scripts as _guards_scripts
+            g = _guards_scripts()
             if g:
                 roots.append(g)
             else:
-                _LOCAL.update(FROM_GROVE)
+                _LOCAL.update(FROM_GUARDS)
         except Exception:
-            _LOCAL.update(FROM_GROVE)
+            _LOCAL.update(FROM_GUARDS)
         for root in roots:
             for base, dirs, names in os.walk(root):
                 dirs[:] = [d for d in dirs if d not in SKIP and not d.startswith(".")]

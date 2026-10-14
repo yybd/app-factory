@@ -26,14 +26,14 @@ import argparse, json, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 REPO = os.path.dirname(HERE)
 sys.path.insert(0, HERE)
-from grove import scripts as _grove_scripts, MISSING as _GROVE_MISSING   # noqa: E402
+from repo_guards import scripts as _guards_scripts, MISSING as _GUARDS_MISSING   # noqa: E402
 
 
-class _Grove:
-    """grove_repo, resolved on first use instead of at import.
+class _Guards:
+    """guards_repo, resolved on first use instead of at import.
 
-    This block used to call `sys.exit()` at module level when grove was not on the
-    machine. That is the right answer for a run — this script reads grove's registry
+    This block used to call `sys.exit()` at module level when RepoGuards was not on the
+    machine. That is the right answer for a run — this script reads RepoGuards' registry
     and cannot work without it — but it is the wrong answer for `--help`, which
     exited the same way. So on a machine with only this repo, the script could not
     even say what it was for, and `check_scripts.py`'s usage check failed on it.
@@ -45,17 +45,17 @@ class _Grove:
     _mod = None
 
     def __getattr__(self, name):
-        if _Grove._mod is None:
-            s = _grove_scripts()
+        if _Guards._mod is None:
+            s = _guards_scripts()
             if not s:
-                sys.exit("\u2717 " + _GROVE_MISSING)
+                sys.exit("\u2717 " + _GUARDS_MISSING)
             sys.path.insert(0, s)
-            import grove_repo
-            _Grove._mod = grove_repo
-        return getattr(_Grove._mod, name)
+            import guards_repo
+            _Guards._mod = guards_repo
+        return getattr(_Guards._mod, name)
 
 
-fr = _Grove()
+fr = _Guards()
 
 # What the shipping skills look for, and the skill that needs each one. Kept here rather
 # than in prose so `--create` and the report can never describe different folders.
@@ -115,7 +115,7 @@ Referred to by every shipping skill as `$KEYS_ROOT`. Nothing in this folder is e
 committed, copied into a repo, or printed — the skills read it in place.
 
 Where the factory looks, in order: the `KEYS_ROOT` environment variable, then
-`keys_root` in grove's registry (relative to the tree's base), then `keys`
+`keys_root` in RepoGuards' registry (relative to the tree's base), then `keys`
 beside the other repos.
 
 ## What goes where
@@ -197,8 +197,8 @@ def point(path):
     if not os.path.isdir(target):
         print(f"✗ {short(target)} is not an existing directory. Create it first, or use --create instead.")
         return 2
-    if not _grove_scripts():
-        print(f"Without grove there is no registry to record {short(target)} in.")
+    if not _guards_scripts():
+        print(f"Without RepoGuards there is no registry to record {short(target)} in.")
         print("Point the skills at it with the variable instead — in your shell, or in")
         print("~/.claude/settings.json under `env`:")
         print(f'    "KEYS_ROOT": "{target}"')
@@ -232,10 +232,10 @@ def main():
     a = ap.parse_args()
     if a.point:
         return point(a.point)
-    # The environment first, grove after. $KEYS_ROOT is the contract every resolver in
+    # The environment first, RepoGuards after. $KEYS_ROOT is the contract every resolver in
     # the tracks reads; a person who set it has answered the question this script asks
     # the registry, and QUICKSTART tells them to set it — so failing here for want of
-    # grove was failing the reader who did exactly what the page said.
+    # RepoGuards was failing the reader who did exactly what the page said.
     root = os.environ.get("KEYS_ROOT")
     root = os.path.expanduser(root) if root else fr.keys_root()
     if not root:

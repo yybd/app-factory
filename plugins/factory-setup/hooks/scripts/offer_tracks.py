@@ -8,7 +8,7 @@ business loading in a website. But it produces a failure with no symptom:
     a repo where no track was enabled  looks identical to
     a repo where the skills decided they were not relevant
 
-Both are silence. Grove's own analysis named this and left it open, because the cost of
+Both are silence. RepoGuards' own analysis named this and left it open, because the cost of
 the alternative — every track on in every directory — is worse. The answer is not to
 change the allocation; it is to make the absence audible, once, in the repo where it is
 wrong.

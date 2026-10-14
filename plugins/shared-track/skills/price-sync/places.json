@@ -1,5 +1,5 @@
 {
-  "_comment": "Where one run of price-sync lands, and how each place closes. Read by $GROVE/tools/close.py. This is the list that used to exist only as a sentence inside SKILL.md — a price lives in eight places, and a session that updates five of them and reports 'done' is the failure this file exists to make impossible. Written 2026-09-10 from the skill's own workflow, not from its description.",
+  "_comment": "Where one run of price-sync lands, and how each place closes. Read by $REPO_GUARDS/tools/close.py. This is the list that used to exist only as a sentence inside SKILL.md — a price lives in eight places, and a session that updates five of them and reports 'done' is the failure this file exists to make impossible. Written 2026-09-10 from the skill's own workflow, not from its description.",
   "operation": "price-sync",
   "operates_from": "anywhere — the operation spans every place below, so no single one of them is where it 'lives'",
   "state": {
