@@ -12,7 +12,7 @@ not a bug.
 | | |
 |---|---|
 | 1 — guards for a multi-repo agent: [English](1-cross-repo-guards.md) · [עברית](1-cross-repo-guards.he.md) | the case for blocking a write into a repo the session is not standing in. About RepoGuards, not about this repo. |
-| [2 — skills and tracks](2-skills-and-tracks.he.md) | why one large instruction file does not hold, and what replaces it |
+| 2 — skills and tracks: [English](2-skills-and-tracks.md) · [עברית](2-skills-and-tracks.he.md) | why one large instruction file does not hold, and what replaces it |
 
 Both were revised on 2026-09-29, when the two repositories went public: the link is in
 place, the guard messages quoted in the first are real ones, and the second describes
