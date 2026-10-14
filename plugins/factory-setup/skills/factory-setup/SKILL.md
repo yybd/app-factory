@@ -65,10 +65,17 @@ different things, and a track enabled but not installed loads nothing:
 claude plugin install <track>@app-factory
 ```
 
-> **The CLI will then say the plugin is "disabled by default — enable it with
-> `claude plugin enable`". Do not run that** — it switches the track on for every
-> directory on the machine, which is the one thing per-repo enablement exists to
-> prevent. The settings file written in step 2 is what enables it here.
+Then switch it off for the rest of the machine — current Claude Code's `install` turns
+a plugin on in **every directory**, which is the one thing per-repo enablement exists to
+prevent:
+
+```bash
+claude plugin disable <track>@app-factory --scope user
+```
+
+The settings file written in step 2 still turns it on here; `enable.py --check` fails
+while a track is on machine-wide. **Never run `claude plugin enable`** — it does the
+opposite.
 
 **4. Open a new session.** Skills load at session start; nothing takes effect in the
 session that ran the command.

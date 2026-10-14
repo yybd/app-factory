@@ -30,16 +30,18 @@ files justify — an `.xcodeproj` means Apple, a `build.gradle` means Android. E
 you enable costs tokens in every session in that repo, which is the whole reason the
 allocation is per repo.
 
-**The CLI said the plugin is "disabled by default — enable it with `claude plugin
-enable`". Should I?**
-No. That command switches the track on for **every directory on the machine**, which is
-what the per-repo setting exists to prevent: App Store skills loading in a website. The
-file `enable.py` wrote is what enables it, here and only here.
+**After `claude plugin install`, is the track on everywhere?**
+With current Claude Code, yes: `install` switches a plugin on for **every directory on
+the machine** — App Store skills loading in your website, the thing the per-repo setting
+exists to prevent. Turn it off at user scope, and the repo's own file decides:
+`claude plugin disable <track>@app-factory --scope user`. `enable.py --check` fails while
+a track is on machine-wide. (Older versions said the plugin was "disabled by default —
+enable it with `claude plugin enable`". Do not run that: it does the same thing.)
 
 **I installed it and no skills appeared.**
 Three things have to be true, and only the third is obvious: the track is installed, it
 is enabled in this repo, and **the session started after both**. Skills load at session
-start. `python3 factory/enable.py --check` answers the first two, and fails if a track
+start. `python3 $AF/factory/enable.py --check` answers the first two, and fails if a track
 is enabled but not installed.
 
 **I opened the session in a subdirectory and nothing loaded.**

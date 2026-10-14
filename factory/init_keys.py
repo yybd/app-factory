@@ -220,6 +220,10 @@ def point(path):
     return 0
 
 
+DEFAULT = os.path.join(os.path.expanduser("~"), "app-keys")
+DEFAULT_SHORT = "~/app-keys"
+
+
 def short(p):
     home = os.path.expanduser("~")
     return "~" + p[len(home):] if p.startswith(home + os.sep) else p
@@ -227,7 +231,9 @@ def short(p):
 
 def main():
     ap = argparse.ArgumentParser(description="The credentials folder the shipping skills expect.")
-    ap.add_argument("--create", action="store_true", help="make the skeleton where the registry says")
+    ap.add_argument("--create", action="store_true",
+                    help="make the skeleton at $KEYS_ROOT, else where RepoGuards' registry says, "
+                         f"else at {DEFAULT_SHORT}")
     ap.add_argument("--point", metavar="PATH", help="use an existing folder instead, and record it")
     a = ap.parse_args()
     if a.point:
@@ -237,10 +243,25 @@ def main():
     # the registry, and QUICKSTART tells them to set it — so failing here for want of
     # RepoGuards was failing the reader who did exactly what the page said.
     root = os.environ.get("KEYS_ROOT")
-    root = os.path.expanduser(root) if root else fr.keys_root()
+    if root:
+        root = os.path.expanduser(root)
+    elif _guards_scripts():
+        root = fr.keys_root()
     if not root:
-        print("✗ could not work out where the tree sits, and so neither where the keys are.")
-        return 2
+        # No variable and no RepoGuards — the single-app reader QUICKSTART promises needs
+        # neither. A stranger-install test failed exactly here: "set the variable this
+        # script asked for", from a script that had asked for none. So: one default, and
+        # say the variable to set, with its value.
+        root = DEFAULT
+        if not a.create:
+            print(f"$KEYS_ROOT is not set, and no credentials folder exists yet.")
+            print(f"  python3 {short(os.path.abspath(__file__))} --create     makes one at {DEFAULT_SHORT}")
+            return 0 if not os.path.isdir(root) else report(root)
+        rc = create(root)
+        print("\nNow tell the skills where it is — in ~/.claude/settings.json, under \"env\":")
+        print(f'    "KEYS_ROOT": "{root}"')
+        print("(or `export KEYS_ROOT=…` in your shell profile). They read only that variable.")
+        return rc
     return create(root) if a.create else report(root)
 
 

@@ -336,6 +336,16 @@ def locale_groups(paths):
         # would drag in every sibling tree — pointing at one String Catalog in a
         # repo root would compare the whole repo.
         if not os.path.isdir(p):
+            # Named one by one — `metadata/*/description.txt` from a shell glob — the
+            # files still say which locale and which field they are, so they are grouped
+            # exactly as a walk would. Only these files: never their siblings. Before
+            # this, a glob gave "0 candidates" and exit 0, and the comparison the gate
+            # exists for never ran.
+            d, f = os.path.split(os.path.abspath(p))
+            if f in PROSE_FIELDS and LOCALE.match(os.path.basename(d)):
+                groups.setdefault((os.path.dirname(d), f), {})[os.path.basename(d)] = p
+            elif f.endswith(".txt") and LOCALE.match(f[:-4]):
+                groups.setdefault((d, "release notes"), {})[f[:-4]] = p
             continue
         for root, dirs, files in os.walk(p):
             for d in sorted(dirs):

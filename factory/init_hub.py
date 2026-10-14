@@ -295,7 +295,13 @@ def main():
     a = ap.parse_args()
     root = hub_root()
     if not root:
-        print("✗ could not work out where the tree sits, and so neither where the hub is.")
+        # Say what to set, with a value — "could not work out where the tree sits" left a
+        # stranger with nothing to type.
+        print("✗ No hub location: $APP_HUB is not set, and there is no RepoGuards registry to ask.")
+        print("  A hub is optional — with one app, the repo's own fastlane/ is the source of truth.")
+        print("  To make one anyway, say where:")
+        print("    export APP_HUB=~/app-hub        # or \"APP_HUB\" under \"env\" in ~/.claude/settings.json")
+        print(f"    python3 {os.path.abspath(__file__)} --create")
         return 2
     if a.create or a.app:
         return create(root, a.app)

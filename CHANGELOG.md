@@ -14,6 +14,32 @@ skill does.
 
 ## Unreleased
 
+## 0.4.3
+
+A patch, from a stranger-install test that followed README and QUICKSTART to the letter
+in an empty home directory. No skill behaves differently on a machine that was already
+set up; a new one now ends up the way the docs say.
+
+- **Tracks no longer load on the whole machine after install.** Claude Code 2.1.283's
+  `claude plugin install` switches a plugin on at user scope, ignoring the tracks'
+  `defaultEnabled: false` — so every installed track loaded in every directory, and
+  `enable.py --check` said nothing. QUICKSTART, the FAQ and `factory-setup` now add
+  `claude plugin disable <track>@app-factory --scope user` after the install, which
+  leaves each repo's own settings in charge; `enable.py` prints those lines and
+  `--check` fails while a track is on machine-wide.
+- **`init_keys.py --create` works without RepoGuards.** With no `$KEYS_ROOT` and no
+  registry it failed, contradicting QUICKSTART. It now makes `~/app-keys` and prints the
+  exact `env` line to point the skills at it.
+- **`enable.py` no longer prints a `marketplace add` for a marketplace that exists** —
+  running it replaced a GitHub install's source with a local folder, silently.
+- **`measure_copy.py` compares translations when given files, not only a folder.**
+  `fastlane/metadata/*/description.txt` gave "0 candidates" and exit 0.
+- **Errors and help that say what to do:** `init_hub.py` names `$APP_HUB` and the command;
+  `check_name.py --help` says it queries Apple's search API.
+- **QUICKSTART:** keeping `$AF` past one terminal, committing `.claude/settings.json`, a
+  deterministic check (`claude plugin list` / `details`), where each skill's scripts live
+  and how to run them by hand, and a full `env` example for `KEYS_ROOT`.
+
 ## 0.4.2
 
 A patch: five places where a script did less than its skill said, found by reading

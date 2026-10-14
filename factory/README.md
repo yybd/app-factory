@@ -2,7 +2,7 @@
 
 Not a skill. The parts of this repo that are not themselves skills: deployment of
 the tracks, the checkers that run inside it, and the initialisers for what the shipping
-skills read. The registry and the guards moved to RepoGuards; `RepoGuards.py` is how this repo
+skills read. The registry and the guards moved to RepoGuards; `repo_guards.py` is how this repo
 finds them.
 
 ## Every script here
@@ -13,7 +13,7 @@ skills** runs only the first group; everything below it is the maintainer's.
 | | | needs RepoGuards |
 |---|---|---|
 | `enable.py` | turn tracks on for one repo (a shim — the tool ships in `plugins/factory-setup/scripts/`) | no |
-| `init_keys.py` | create the credentials folder, or point at an existing one | no, with `$KEYS_ROOT` |
+| `init_keys.py` | create the credentials folder, or point at an existing one | no |
 | `init_hub.py` | create a hub, if you want one | no, with `$APP_HUB` |
 | `check_urls.py` | do the store-facing URLs resolve | no, with `$APP_HUB` |
 | | | |
@@ -29,7 +29,7 @@ skills** runs only the first group; everything below it is the maintainer's.
 | | | |
 | `deploy.py` | put this repo onto this machine: settings, cache, the commit-msg hook, verify | **yes** |
 | `dashboard/build_dashboard.py` | the maintainer's view of the whole tree | **yes** |
-| `RepoGuards.py` | find the RepoGuards checkout, or say it is not here | — |
+| `repo_guards.py` | find the RepoGuards checkout, or say it is not here | — |
 
 ## The invariant
 

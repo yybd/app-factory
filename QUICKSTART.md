@@ -26,6 +26,9 @@ commands below find `factory/`. Give it a name, so the rest stays short:
 export AF=~/.claude/plugins/marketplaces/app-factory
 ```
 
+That lasts for this terminal. To keep it, put the same line in your shell profile
+(`~/.zshrc` or `~/.bashrc`).
+
 To work from your own checkout instead — to read the skills, or change one — clone it
 and add that path (`git clone https://github.com/yybd/app-factory ~/app-factory`, then
 `claude plugin marketplace add ~/app-factory`), and set `AF=~/app-factory`.
@@ -52,18 +55,29 @@ Then install what it enabled — enabling and installing are different, and a tr
 enabled but not installed loads nothing:
 
 ```bash
-claude plugin install apple-track@app-factory
-claude plugin install shared-track@app-factory
+claude plugin install apple-track@app-factory     # one line per track enable.py turned on —
+claude plugin install shared-track@app-factory    # it prints them for you
 claude plugin install factory-setup@app-factory   # optional: says when a repo has no track on
 ```
 
-> **The CLI will then say a plugin is "disabled by default — enable it with
-> `claude plugin enable`". Do not.** That command switches the track on for every
-> directory on the machine, which is the one thing this setup exists to avoid. The
-> file `enable.py` wrote is what enables it — here, and only here.
+**Then switch the tracks off for the rest of the machine.** `claude plugin install`
+turns a plugin on for every directory you will ever open — which is the one thing this
+setup exists to avoid. Turning it off at user scope leaves the repo's own file in
+charge, so the track loads here and nowhere else:
 
-**Check:** `python3 $AF/factory/enable.py --check` lists the tracks as on
-**and installed**; it fails if one is enabled but not installed.
+```bash
+claude plugin disable apple-track@app-factory --scope user
+claude plugin disable shared-track@app-factory --scope user
+```
+
+(Leave `factory-setup` on: it is meant to be everywhere.)
+
+**Check:** `python3 $AF/factory/enable.py --check` lists the tracks as on here **and
+installed**, and fails if one is enabled but not installed — or switched on for the
+whole machine.
+
+**Commit `.claude/settings.json`.** It is the repo's own declaration of which tracks it
+loads, and anyone who clones the repo gets the same ones.
 
 > **A track is enabled per repo, in that repo's `.claude/settings.json`.** That is on
 > purpose: App Store skills have no business loading in a website. Claude Code reads
@@ -80,9 +94,12 @@ Skills load at session start. Nothing you did above affects a session already ru
 cd ~/code/my-app && claude
 ```
 
-**Check:** ask *"what skills do you have for shipping this app?"* — the reply should
-name skills from the tracks you enabled. If it does not, the settings file is in the
-wrong directory; §2's note says which.
+**Check:** `claude plugin list`, run from the app's directory, shows each track you
+enabled as `✔ enabled` — and run from any other directory, as `✘ disabled`.
+`claude plugin details apple-track@app-factory` lists the skills a track brings. Inside
+the session, asking *"what skills do you have for shipping this app?"* should name them
+too. If a track is off here, the settings file is in the wrong directory; §2's note
+says which.
 
 ---
 
@@ -98,6 +115,14 @@ get it rejected. It needs no credentials, no data repo, and changes nothing.
 **Check:** you get findings about *your* project — a missing privacy string, a
 permission with no usage description — rather than a generic checklist.
 
+**The scripts run without a session too.** Every skill's tools sit in
+`$AF/plugins/<track>/skills/<skill>/scripts/`, and each answers `--help`. For example:
+
+```bash
+python3 $AF/plugins/apple-track/skills/app-store-review-compliance/scripts/scan_project.py .
+python3 $AF/plugins/shared-track/skills/copy-edit/scripts/measure_copy.py fastlane/metadata --parity-only
+```
+
 ---
 
 ## 5 · When you want to ship, add credentials
@@ -112,10 +137,19 @@ It creates a folder — outside every repo, gitignored from the first byte — w
 `credentials.json` naming where each credential is. Fill it in by hand. The skills read
 the files in place and copy them nowhere.
 
-**Check:** `python3 $AF/factory/init_keys.py` reports the folder as set up.
+With no `$KEYS_ROOT` set, it makes the folder at `~/app-keys` and prints the line that
+points the skills at it. Put that line in `~/.claude/settings.json`:
 
-Point the skills at it with `KEYS_ROOT` in your shell, or in
-`~/.claude/settings.json` under `env`.
+```json
+{
+  "env": { "KEYS_ROOT": "/Users/you/app-keys" }
+}
+```
+
+(or `export KEYS_ROOT=…` in your shell profile). To keep the folder somewhere else, set
+`KEYS_ROOT` first and `--create` makes it there.
+
+**Check:** `python3 $AF/factory/init_keys.py` reports the folder as set up.
 
 ---
 

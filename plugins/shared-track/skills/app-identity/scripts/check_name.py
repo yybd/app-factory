@@ -46,7 +46,11 @@ def norm(s):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Audit an App Store name and subtitle.")
+    ap = argparse.ArgumentParser(
+        description="Audit an App Store name and subtitle.",
+        epilog="Needs the network: it queries Apple's public iTunes Search API "
+               "(itunes.apple.com/search) with your category terms, one request per term. "
+               "Your name and claims are compared locally and are not sent.")
     ap.add_argument("--name", required=True, help='full App Store name, e.g. "Brand: keyword tail"')
     ap.add_argument("--subtitle", default="")
     ap.add_argument("--category", required=True,

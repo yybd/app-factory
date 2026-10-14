@@ -191,6 +191,42 @@ def installed(track):
         return False
 
 
+def globally_on():
+    """Tracks switched on for the whole machine, in the user's own settings.
+
+    `claude plugin install` writes `true` at user scope for every plugin it installs —
+    measured with Claude Code 2.1.283, which ignores the plugins' `defaultEnabled:
+    false`. Left there, a track loads in every directory on the machine, which is the
+    one thing per-repo tracks exist to prevent, and `--check` said nothing about it.
+    `factory-setup` is meant to be on everywhere, so it is not counted.
+    """
+    try:
+        with open(os.path.expanduser("~/.claude/settings.json"), encoding="utf-8") as f:
+            ep = json.load(f).get("enabledPlugins") or {}
+    except Exception:
+        return []
+    return sorted(k.split("@")[0] for k, v in ep.items()
+                  if k.endswith("@" + MARKETPLACE) and v and not k.startswith("factory-setup@"))
+
+
+def marketplace_known():
+    """Is a marketplace by this name already registered? Adding it again replaces it."""
+    try:
+        with open(os.path.expanduser("~/.claude/plugins/known_marketplaces.json"),
+                  encoding="utf-8") as f:
+            return MARKETPLACE in json.load(f)
+    except Exception:
+        return False
+
+
+def say_global(tracks):
+    print("Switched on for EVERY directory on this machine, in ~/.claude/settings.json —")
+    print("so they load in your website and everywhere else, not only here:")
+    for t in tracks:
+        print(f"    claude plugin disable {t}@{MARKETPLACE} --scope user")
+    print("  That turns them off for the machine; this repo's own settings still turn them on here.")
+
+
 def git_root(start):
     try:
         r = subprocess.run(["git", "-C", start, "rev-parse", "--show-toplevel"],
@@ -239,6 +275,10 @@ def main():
 
     if a.check:
         print()
+        everywhere = globally_on()
+        if everywhere:
+            say_global(everywhere)
+            return 1
         if on:
             missing = [t for t in on if not installed(t)]
             if missing:
@@ -299,18 +339,26 @@ def main():
         todo = [t for t in want if not installed(t)]
         if todo:
             print("\nInstall them once on this machine:")
-            if REPO:
+            # Only when the marketplace is unknown: adding it again under the same name
+            # silently replaces its source — a GitHub install would become this folder.
+            if REPO and not marketplace_known():
                 print(f"    claude plugin marketplace add {REPO}")
             for t in todo:
                 print(f"    claude plugin install {t}@{MARKETPLACE}")
             if not installed("factory-setup"):
                 print(f"    claude plugin install factory-setup@{MARKETPLACE}   "
                       f"# optional: says when a repo has no track on")
-            print("\n  If the CLI then says a plugin is \"disabled by default — enable it with\n"
-                  "  `claude plugin enable`\", do NOT: that switches it on for every directory\n"
-                  "  on the machine. The file above is what enables it, here and only here.")
+            print("\nThen switch them off for the rest of the machine — `install` turns them on")
+            print("everywhere, and the file above is what turns them on here:")
+            for t in todo:
+                print(f"    claude plugin disable {t}@{MARKETPLACE} --scope user")
+            print(f"\n  python3 {__file__} --check     confirms both")
         else:
             print("\n✓ all of them are already installed on this machine.")
+            everywhere = globally_on()
+            if everywhere:
+                print()
+                say_global(everywhere)
     print("\n**Open a new session in this repo** — skills load at session start, and this\n"
           "changed nothing about the one you are in.")
     return 0

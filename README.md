@@ -18,6 +18,7 @@ there carries them; a session opened anywhere else does not.
 ```bash
 claude plugin marketplace add yybd/app-factory
 cd ~/code/my-app && python3 ~/.claude/plugins/marketplaces/app-factory/factory/enable.py
+# then the install lines it prints, and QUICKSTART for the rest
 ```
 
 **[QUICKSTART.md](QUICKSTART.md)** walks the whole thing — fifteen minutes, one app,

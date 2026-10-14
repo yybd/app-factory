@@ -25,6 +25,9 @@ claude plugin marketplace add yybd/app-factory
 export AF=~/.claude/plugins/marketplaces/app-factory
 ```
 
+זה תקף לטרמינל הזה. כדי שיישאר, הוסיפו את אותה שורה לקובץ הפרופיל של המעטפת
+(`~/.zshrc` או `~/.bashrc`).
+
 כדי לעבוד מצ'קאאוט משלכם במקום — לקרוא את הסקילים, או לשנות אחד — שכפלו והוסיפו את
 הנתיב ההוא (`git clone https://github.com/yybd/app-factory ~/app-factory` ואז
 `claude plugin marketplace add ~/app-factory`), ואז `AF=~/app-factory`.
@@ -50,17 +53,27 @@ python3 $AF/factory/enable.py
 לא טוען כלום:
 
 ```bash
-claude plugin install apple-track@app-factory
-claude plugin install shared-track@app-factory
+claude plugin install apple-track@app-factory     # שורה לכל מסלול ש-enable.py הדליק —
+claude plugin install shared-track@app-factory    # הוא מדפיס אותן בשבילך
 claude plugin install factory-setup@app-factory   # אופציונלי: אומר כשלריפו אין מסלול דולק
 ```
 
-> **ה-CLI יגיד אז שהתוסף "disabled by default — enable it with `claude plugin
-> enable`". אל.** הפקודה הזו מדליקה את המסלול בכל תיקייה במחשב, וזה בדיוק מה
-> שההתקנה הזו נועדה למנוע. הקובץ ש-`enable.py` כתב הוא מה שמדליק אותו — כאן, ורק כאן.
+**ואז כבו את המסלולים בשאר המחשב.** `claude plugin install` מדליק תוסף בכל תיקייה
+שתפתחו אי פעם, וזה בדיוק מה שההתקנה הזו נועדה למנוע. כיבוי ברמת המשתמש משאיר את
+ההחלטה בידי הקובץ של הריפו, כך שהמסלול נטען כאן ולא בשום מקום אחר:
 
-**בדיקה:** `python3 $AF/factory/enable.py --check` מציג את המסלולים כדולקים
-**ומותקנים**; הוא נכשל אם מסלול הופעל ולא הותקן.
+```bash
+claude plugin disable apple-track@app-factory --scope user
+claude plugin disable shared-track@app-factory --scope user
+```
+
+(את `factory-setup` משאירים דולק: הוא אמור להיות בכל מקום.)
+
+**בדיקה:** `python3 $AF/factory/enable.py --check` מציג את המסלולים כדולקים כאן
+**ומותקנים**. הוא נכשל אם מסלול הופעל ולא הותקן, או אם הוא דולק בכל המחשב.
+
+**עשו קומיט ל-`.claude/settings.json`.** זו ההצהרה של הריפו עצמו אילו מסלולים הוא
+טוען, ומי שמשכפל את הריפו מקבל את אותם מסלולים.
 
 > **מסלול מופעל לפי ריפו**, ב-`.claude/settings.json` של אותו ריפו. זה בכוונה:
 > לסקילים של App Store אין מה לעשות באתר אינטרנט. ו-Claude Code קורא את הקובץ הזה
@@ -77,9 +90,11 @@ claude plugin install factory-setup@app-factory   # אופציונלי: אומר
 cd ~/code/my-app && claude
 ```
 
-**בדיקה:** שאל *"אילו סקילים יש לך לשליחת האפליקציה הזו?"* — התשובה צריכה לנקוב
-בסקילים מהמסלולים שהפעלת. אם לא, קובץ ההגדרות בתיקייה הלא נכונה; ההערה בסעיף 2
-אומרת איזו.
+**בדיקה:** `claude plugin list`, שמורץ מתיקיית האפליקציה, מציג כל מסלול שהפעלת
+כ-`✔ enabled`, ומכל תיקייה אחרת כ-`✘ disabled`. ‏`claude plugin details
+apple-track@app-factory` מונה את הסקילים שמסלול מביא. בתוך הסשן, גם השאלה *"אילו
+סקילים יש לך לשליחת האפליקציה הזו?"* צריכה להחזיר אותם. אם מסלול כבוי כאן, קובץ
+ההגדרות בתיקייה הלא נכונה; ההערה בסעיף 2 אומרת איזו.
 
 ---
 
@@ -95,6 +110,14 @@ cd ~/code/my-app && claude
 **בדיקה:** אתה מקבל ממצאים על **הפרויקט שלך** — מחרוזת פרטיות חסרה, הרשאה בלי הסבר
 שימוש — ולא רשימת תיוג גנרית.
 
+**הסקריפטים רצים גם בלי סשן.** הכלים של כל סקיל יושבים ב-
+`$AF/plugins/<track>/skills/<skill>/scripts/`, וכל אחד עונה ל-`--help`. למשל:
+
+```bash
+python3 $AF/plugins/apple-track/skills/app-store-review-compliance/scripts/scan_project.py .
+python3 $AF/plugins/shared-track/skills/copy-edit/scripts/measure_copy.py fastlane/metadata --parity-only
+```
+
 ---
 
 ## 5 · כשרוצים לשלוח, מוסיפים אישורים
@@ -109,10 +132,19 @@ python3 $AF/factory/init_keys.py --create
 שאומר איפה כל אישור נמצא. ממלאים ביד. הסקילים קוראים את הקבצים במקומם ולא מעתיקים
 אותם לשום מקום.
 
-**בדיקה:** `python3 $AF/factory/init_keys.py` מדווח שהתיקייה מוכנה.
+כש-`$KEYS_ROOT` לא מוגדר, הוא יוצר את התיקייה ב-`~/app-keys` ומדפיס את השורה שמכוונת
+אליה את הסקילים. שימו אותה ב-`~/.claude/settings.json`:
 
-מכוונים את הסקילים אליה עם `KEYS_ROOT` במעטפת, או ב-`~/.claude/settings.json` תחת
-`env`.
+```json
+{
+  "env": { "KEYS_ROOT": "/Users/you/app-keys" }
+}
+```
+
+(או `export KEYS_ROOT=…` בקובץ הפרופיל של המעטפת). כדי שהתיקייה תהיה במקום אחר, מגדירים
+קודם את `KEYS_ROOT`, ו-`--create` יוצר אותה שם.
+
+**בדיקה:** `python3 $AF/factory/init_keys.py` מדווח שהתיקייה מוכנה.
 
 ---
 

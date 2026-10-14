@@ -18,6 +18,7 @@
 ```bash
 claude plugin marketplace add yybd/app-factory
 cd ~/code/my-app && python3 ~/.claude/plugins/marketplaces/app-factory/factory/enable.py
+# ואז שורות ההתקנה שהוא מדפיס, וה-QUICKSTART לכל השאר
 ```
 
 **[QUICKSTART.he.md](QUICKSTART.he.md)** עובר על הכול — חמש-עשרה דקות, אפליקציה אחת,
