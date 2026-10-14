@@ -14,6 +14,38 @@ skill does.
 
 ## Unreleased
 
+## 0.6.0
+
+A minor: the App Store's October 2026 marketing surfaces — the product page header, the
+search results asset, and iPhone Duo screenshots — from storyboard to upload. Nothing that
+worked before behaves differently; the sync now holds Duo stills back from `deliver`, which
+could not send them anyway.
+
+- **The sizes, once.** `shared/apple-specs.json` gains the two Duo displays and a
+  `creative_assets` block (header 21:9 and 16:9, search results a 3:2 *range* and the same
+  16:9), and the generated size table renders them. The size checker accepts both ends of a
+  range and nothing in between that a document writes by hand.
+- **`appstore-media` produces them.** A `creative/` folder in the media tree, a creative row
+  in the storyboard, Apple's asset rules beside the hard rules, and `frameshot.py` presets:
+  `duo_outer` / `duo_inner`, and three banner presets (`header21x9`, `search3x2`,
+  `universal16x9`) with the caption beside the device on the reading side, kept inside a
+  centred safe area and shrunk to two lines. `verify_assets.py` checks `creative/` against
+  the header and search rules — including 30-or-60 fps and no audio requirement — instead of
+  failing it as a wrong screenshot size.
+- **`app-store-deliver` sends them.** `upload_library_assets.rb` drives the App Asset
+  Library: reads Apple's reference data at run time, reuses an asset already uploaded,
+  places it per locale (version, CPP or PPO treatment), and `--submit` sends assets to
+  review without a version — the only road onto a version that is already live. Its first
+  read-only run against a live library found two things the documentation does not say:
+  placement groups are named by store (`IPHONE_APP_STORE`, `ANY`), not platform, and a 21:9
+  header fits inside the 3:2 search range unless the ratio is checked. Both are handled
+  and written down in `plugins/apple-track/skills/app-store-deliver/references/asset-library-api.md`. Uploads themselves have not run
+  yet; the first one is the test.
+- **Compliance and shipping know.** `app-store-review-compliance` carries the asset rules
+  (no prices, URLs, other platforms or unearned awards in a banner); `ship-apple-app` lists
+  Duo as required from April 2027 for builds on the iOS 27.1 SDK, and the creative assets
+  as an optional row.
+
 ## 0.5.0
 
 A minor: a new track. App Factory now ships outside the stores on Windows as well as on
