@@ -1,0 +1,29 @@
+schema_version: "1.1"
+name: compliance-finds-required-reason-apis
+description: >-
+  An iOS app that calls UserDefaults and systemUptime and ships no PrivacyInfo.xcprivacy.
+  The skill's digest maps each Required-Reason API to its category and reason code; a
+  bare model tends to say "add a privacy manifest" and stop. Replaces a missing-camera-
+  string case that a bare model also caught (Δ 0) and whose LLM judge failed a correct,
+  longer answer three times out of three — so every grader here is a regex.
+  Needs --scaffold for the fixture.
+tags: [behaviour, apple]
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    This directory is my iOS app. I'm submitting it to the App Store next week. Review it
+    against Apple's requirements and tell me what would block the upload or the review,
+    and exactly what to add to fix each one.
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: names-the-manifest
+    type: regex
+    pattern: 'PrivacyInfo\.xcprivacy'
+  - name: user-defaults-reason
+    type: regex
+    pattern: 'CA92\.1'
+  - name: boot-time-reason
+    type: regex
+    pattern: '35F9\.1'

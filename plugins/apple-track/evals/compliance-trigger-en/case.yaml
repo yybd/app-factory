@@ -6,7 +6,7 @@ execution:
   prompt: |
     I'm about to submit my iOS app to the App Store. Before I do, can you check it against
     Apple's review guidelines and tell me what would get it rejected?
-  max_turns: 4
+  max_turns: 6
   allowed_tools: [Read, Glob, Grep, Skill]
 graders:
   - name: compliance-skill-fired
