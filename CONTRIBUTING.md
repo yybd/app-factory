@@ -69,10 +69,10 @@ with a camera and no usage string it names that key rather than reciting a check
 python3 factory/run_evals.py apple-track
 ```
 
-**Run it through that script, from a terminal.** Every track sets `defaultEnabled:
+**Run it through that script.** Every track sets `defaultEnabled:
 false`, and the eval sandbox enables nothing — pointed at `plugins/apple-track` directly,
 the suite runs without the plugin and every trigger case fails. The script runs a copy
-with that line dropped. Started inside a desktop-app session the runs cannot log in.
+with that line dropped. The runs use the `claude` CLI's own login, which is not the desktop app's — `claude auth login` once, if `claude auth status` says it is not logged in.
 Each run costs model usage; `--max-cost-usd` caps it.
 
 **It is not in CI**, for the same reason `check_urls` is not: it spends money and calls

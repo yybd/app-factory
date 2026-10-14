@@ -15,10 +15,10 @@ No case field or flag enables it (checked against the plugin-evals docs). So thi
 the track to a temp directory, drops `defaultEnabled` from the copy's manifest, runs
 there, and brings `evals/results/` back. The repo is never edited.
 
-**Run it from a terminal.** The eval spawns `claude -p` children on your own credential.
-Started from inside a desktop-app session they fail with "Not logged in" — the session
-borrows the app's login, and the children cannot. A terminal where `claude` works is
-enough.
+**The CLI must be logged in.** The eval spawns `claude -p` children, and they read the
+`claude` CLI's own login — not the desktop app's, which is separate. A machine that only
+ever used the app has none: `claude auth status` says `"loggedIn": false`, and every run
+fails with "Not logged in". `claude auth login` once fixes it; this script checks first.
 
 **What it passes on its own:** `--trust-plugin` (these are this repo's own files) and
 `--scaffold`, which runs each case's `fixture.sh`. Those scripts are written here and
@@ -72,11 +72,20 @@ def main():
     if not known:
         print("No track has an evals/ directory yet.")
         return 0
-    if os.environ.get("CLAUDE_CODE_SDK_HAS_HOST_AUTH_REFRESH"):
-        print("⚠ This looks like a session inside the desktop app. Its eval children cannot "
-              "log in;\n  run this from a terminal instead.\n")
     if not shutil.which("claude"):
         sys.exit("✗ `claude` is not on PATH.")
+    # The eval's children read the CLI's own login, not the desktop app's. On a machine
+    # that only ever used the app the CLI has none, and the suite dies on its first run
+    # with "Not logged in" — after the scaffold, so it looks like the case failed.
+    try:
+        st = json.loads(subprocess.run(["claude", "auth", "status"], capture_output=True,
+                                       text=True, timeout=30).stdout)
+    except Exception:
+        st = {}
+    if st.get("loggedIn") is False:
+        sys.exit("✗ The `claude` CLI is not logged in (`claude auth status`). The desktop app's\n"
+                 "  login is its own; the eval runs `claude -p` and needs the CLI's. Run\n"
+                 "  `claude auth login` in a terminal once, then this again.")
     rc = 0
     for track in names or known:
         rc = run(track, passthrough) or rc
