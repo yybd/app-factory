@@ -77,7 +77,16 @@ stills permission-free, probes+records (or instructs) for video, then converts a
    recordings). Window-region recording can catch *another app* (e.g. the Terminal you
    launched from) bleeding over the window — tell the user to keep other windows off the
    capture region, and sample frames to confirm none crept in.
-6. **Pin the intended IAP price** in the **IAP reviewer** paywall shot — StoreKit may fetch
+6. **WebKit apps (Tauri, Electron, any WKWebView) stop rendering while occluded.** A
+   window grab by id (`screencapture -l <id>`) succeeds behind other windows, but the web
+   view is not painting there: animations freeze half-way and state changes never show, so
+   the shot catches a sheet mid-slide or the previous scene. Bring the window **frontmost**
+   before each capture (`osascript -e 'tell application "<App>" to activate'`, then let it
+   settle) and keep it there for the whole run.
+7. **Frame window grabs with `frameshot.py --preset mac`.** The grab keeps the window's
+   rounded corners as alpha; frameshot flattens them onto the bezel, where a plain
+   `convert("RGB")` or `ffmpeg format=rgb24` would paint them black.
+8. **Pin the intended IAP price** in the **IAP reviewer** paywall shot — StoreKit may fetch
    the real (often stale) App Store Connect price; force the intended one, and note that the
    live ASC product still needs updating. This applies **only** to the reviewer screenshot:
    a price never goes into a listing screenshot, App Preview or caption (see the hard rules

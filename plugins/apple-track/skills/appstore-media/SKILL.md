@@ -270,6 +270,12 @@ frameshot="${CLAUDE_PLUGIN_ROOT}/skills/appstore-media/scripts/frameshot.py"
   **The inner display is not**: an iPad capture framed as `duo_inner` shows a layout the
   app may not use there, and a screenshot has to depict the app on that device. Say so
   to the user rather than shipping it as a Duo shot.
+- **Mac** — `mac` (2880×1800, 16:10, the largest size App Store Connect accepts for the
+  Mac set). Frame a window grab (`screencapture -o -l <window-id>`, or a self-render) of a
+  1440×900-point window, or 1280×800 scaled up. The caption defaults to `--font-scale 0.85`.
+  A window grab's rounded corners arrive as transparency; the script flattens any alpha
+  onto the bezel colour, so they do not turn into black corners — no pre-processing needed.
+  Capture with the app **frontmost**: see `references/macos-capture.md`.
 - **Creative assets** — `header21x9` (3840×1646), `search3x2` (3840×2560) and
   `universal16x9` (5244×2950, header + search in one file). A different layout: the
   caption sits **beside** the device on the reading side (right for `--rtl`), one or two

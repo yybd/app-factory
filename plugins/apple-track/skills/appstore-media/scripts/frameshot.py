@@ -8,6 +8,7 @@ instead of drifting each time someone reframes by hand.
   frameshot.py --preset iphone69 --in raw.png --caption "Your saved replies" --out 01.png
   frameshot.py --preset iphone69 --in raw.png --caption "טקסט בעברית" --rtl   # any RTL string; --rtl sets the direction --out 01_he.png
   frameshot.py --manifest shots.json
+  frameshot.py --preset mac --in window.png --caption "Notes on your Mac" --out mac_01.png
   frameshot.py --preset universal16x9 --in raw/hero.png --caption "Notes that stay yours" --out creative/universal.png
 
 Output is exact-size PNG with no alpha channel, which is what App Store Connect requires.
@@ -50,6 +51,10 @@ PRESETS = {
     "ipad13":    {"size": (2064, 2752), "corner": 0.036, "kind": "pad"},
     "duo_outer": {"size": (1398, 2034), "corner": 0.080, "kind": "phone"},
     "duo_inner": {"size": (2007, 2853), "corner": 0.050, "kind": "pad"},
+    # Mac App Store: 16:10 at the largest size App Store Connect accepts. The corner is a
+    # macOS window's, not a device's, and the caption is set a little smaller than the
+    # pad size because a window carries more text of its own to compete with.
+    "mac":       {"size": (2880, 1800), "corner": 0.012, "kind": "mac", "font_scale": 0.85},
     # creative assets — see apple-specs.json `creative_assets`
     "header21x9":    {"size": (3840, 1646), "kind": "banner"},
     "universal16x9": {"size": (5244, 2950), "kind": "banner"},
@@ -120,6 +125,22 @@ def _trim_bottom(im: Image.Image, keep_margin: float = 0.02) -> Image.Image:
         last -= 1
     cut = min(im.height, last + int(im.height * keep_margin))
     return im.crop((0, 0, im.width, cut)) if cut < im.height else im
+
+
+def _open(src, bezel: str) -> Image.Image:
+    """Open a capture as RGB, flattening any alpha onto the bezel colour.
+
+    A macOS window grab (`screencapture -o -l <id>`) carries the window's rounded corners
+    as transparency, and `convert("RGB")` turns transparent pixels black — four black
+    corners inside the bezel. Composited onto the bezel colour they vanish into it.
+    """
+    im = Image.open(src)
+    if im.mode in ("RGBA", "LA", "PA") or (im.mode == "P" and "transparency" in im.info):
+        rgba = im.convert("RGBA")
+        flat = Image.new("RGB", rgba.size, bezel)
+        flat.paste(rgba, (0, 0), rgba)
+        return flat
+    return im.convert("RGB")
 
 
 def _rounded_mask(size, radius):
@@ -193,8 +214,8 @@ def composite(srcs, out: Path, preset: str, caption: str, rtl: bool,
         y += leading
 
     pad = int(W * 0.010)
-    first = _trim_border(Image.open(srcs[0]).convert("RGB"))
-    second = _trim_border(Image.open(srcs[1]).convert("RGB"))
+    first = _trim_border(_open(srcs[0], bezel))
+    second = _trim_border(_open(srcs[1], bezel))
 
     # The layout follows the first capture's shape. A landscape window sits behind with the
     # phone over its corner; a portrait window (a menu-bar app) reads better shoulder to
@@ -258,7 +279,7 @@ def banner(srcs, out: Path, preset: str, caption: str, rtl: bool,
     # Devices: phones side by side, the second slightly lower — two screens read as "more
     # of the app", which is the point of a header. Each is sized to the box height first.
     pad = int(H * 0.010)
-    shots = [Image.open(x).convert("RGB") for x in srcs]
+    shots = [_open(x, bezel) for x in srcs]
     n = len(shots)
     devs = []
     for shot in shots:
@@ -306,7 +327,7 @@ def banner(srcs, out: Path, preset: str, caption: str, rtl: bool,
 
 
 def frame(src: Path, out: Path, preset: str, caption: str, rtl: bool,
-          bg: str, fg: str, bezel: str, font_scale: float, bleed: float = 0.0,
+          bg: str, fg: str, bezel: str, font_scale: float | None, bleed: float = 0.0,
           trim_bottom: bool = False) -> None:
     if rtl and not features.check("raqm"):
         sys.exit("error: --rtl needs Pillow built with RAQM, otherwise Hebrew renders reversed.")
@@ -314,6 +335,8 @@ def frame(src: Path, out: Path, preset: str, caption: str, rtl: bool,
         sys.exit(f"error: unknown preset {preset!r}; choose from {', '.join(PRESETS)}")
 
     spec = PRESETS[preset]
+    if font_scale is None:
+        font_scale = spec.get("font_scale", 1.0)
     W, H = spec["size"]
     canvas = Image.new("RGB", (W, H), bg)
     draw = ImageDraw.Draw(canvas)
@@ -339,7 +362,7 @@ def frame(src: Path, out: Path, preset: str, caption: str, rtl: bool,
     # Device: bezel rounded-rect with the capture inset, centred in the space that is left.
     avail_h = H - band - int(H * 0.03)
     avail_w = W - 2 * int(W * 0.075)
-    shot = Image.open(src).convert("RGB")
+    shot = _open(src, bezel)
     if trim_bottom:
         shot = _trim_bottom(shot)
     pad = int(W * 0.012)                       # bezel thickness
@@ -382,7 +405,8 @@ def main() -> None:
     ap.add_argument("--bg", default=DEFAULT_BG)
     ap.add_argument("--fg", default=DEFAULT_FG)
     ap.add_argument("--bezel", default=BEZEL)
-    ap.add_argument("--font-scale", type=float, default=1.0)
+    ap.add_argument("--font-scale", type=float, default=None,
+                    help="caption size multiplier; default 1.0, or the preset's own (mac: 0.85).")
     ap.add_argument("--composite", nargs=2, metavar=("WIDE", "PHONE"),
                     help="two captures in one frame — a Mac window behind, a phone overlapping it.")
     ap.add_argument("--trim-bottom", action="store_true",
@@ -416,7 +440,7 @@ def main() -> None:
             frame(Path(s["in"]), Path(s["out"]), s.get("preset", a.preset),
                   s.get("caption", ""), bool(s.get("rtl", False)),
                   s.get("bg", a.bg), s.get("fg", a.fg), s.get("bezel", a.bezel),
-                  float(s.get("font_scale", 1.0)), float(s.get("bleed", 0.0)),
+                  s.get("font_scale", a.font_scale), float(s.get("bleed", 0.0)),
                   bool(s.get("trim_bottom", False)))
         return
 
@@ -425,14 +449,14 @@ def main() -> None:
         if not srcs or not a.out:
             ap.error("a banner preset needs --in (or --composite A B) and --out")
         banner([Path(x) for x in srcs], a.out, a.preset, a.caption, a.rtl,
-               a.bg, a.fg, a.bezel, a.font_scale, a.safe)
+               a.bg, a.fg, a.bezel, a.font_scale or 1.0, a.safe)
         return
 
     if a.composite:
         if not a.out:
             ap.error("--out is required with --composite")
         composite([Path(x) for x in a.composite], a.out, a.preset, a.caption, a.rtl,
-                  a.bg, a.fg, a.bezel, a.font_scale)
+                  a.bg, a.fg, a.bezel, a.font_scale or 1.0)
         return
 
     if not a.src or not a.out:
