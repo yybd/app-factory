@@ -14,6 +14,12 @@ skill does.
 
 ## Unreleased
 
+## 0.5.0
+
+A minor: a new track. App Factory now ships outside the stores on Windows as well as on
+the Mac — 41 skills in eight tracks. No existing skill behaves differently, except that
+`launch-app` now routes a Windows release instead of calling it unmanaged.
+
 - **A Windows track.** `windows-track` holds one skill, `windows-direct-distribution`:
   WinSparkle wired into a Tauri app and loaded at runtime, so a missing DLL costs the
   updater and never the app; the NSIS installer signed with the same EdDSA key as
