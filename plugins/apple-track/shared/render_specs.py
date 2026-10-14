@@ -61,6 +61,11 @@ def contradictions():
     icon = d.get("icons", {}).get("source")
     if icon:
         known.add(tuple(icon))
+    # Creative assets state a size or the two ends of a range; both ends are real sizes.
+    for p in d.get("creative_assets", {}).get("placements", []):
+        for s in p["images"] + [p["video"]]:
+            known.add(tuple(s["min"]))
+            known.add(tuple(s["max"]))
     # Dimensions the documents name deliberately and that are NOT store sizes — capture
     # inputs, window geometry, the worked example of a grab that must be padded. Each
     # carries its reason in the JSON, so the exception list is data rather than a

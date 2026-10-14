@@ -3,7 +3,9 @@ name: app-store-deliver
 description: >-
   Send an App Store listing to App Store Connect: sync the text and media into the app
   repo, verify against what is already live, then upload metadata, screenshots, App
-  Preview videos, review information and in-app purchase content over the ASC API. Use
+  Preview videos, review information and in-app purchase content over the ASC API — and,
+  through the App Asset Library, the product page header, the search results asset and
+  iPhone Duo screenshots, which fastlane cannot send. Use
   when the user wants the listing pushed, says "upload the metadata", "send the
   listing", "deliver to App Store Connect" ("תעלה את הליסטינג"), or after listing text
   or media changed. It pulls the live listing and refuses to overwrite work it cannot
@@ -315,6 +317,40 @@ Upload it separately with `${CLAUDE_PLUGIN_ROOT}/skills/app-store-deliver/script
 (`DESKTOP` preview type
 for Mac) — the sync already places the video in `fastlane/screenshots/<locale>/`.
 
+### 2b. Creative assets and iPhone Duo — the App Asset Library
+Three things `deliver` cannot send: the **product page header**, the **search results**
+asset, and **iPhone Duo** screenshots (fastlane has no Duo display type, and the sync
+holds Duo stills back for that reason). They go up through the App Asset Library —
+upload once, then *place* the asset on a localization:
+```bash
+LANG=en_US.UTF-8 LC_ALL=en_US.UTF-8 RUBYOPT=-EUTF-8 \
+  ruby ${CLAUDE_PLUGIN_ROOT}/skills/app-store-deliver/scripts/upload_library_assets.rb \
+      <bundle-id> <locale> <App>/<locale>/creative/* <App>/<locale>/screenshots-duo-*/* --dry-run
+```
+Run it **once per locale** — placements are per localization — and **dry-run first**:
+it reads the library, Apple's reference data and the localization's current
+placements, and prints, per file, which placement type × group it would land in and
+that group's limit. Read the plan before dropping `--dry-run`.
+
+- **The kind is read from the folder:** `creative/` → `CREATIVE_ASSETS`, anything else
+  → screenshot. The category cannot be changed after upload, so a file in the wrong
+  folder is a re-upload, not a fix.
+- **A 16:9 universal file goes to header AND search**; `--only header|search` narrows it.
+- **Each slot holds one asset per localization.** A slot that is full is reported and
+  skipped; `--replace` deletes the existing placement first. Before `--replace`, look at
+  what is there — it may be a website edit, which is the same rule as step 1a.
+- **The version decides the road.** In `PREPARE_FOR_SUBMISSION` one run places the
+  assets and they go to review with the version. On a version that is **already live**,
+  a placement needs an *approved* asset: run with `--submit` (sends the assets to App
+  Review on their own, no build), and after approval run the same command again — it
+  reuses the asset by name and size and only places it.
+- `--cpp-loc ID` / `--ppo-loc ID` place on a custom product page or a PPO treatment
+  instead of the version — that is how one campaign's header goes on one CPP.
+
+`--submit` sends work to App Review: confirm it with the user like any submit. The
+model, the endpoints, the measured facts about the reference data and the two-step
+flow are in [references/asset-library-api.md](references/asset-library-api.md).
+
 ### 3. Deliver the App Review content (contact, notes, and the ATTACHMENT)
 What App Review reads before it opens the app. `deliver` pushes the contact and
 notes fields, but it **cannot upload the attachment** — there is no Spaceship model
@@ -400,6 +436,15 @@ creating the app record if missing — then submit is `ship-apple-app`'s job.
   (keeps one of each fileName, reorders).
 - **`verify_only` crashes** with no binary (`Digest::MD5.hexdigest(nil)`). Don't use
   it for metadata-only; validate lengths + run the real upload (it skips the binary).
+- **Header, search results and iPhone Duo are not sent by deliver either** — fastlane
+  has no Asset Library support and no Duo display type. The sync holds Duo stills back
+  by pixel size (a Duo still staged for `deliver` fails the run) and never stages
+  `creative/`. Step 2b sends all three.
+- **The Asset Library names stores, not platforms.** Its placement groups say
+  `IPHONE_APP_STORE` / `IPAD_APP_STORE` / `ANY`, never `IOS`; and a range spec (search
+  results) has to be matched on aspect ratio as well as size, or a 21:9 header is
+  planned onto search results. Both handled in the script, both found on its first
+  run against a live library.
 - **App Preview videos are NOT uploaded by deliver** — it silently processes only
   stills. Use `${CLAUDE_PLUGIN_ROOT}/skills/app-store-deliver/scripts/upload_app_preview.rb`
   (reserve→upload→commit + poll).
@@ -461,6 +506,12 @@ before anything reaches the store. Only the copying is conditional.
   whether the listing comes from a hub or from the repo's own `fastlane/`.
 - [scripts/upload_app_preview.rb](scripts/upload_app_preview.rb) — upload an App
   Preview video (deliver can't); `DESKTOP` for Mac, polls processing, sets poster frame.
+- [scripts/upload_library_assets.rb](scripts/upload_library_assets.rb) — the App Asset
+  Library: product page header, search results asset, iPhone Duo screenshots. Reads
+  Apple's reference data at run time, reuses an asset already uploaded, places it per
+  locale, and `--submit` sends assets to review without a version. `--dry-run` first.
+- [references/asset-library-api.md](references/asset-library-api.md) — the Asset
+  Library model, endpoints, the live-version two-step, and the gotchas.
 - [scripts/dedup_screenshots.rb](scripts/dedup_screenshots.rb) — remove duplicate
   screenshots and fix ordering after a flaky deliver run (`--dry-run` to inspect).
 - [scripts/upload_review_content.rb](scripts/upload_review_content.rb) — App Review

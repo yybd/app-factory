@@ -31,6 +31,12 @@ claim must be true of the shipping app. Hero feature first.
 | 1 | <hero screen>    | <what's on screen>| <benefit, 3–6 w>| <strength>             | <RTL? device? background?> |
 | 2 | …                | …                 | …               | …                      | … |
 
+## Creative assets (optional — iOS 27+ product page)
+| Asset | The one idea | Capture(s) | Phrase | Preset |
+|-------|--------------|------------|--------|--------|
+| Header | <single clear idea, for a first-time visitor> | <which shot(s)> | <≤ 6 words> | universal16x9 / header21x9 |
+| Search | <what the app does, at a glance — or "same as header"> | <real UI> | <short> | universal16x9 / search3x2 |
+
 ## App Preview video (scene-by-scene, 15–30s, real in-app footage only)
 | Scene | t (s) | Shows | On-screen text | Note (pacing / transition) |
 |-------|-------|-------|----------------|----------------------------|
@@ -54,6 +60,9 @@ claim must be true of the shipping app. Hero feature first.
   done in two taps, an export completing) — let the demo data and pacing show it.
 - **Order = priority.** A scanner sees shot 1 and the first 3s of video; lead with
   the strongest, truest thing.
+- **The header is the hero, wider.** On iOS 27 it is the first thing a visitor sees
+  on the product page, above the screenshots — so it carries the hero strength, in the
+  same words as shot 1 where that phrase works. It is one idea, not a summary.
 
 ## Consistency downstream
 - **Phase 3 (flow):** every storyboard shot/scene becomes a beat in `DemoFlowTests`,

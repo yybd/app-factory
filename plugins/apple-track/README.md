@@ -12,7 +12,7 @@ edit a skill, not this table.*
 | Skill | What it is for | scripts | refs |
 |---|---|---|---|
 | `app-icon-generator` | Generate a complete Xcode app-icon set from a single source image (or create a starter icon if the user has none), sized to Apple's current icon sp… | 2 | 1 |
-| `app-store-deliver` | Send an App Store listing to App Store Connect: sync the text and media into the app repo, verify against what is already live, then upload metadat… | 8 | 1 |
+| `app-store-deliver` | Send an App Store listing to App Store Connect: sync the text and media into the app repo, verify against what is already live, then upload metadat… | 9 | 2 |
 | `app-store-metadata` | Create, organize, translate, and validate App Store / Mac App Store listing metadata for an Xcode project — localized text (name, subtitle, descrip… | 2 | 3 |
 | `app-store-review-compliance` | Audit a macOS or iOS Xcode project against Apple's App Store Review Guidelines and fix the issues that get apps rejected, BEFORE submitting to App… | 1 | 2 |
 | `app-store-reviews-responder` | Monitor App Store / Mac App Store customer reviews and draft developer responses to them. | 1 | 1 |
@@ -28,7 +28,7 @@ edit a skill, not this table.*
 | `notarize-and-distribute` | Take a built macOS app from an Xcode archive, package it into a signed DMG, notarize it with Apple, staple the ticket, and verify that everything —… | 1 | 1 |
 | `ship-apple-app` | Verify an Apple app is submission-ready and ship it — the FINAL App Store / Mac App Store step: confirm the content is already in place (signing, c… |  | 1 |
 
-**What it costs.** 12,920 characters of description ≈ 3,230 tokens, in every session
+**What it costs.** 13,145 characters of description ≈ 3,286 tokens, in every session
 that enables this track. A skill's body is read only when the skill fires; its description
 is in context always.
 

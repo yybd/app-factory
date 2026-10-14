@@ -4,8 +4,11 @@ Source of truth (re-check here if anything is rejected — specs change occasion
 - Screenshots: https://developer.apple.com/help/app-store-connect/reference/app-information/screenshot-specifications/
 - App Previews: https://developer.apple.com/help/app-store-connect/reference/app-information/app-preview-specifications/
 - Upload rules: https://developer.apple.com/help/app-store-connect/manage-app-information/upload-app-previews-and-screenshots
+- Creative assets: https://developer.apple.com/help/app-store-connect/reference/app-information/creative-assets-specifications
+- Design guidance: https://developer.apple.com/app-store/asset-best-practices/
 
-Verified against Apple's pages: June 2026.
+Verified against Apple's pages: October 2026. The complete table, which the scripts
+read, is `shared/apple-specs.json`; this page quotes what capture needs.
 
 ## Screenshots
 
@@ -17,6 +20,8 @@ Verified against Apple's pages: June 2026.
 | iPhone 6.5" (legacy alternative) | Alternative to 6.9" | 1242×2688, 1284×2778 |
 | iPad 13" (Pro M4/M5, Air M2+) | **Required** if app runs on iPad | 2064×2752, 2048×2732 |
 | Mac | **Required** for Mac apps | 1280×800, 1440×900, 2560×1600, 2880×1800 (16:10, landscape) |
+| iPhone Duo — outer display | Optional; **required from April 2027** (iOS 27.1 SDK+) | 1398×2034 |
+| iPhone Duo — inner display | same set as the outer one | 2007×2853 |
 
 Notes:
 - iPhone 6.9" simulator screenshots come out at the right size natively (e.g. iPhone 17 Pro Max → 1320×2868). Mac screenshots almost never do — plan to compose/pad to a 16:10 size (2880×1800 recommended).
@@ -45,6 +50,20 @@ Optional; up to 3 per device size per locale.
 | Mac | — (landscape only) | 1920×1080 |
 
 A 6.9" preview is auto-scaled to all smaller iPhones if you provide only that one; same for iPad 13".
+iPhone Duo previews use the same iPhone size (886×1920 / 1920×886) — there is no Duo video size.
+
+## Creative assets — product page header and search results
+
+Optional, iOS / iPadOS apps, shown on iOS 27 and later. RGB, no alpha, no transparency.
+
+| Placement | Image | Video (5–30 s, 30 or 60 fps, loops) |
+|---|---|---|
+| Product page header | 21:9 at 3840×1646 (png/jpg), or 16:9 PNG at 5244×2950 | 21:9 at 3840×1646 — muted until the viewer unmutes |
+| Search results | 3:2 from 1920×1280 to 3840×2560 (png/jpg), or 16:9 PNG at 5244×2950 | 3:2, same range — always muted |
+
+The 16:9 PNG at 5244×2950 is accepted by both, so one file can be header and search
+asset. One asset per placement per localization. Without a search asset the store
+shows the screenshots and App Preview there instead.
 
 ## App Preview content rules (App Review enforces these)
 

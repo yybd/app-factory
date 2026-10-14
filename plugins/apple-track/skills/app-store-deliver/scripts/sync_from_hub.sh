@@ -361,12 +361,24 @@ is_mac_shot() {
     *) return 1 ;;
   esac
 }
+# iPhone Duo stills: deliver has no display type for them and fails the run on one, so
+# they never enter this staging folder. upload_library_assets.rb sends them through the
+# App Asset Library. Sizes from shared/apple-specs.json (`iphone_duo`), both orientations.
+is_duo_shot() {
+  local dims
+  dims="$(sips -g pixelWidth -g pixelHeight "$1" 2>/dev/null \
+          | awk '/pixelWidth/{w=$2} /pixelHeight/{h=$2} END{print w"x"h}')"
+  case "$dims" in
+    1398x2034|2034x1398|2007x2853|2853x2007) return 0 ;;
+    *) return 1 ;;
+  esac
+}
 # keep this still for the platform being delivered? (no --platform → keep all)
 want_shot() {
   [[ -z "$platform" ]] && return 0
   if [[ "$platform" == "osx" ]]; then is_mac_shot "$1"; else ! is_mac_shot "$1"; fi
 }
-shots_n=0; vids_n=0; skipped_n=0; with_media=" "; no_media=()
+shots_n=0; vids_n=0; skipped_n=0; duo_n=0; with_media=" "; no_media=()
 for loc in "${expected[@]}"; do
   destloc="$dst/screenshots/$loc"; copied=0
   for appdir in "$media"/*/; do          # one <App> per root, but glob to be safe
@@ -391,6 +403,7 @@ for loc in "${expected[@]}"; do
       [[ "$dirbase" != "screenshots" ]] && prefix="${dirbase#screenshots-}_"
       for img in "$shotdir"*.png "$shotdir"*.jpg "$shotdir"*.jpeg; do
         [[ -e "$img" ]] || continue
+        is_duo_shot "$img" && { duo_n=$((duo_n+1)); continue; }
         want_shot "$img" || { skipped_n=$((skipped_n+1)); continue; }
         cp "$img" "$destloc/$prefix$(basename "$img")"; shots_n=$((shots_n+1)); copied=1
       done
@@ -425,6 +438,8 @@ shots_msg="$shots_n still(s), $vids_n preview video(s) → $dst/screenshots/<loc
 # never drop stills silently — say what --platform filtered out and why
 [[ $skipped_n -gt 0 ]] && shots_msg="$shots_msg
     ($skipped_n still(s) held back as not --platform $platform; deliver the other platform to ship them)"
+[[ $duo_n -gt 0 ]] && shots_msg="$shots_msg
+    ($duo_n iPhone Duo still(s) held back — deliver cannot send them; upload_library_assets.rb does)"
 
 fi   # end of the hub-backed branch; standalone joins here for verification
 

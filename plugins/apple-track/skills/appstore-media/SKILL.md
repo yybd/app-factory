@@ -6,7 +6,8 @@ description: >-
   SCRIPTWRITER: before any capture it writes the storyboard deciding which strengths
   each shot carries. Use when the user wants store screenshots, an app preview video, a
   demo recording, a media script or storyboard, simulator capture, fastlane snapshot
-  setup, screenshot captions, an iMovie editing plan, or verification against Apple's
+  setup, screenshot captions, an iMovie editing plan, the product page header or search
+  results creative asset, iPhone Duo screenshots, or verification against Apple's
   required formats — including "I need screenshots for my app", "תכין צילומי מסך",
   "סרטון לאפסטור". Also for adding accessibility identifiers or a demo mode for capture.
   This skill CAPTURES from a running app. It does NOT upload, and does NOT author the
@@ -55,7 +56,10 @@ redefine it. Each app owns one media root per store in the hub: `<slug>/media/ap
 └─ <App>/                   # <App> = the app's display name
    └─ <locale>/             # App Store Connect locale code: en-US, he, pt-BR …
       ├─ screenshots/        # ✅ upload-ready stills, exact device sizes
+      ├─ screenshots-ipad13/ # ✅ one folder per further device class …
+      ├─ screenshots-duo-inner/ · screenshots-duo-outer/   # ✅ iPhone Duo (one ASC set, two displays)
       ├─ app-preview/        # ✅ upload-ready App Preview video(s)
+      ├─ creative/           # ✅ product page header + search results (image or video)
       ├─ iap/
       │  └─ review_screenshot.png   # pinned IAP reviewer screenshot (handed to app-store-metadata)
       └─ raw/                # intermediates — NOT for upload
@@ -64,9 +68,16 @@ redefine it. Each app owns one media root per store in the hub: `<slug>/media/ap
 Rules: scriptwriter deliverables + helpers live at the **apple root** (one app per
 root); captured, per-locale media lives under `<App>/<locale>/…`. The capture scripts
 create `<App>/<locale>/raw/`; Phase-5 conversion/organization produces `screenshots/`,
-`app-preview/`, and `iap/`. `<locale>` is the store's locale code (Hebrew = `he` on
+`app-preview/`, `creative/` and `iap/`. `<locale>` is the store's locale code (Hebrew = `he` on
 Apple, `iw-IL` on Play). One IAP reviewer screenshot covers all locales unless the
 paywall is localized.
+
+**The folder name is the contract with `app-store-deliver`.** Its sync stages
+`screenshots*/` and `app-preview/` for `deliver` — except Duo stills, which it holds
+back by pixel size — and never stages `creative/`. Its Asset Library uploader reads
+the category off the folder: `creative/` → creative asset, anything else → screenshot,
+and that category cannot be changed after upload. A header saved under `screenshots/`
+is therefore not a misfiled file, it is an asset that can never be placed.
 
 ## The six phases
 
@@ -95,6 +106,11 @@ Before writing anything, build a picture of the app:
    - **Locales** to produce. Default to the app's own — the locales its listing
      already has, or the languages it ships strings for. Never assume a pair.
    - **Targets**: iOS screenshots? iOS App Preview? Mac screenshots? Mac App Preview? Marketing video for web/social too?
+   - **Creative assets** (iOS / iPadOS apps): a product page **header** and a **search
+     results** asset? Both optional; without a search asset the store falls back to the
+     screenshots. One 16:9 PNG serves both — the cheapest start. Shown on iOS 27+.
+   - **iPhone Duo** (iPhone apps): optional now, **required from April 2027** for apps
+     built with the iOS 27.1 SDK or later. Ask whether to produce the set this release.
    - Whether the app has (or can have) a demo mode with attractive seeded data.
 
 If neither the profile nor the user pins down the story, propose one yourself from the project inspection and let them edit it. Don't proceed to Phase 1 without an agreed screen list — everything downstream is built on it.
@@ -119,7 +135,11 @@ Decide and write down — **lifting from the profile/README, never inventing**:
 2. **Screenshot storyboard** — the ordered shot list (hero first). Per shot: the
    screen/feature, the headline intent, what's on screen (the demo data to show),
    framing, and **which strength it sells**.
-3. **Video script** — the App Preview as a scene-by-scene script: per scene the
+3. **Creative assets** — if the user wants them: the ONE idea the header carries
+   (Apple: a single clear idea, for a first-time visitor), which capture(s) show it,
+   the short phrase on it, and whether one universal 16:9 serves search results too or
+   search gets its own asset that "states the obvious" — what the app does, at a glance.
+4. **Video script** — the App Preview as a scene-by-scene script: per scene the
    timing (seconds), what's shown, the on-screen text, pacing, and the narrative
    arc — a 15–30s story (hook → value → payoff). Real in-app footage only (see the
    hard rules).
@@ -242,6 +262,21 @@ frameshot="${CLAUDE_PLUGIN_ROOT}/skills/appstore-media/scripts/frameshot.py"
 - `--preset` — `iphone69` (1320×2868), `ipad13` (2064×2752). These two are all App Store
   Connect needs; it scales them down to every smaller size in the family. `iphone65` exists
   only for a listing that skips the 6.9" set.
+- **iPhone Duo** — `duo_outer` (1398×2034) and `duo_inner` (2007×2853). Both go in the
+  same ASC set. Save them to `screenshots-duo-outer/` and `screenshots-duo-inner/`.
+  Capture on an iPhone Duo simulator when your Xcode has one
+  (`xcrun simctl list devicetypes | grep -i duo`). Until then a phone capture framed with
+  `duo_outer` is a fair stand-in for the outer display, which is an ordinary phone screen.
+  **The inner display is not**: an iPad capture framed as `duo_inner` shows a layout the
+  app may not use there, and a screenshot has to depict the app on that device. Say so
+  to the user rather than shipping it as a Duo shot.
+- **Creative assets** — `header21x9` (3840×1646), `search3x2` (3840×2560) and
+  `universal16x9` (5244×2950, header + search in one file). A different layout: the
+  caption sits **beside** the device on the reading side (right for `--rtl`), one or two
+  captures (`--composite A B`), and everything that matters stays inside a centred
+  `--safe` share of the width (default 0.62), because the store crops the header
+  differently on iPhone and iPad. The caption is shrunk to fit two lines; past that it
+  errors — a header carries one short phrase. Save into `<App>/<locale>/creative/`.
 - `--composite WIDE PHONE` — two captures in one frame: a Mac window behind, a phone
   overlapping its lower-right. Use it for the cross-device claim, which two separate
   screenshots only imply. In a manifest, pass `"in": ["mac.png", "phone.png"]`.
@@ -251,6 +286,22 @@ frameshot="${CLAUDE_PLUGIN_ROOT}/skills/appstore-media/scripts/frameshot.py"
   than silently writing the caption backwards.
 - The script errors when a caption wraps past three lines. That is a caption that is too
   long for a store thumbnail, not a layout problem to work around.
+
+## Creative assets — the rules Apple adds
+
+On top of the hard rules below, from Apple's asset guidance:
+- **One clear idea**, designed for someone who has never seen the app. Dense or
+  cluttered assets dilute it.
+- **The focal point in the centre** — keep key elements inside the safe area; preview in
+  App Store Connect (Product Page → Preview) before submitting, on iPhone and iPad.
+- **No pricing, discounts, website URLs or copyright symbols; no logos or mentions of
+  other platforms; no Apple recognitions** (Editor's Choice, App of the Day, Apple Design
+  Award) and **no awards the app has not received.** Content fit for a 4+ rating.
+- **Text short and localized** — a different asset per locale where the phrase differs.
+- The search asset shows the real interface: people searching want to decide quickly
+  whether this is what they were looking for.
+- Videos: 5–30 s, 30 or 60 fps, looping. The header plays muted until the viewer
+  unmutes; the search asset never plays sound — it must work silent.
 
 ## Hard rules (violating these gets the submission rejected)
 
@@ -265,7 +316,9 @@ frameshot="${CLAUDE_PLUGIN_ROOT}/skills/appstore-media/scripts/frameshot.py"
 ## Definition of done
 
 - `media-script.md` (the storyboard + strategy) exists in the media folder and was agreed before capture.
-- `verify_assets.py` passes for every locale and device class the user targeted.
+- `verify_assets.py` passes for every locale and device class the user targeted —
+  including `creative/`, which it checks against the header / search rules, not the
+  screenshot table.
 - **No listing asset shows a price** — check the shot list and the captions, not just the files; `verify_assets.py` checks sizes and formats, it cannot see a price. The IAP reviewer screenshot is the deliberate exception.
 - The user has `captions.md` (per target locale) + `imovie-plan.md` (in the conversational language), both consistent with `media-script.md`.
 - Summarize for the user (in the `conversational language` from the hub `DATA.md`): what was produced, where it is, the remaining manual steps (iMovie pass, framing tool pass, upload to App Store Connect), and the one-command way to regenerate everything next release.

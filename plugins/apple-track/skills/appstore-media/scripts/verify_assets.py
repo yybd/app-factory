@@ -5,9 +5,13 @@ Usage:
     python3 verify_assets.py <file-or-directory> [...]
 
 Checks every .png/.jpg/.jpeg/.mp4/.mov/.m4v found (directories are walked).
-Images:  exact accepted screenshot sizes.
+Images:  exact accepted screenshot sizes (iPhone Duo included).
 Videos:  exact accepted App Preview resolutions, 15-30s duration, <=30fps,
          <=500MB, stereo audio track present.
+Creative assets — any file under a `creative/` directory — are held to the
+product page header / search results rules instead: their own sizes (a range
+for search results), no alpha, 16:9 only as PNG, and for video 30 or 60 fps,
+5-30s, no audio requirement.
 
 Exits non-zero if anything fails, so it can gate a release script.
 Specs source: developer.apple.com App Store Connect reference (verified 2026-06).
@@ -28,7 +32,8 @@ import sys
 _SHARED = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                         "..", "..", "..", "shared"))
 sys.path.insert(0, _SHARED)
-from apple_specs import screenshot_sizes, preview_sizes       # noqa: E402
+from apple_specs import (screenshot_sizes, preview_sizes,      # noqa: E402
+                         creative_matches, creative_video_rules)
 
 SCREENSHOT_SIZES = screenshot_sizes()
 PREVIEW_SIZES = preview_sizes()
@@ -46,6 +51,14 @@ def report(path, ok, msg):
         failures.append(path)
 
 
+def is_creative(path):
+    # The canonical tree keeps creative assets in <App>/<locale>/creative/. They are not
+    # screenshots: the sizes, the formats and the video rules all differ, and a header
+    # checked against the screenshot table fails as "not an accepted size" — true, and
+    # useless.
+    return "creative" in os.path.normpath(path).split(os.sep)
+
+
 def check_image(path):
     try:
         out = subprocess.check_output(
@@ -59,6 +72,23 @@ def check_image(path):
         bits = int(bps_lines[0].split()[-1]) if bps_lines else None
     except Exception as e:
         report(path, False, f"could not read image: {e}")
+        return
+    if is_creative(path):
+        ext = os.path.splitext(path)[1]
+        fits = creative_matches(w, h, ext)
+        if not fits:
+            report(path, False,
+                   f"{w}x{h}{ext} fits no creative placement — header is 21:9 at 3840x1646 "
+                   f"(or 16:9 PNG at 5244x2950), search results 3:2 from 1920x1280 to "
+                   f"3840x2560 (or the same 16:9 PNG)")
+        elif has_alpha:
+            report(path, False, f"{w}x{h} ({', '.join(fits)}) but has an ALPHA channel — "
+                                f"creative assets may not be transparent. Flatten to RGB.")
+        elif bits and bits > 8:
+            report(path, False, f"{w}x{h} ({', '.join(fits)}) but is {bits}-bit/channel — "
+                                f"convert to 8-bit.")
+        else:
+            report(path, True, f"{w}x{h} — {', '.join(fits)}, no alpha")
         return
     label = SCREENSHOT_SIZES.get((w, h))
     if not label:
@@ -107,6 +137,9 @@ def check_video(path):
         report(path, False, "no video stream")
         return
     w, h = int(v["width"]), int(v["height"])
+    if is_creative(path):
+        check_creative_video(path, info, v, w, h)
+        return
     label = PREVIEW_SIZES.get((w, h))
     if not label:
         near = min(PREVIEW_SIZES, key=lambda s: abs(s[0]-w) + abs(s[1]-h))
@@ -136,6 +169,32 @@ def check_video(path):
     else:
         report(path, True,
                f"{w}x{h} ({label}), {dur:.1f}s, {fps:.0f}fps, {size_mb:.0f}MB, stereo audio")
+
+
+def check_creative_video(path, info, v, w, h):
+    """A header or search-results video. Not an App Preview: 30 OR 60 fps, 5-30s, and
+    no audio requirement — the header plays muted until the viewer unmutes, the search
+    asset never plays sound."""
+    problems = []
+    fits = creative_matches(w, h, os.path.splitext(path)[1], video=True)
+    if not fits:
+        problems.append(f"{w}x{h} fits no creative video placement (header 21:9 3840x1646, "
+                        f"search results 3:2 from 1920x1280 to 3840x2560)")
+    num, _, den = v.get("r_frame_rate", "30/1").partition("/")
+    fps = float(num) / float(den or 1)
+    rules = creative_video_rules()
+    allowed = sorted({f for fr, _ in rules.values() for f in fr})
+    if not any(abs(fps - f) < 0.05 for f in allowed):
+        problems.append(f"frame rate {fps:.2f} — creative video must be "
+                        f"{' or '.join(map(str, allowed))} fps")
+    dur = float(info["format"]["duration"])
+    lo = min(s[0] for _, s in rules.values()); hi = max(s[1] for _, s in rules.values())
+    if not (lo <= dur <= hi + 0.5):
+        problems.append(f"duration {dur:.1f}s outside {lo}-{hi}s")
+    if problems:
+        report(path, False, "; ".join(problems))
+    else:
+        report(path, True, f"{w}x{h} ({', '.join(fits)}), {dur:.1f}s, {fps:.0f}fps — loops on the store")
 
 
 def walk(target):

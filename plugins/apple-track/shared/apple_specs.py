@@ -58,6 +58,53 @@ def preview_sizes():
     return out
 
 
+def duo_sizes():
+    """{(w, h): "label"} for the iPhone Duo stills, both orientations.
+
+    Kept apart from the rest because they travel a different road: fastlane `deliver`
+    has no Duo display type, so a Duo still handed to it fails the run. The deliver
+    staging holds them back by this set; the Asset Library uploader sends them.
+    """
+    return screenshot_sizes(platforms=["iphone_duo"])
+
+
+def creative_placements():
+    """The creative-asset placements (product page header, search results), as stored."""
+    return load().get("creative_assets", {}).get("placements", [])
+
+
+def creative_matches(w, h, ext, video=False):
+    """[label] of every creative placement a (w, h, ext) file is accepted by.
+
+    Images are exact for the header and a RANGE for search results, so this is not a
+    lookup in a size table the way screenshots are. An empty list means the file fits
+    no placement — which is the answer a verifier needs, not an exception.
+    """
+    ext = ext.lower().lstrip(".")
+    out = []
+    for p in creative_placements():
+        specs = [p["video"]] if video else p["images"]
+        for s in specs:
+            (wmin, hmin), (wmax, hmax) = s["min"], s["max"]
+            if wmin <= w <= wmax and hmin <= h <= hmax and ext in s["formats"]:
+                if _ratio_ok(w, h, s["ratio"]):
+                    out.append(p["label"] + (" (universal 16:9)" if s.get("universal") else ""))
+    return out
+
+
+def creative_video_rules():
+    """{label: (fps_list, (min_s, max_s))} — what a creative video must also satisfy."""
+    return {p["label"]: (p["video"]["fps"], tuple(p["video"]["seconds"]))
+            for p in creative_placements()}
+
+
+def _ratio_ok(w, h, ratio):
+    # Within 1%: Apple's 21:9 is 3840x1646 (2.333…), and a range spec has to be held to
+    # its ratio or a portrait file inside the box would pass as a "search results" image.
+    a, b = (int(x) for x in ratio.split(":"))
+    return abs((w / h) - (a / b)) <= 0.01 * (a / b)
+
+
 def cert_types():
     """[(prefix, what it is for)] — the certificate table both signing scripts read.
 
@@ -95,6 +142,9 @@ def render_markdown():
     L.append("")
     L.append(d.get("_watch_note", ""))
     L.append("")
+    if d.get("_duo_note"):
+        L.append(d["_duo_note"])
+        L.append("")
     L.append("### App Preview videos")
     L.append("")
     L.append("| Platform | Sizes |")
@@ -103,6 +153,31 @@ def render_markdown():
         L.append(f"| {platform} | " + " · ".join(f"{w} × {h}" for w, h in sizes) + " |")
     L.append("")
     L.append(d.get("_preview_rules", ""))
+    if d.get("_preview_duo_note"):
+        L.append("")
+        L.append(d["_preview_duo_note"])
+    ca = d.get("creative_assets")
+    if ca:
+        L.append("")
+        L.append("### Creative assets — product page header and search results")
+        L.append("")
+        L.append(f"*Source: {ca['_source']} — checked {ca['_checked']}.*")
+        L.append("")
+        L.append("| Placement | Kind | Ratio | Size | Formats | Video |")
+        L.append("|---|---|---|---|---|---|")
+        for p in ca["placements"]:
+            for s in p["images"] + [dict(p["video"], kind="video")]:
+                kind = s.get("kind", "image")
+                size = (f"{s['min'][0]} × {s['min'][1]}" if s["min"] == s["max"]
+                        else f"{s['min'][0]} × {s['min'][1]} – {s['max'][0]} × {s['max'][1]}")
+                vid = (f"{'/'.join(map(str, s['fps']))} fps, {s['seconds'][0]}–{s['seconds'][1]} s"
+                       if kind == "video" else "")
+                L.append(f"| {p['label']} | {kind} | {s['ratio']} | {size} | "
+                         f"{', '.join(s['formats'])} | {vid} |")
+        L.append("")
+        L.append(ca["_rules"])
+        L.append("")
+        L.append(ca["_universal"])
     return "\n".join(L).rstrip() + "\n"
 
 

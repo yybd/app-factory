@@ -8,6 +8,7 @@ instead of drifting each time someone reframes by hand.
   frameshot.py --preset iphone69 --in raw.png --caption "Your saved replies" --out 01.png
   frameshot.py --preset iphone69 --in raw.png --caption "טקסט בעברית" --rtl   # any RTL string; --rtl sets the direction --out 01_he.png
   frameshot.py --manifest shots.json
+  frameshot.py --preset universal16x9 --in raw/hero.png --caption "Notes that stay yours" --out creative/universal.png
 
 Output is exact-size PNG with no alpha channel, which is what App Store Connect requires.
 
@@ -32,10 +33,27 @@ except ImportError:
                  "  Check: python3 -c \"from PIL import features; print(features.check('raqm'))\"")
 
 # Largest size per family is all App Store Connect needs — it scales down to the rest.
+#
+# The Duo pair are their own sets, not scaled from anything: one per display, and the
+# store shows the one that matches the way the device is held. Their corner ratios are
+# an estimate from the published screen sizes, not a measured bezel — check one framed
+# shot in App Store Connect's preview before framing a whole set.
+#
+# The `banner` presets are the creative assets — the product page header and the search
+# results tile. They are a different layout (caption beside the device, not above it)
+# because they are landscape, and because the store crops them per device: the header
+# is shown at different widths on iPhone and iPad, so everything that matters is kept
+# inside a centred safe area (`--safe`) and the edges carry only background.
 PRESETS = {
-    "iphone69": {"size": (1320, 2868), "corner": 0.092, "kind": "phone"},
-    "iphone65": {"size": (1284, 2778), "corner": 0.088, "kind": "phone"},
-    "ipad13":   {"size": (2064, 2752), "corner": 0.036, "kind": "pad"},
+    "iphone69":  {"size": (1320, 2868), "corner": 0.092, "kind": "phone"},
+    "iphone65":  {"size": (1284, 2778), "corner": 0.088, "kind": "phone"},
+    "ipad13":    {"size": (2064, 2752), "corner": 0.036, "kind": "pad"},
+    "duo_outer": {"size": (1398, 2034), "corner": 0.080, "kind": "phone"},
+    "duo_inner": {"size": (2007, 2853), "corner": 0.050, "kind": "pad"},
+    # creative assets — see apple-specs.json `creative_assets`
+    "header21x9":    {"size": (3840, 1646), "kind": "banner"},
+    "universal16x9": {"size": (5244, 2950), "kind": "banner"},
+    "search3x2":     {"size": (3840, 2560), "kind": "banner"},
 }
 
 # The caption font. `--font` overrides both; these are the fallbacks.
@@ -212,6 +230,81 @@ def composite(srcs, out: Path, preset: str, caption: str, rtl: bool,
     print(f"{out}  {W}x{H}  composite  \"{caption}\"")
 
 
+def banner(srcs, out: Path, preset: str, caption: str, rtl: bool,
+           bg: str, fg: str, bezel: str, font_scale: float, safe: float = 0.62) -> None:
+    """A creative asset: caption on the reading side, one or two devices on the other.
+
+    Landscape, so the caption sits BESIDE the device rather than above it — the start
+    side for the script (left for LTR, right for RTL), which is where the eye lands
+    first. Everything that carries meaning is kept inside a centred box `safe` of the
+    width and 80% of the height: Apple crops the header differently per device and asks
+    for the focal point in the centre, and a caption clipped at the edge on one device
+    is worse than a little empty background on all of them.
+    """
+    if rtl and not features.check("raqm"):
+        sys.exit("error: --rtl needs Pillow built with RAQM, otherwise Hebrew renders reversed.")
+    if not 1 <= len(srcs) <= 2:
+        sys.exit("error: a banner takes one or two captures.")
+    W, H = PRESETS[preset]["size"]
+    canvas = Image.new("RGB", (W, H), bg)
+    draw = ImageDraw.Draw(canvas)
+
+    sw_, sh_ = int(W * safe), int(H * 0.80)
+    sx, sy = (W - sw_) // 2, (H - sh_) // 2
+    text_w = int(sw_ * 0.46) if caption else 0
+    gap = int(sw_ * 0.04) if caption else 0
+    dev_box_w = sw_ - text_w - gap
+
+    # Devices: phones side by side, the second slightly lower — two screens read as "more
+    # of the app", which is the point of a header. Each is sized to the box height first.
+    pad = int(H * 0.010)
+    shots = [Image.open(x).convert("RGB") for x in srcs]
+    n = len(shots)
+    devs = []
+    for shot in shots:
+        target_h = sh_ if n == 1 else int(sh_ * 0.92)
+        w_for_h = int((target_h - 2 * pad) * shot.width / shot.height) + 2 * pad
+        w_cap = dev_box_w if n == 1 else int(dev_box_w * 0.52)
+        corner = 0.085 if shot.height > shot.width * 1.3 else 0.03
+        devs.append(_device_image(shot, min(w_for_h, w_cap), pad, corner, bezel))
+    total_w = sum(d.width for d, _ in devs) + (int(dev_box_w * 0.04) if n == 2 else 0)
+    dev_x0 = (sx + sw_ - total_w) if not rtl else sx      # devices on the far side
+    x = dev_x0
+    for i, (d, m) in enumerate(devs):
+        y = sy + (sh_ - d.height) // 2 + (int(sh_ * 0.06) if i == 1 else 0)
+        canvas.paste(d, (x, y), m)
+        x += d.width + int(dev_box_w * 0.04)
+
+    if caption:
+        # Fit to two lines by shrinking, not by wrapping further: a banner is read at a
+        # glance, and a third line is where one orphaned word ends up on its own. The
+        # floor is 60% of the starting size — below that the phrase is too long, and
+        # saying so beats a caption nobody can read on a phone.
+        start = int(H * 0.085 * font_scale)
+        font_size = start
+        while True:
+            font = _font(FONT_RTL if rtl else FONT_LATIN, font_size)
+            lines = _wrap(draw, caption, font, text_w, rtl)
+            if len(lines) <= 2 or font_size <= start * 0.6:
+                break
+            font_size = int(font_size * 0.92)
+        if len(lines) > 2:
+            sys.exit(f"error: caption needs {len(lines)} lines even at 60% size; a header "
+                     f"carries one short phrase — shorten it.")
+        leading = int(font_size * 1.22)
+        ty = sy + (sh_ - leading * len(lines)) // 2
+        # anchored on the start edge of the text column, in the script's direction
+        tx, anchor = ((sx + sw_, "ra") if rtl else (sx, "la"))
+        for line in lines:
+            draw.text((tx, ty), line, font=font, fill=fg, anchor=anchor,
+                      direction="rtl" if rtl else "ltr")
+            ty += leading
+
+    out.parent.mkdir(parents=True, exist_ok=True)
+    canvas.save(out, "PNG")                     # RGB — creative assets may not be transparent
+    print(f"{out}  {W}x{H}  banner  {'rtl' if rtl else 'ltr'}  \"{caption}\"")
+
+
 def frame(src: Path, out: Path, preset: str, caption: str, rtl: bool,
           bg: str, fg: str, bezel: str, font_scale: float, bleed: float = 0.0,
           trim_bottom: bool = False) -> None:
@@ -295,6 +388,9 @@ def main() -> None:
     ap.add_argument("--trim-bottom", action="store_true",
                     help="cut a uniform empty band off the bottom of the capture before framing "
                          "— for a screen that does not fill, typically on iPad.")
+    ap.add_argument("--safe", type=float, default=0.62,
+                    help="banner presets only: the share of the width that carries caption and "
+                         "devices; the rest is background the store may crop.")
     ap.add_argument("--bleed", type=float, default=0.0,
                     help="0.0 fits the whole device; 0.25 enlarges it by a quarter and runs the "
                          "bottom off the canvas — use it when the captured screen does not fill.")
@@ -303,6 +399,14 @@ def main() -> None:
     if a.manifest:
         shots = json.loads(a.manifest.read_text())
         for s in shots:
+            pre = s.get("preset", a.preset)
+            if PRESETS[pre]["kind"] == "banner":
+                srcs = s["in"] if isinstance(s["in"], list) else [s["in"]]
+                banner([Path(x) for x in srcs], Path(s["out"]), pre, s.get("caption", ""),
+                       bool(s.get("rtl", False)), s.get("bg", a.bg), s.get("fg", a.fg),
+                       s.get("bezel", a.bezel), float(s.get("font_scale", 1.0)),
+                       float(s.get("safe", a.safe)))
+                continue
             if isinstance(s["in"], list):
                 composite([Path(x) for x in s["in"]], Path(s["out"]), s.get("preset", a.preset),
                           s.get("caption", ""), bool(s.get("rtl", False)),
@@ -314,6 +418,14 @@ def main() -> None:
                   s.get("bg", a.bg), s.get("fg", a.fg), s.get("bezel", a.bezel),
                   float(s.get("font_scale", 1.0)), float(s.get("bleed", 0.0)),
                   bool(s.get("trim_bottom", False)))
+        return
+
+    if PRESETS[a.preset]["kind"] == "banner":
+        srcs = a.composite or ([a.src] if a.src else [])
+        if not srcs or not a.out:
+            ap.error("a banner preset needs --in (or --composite A B) and --out")
+        banner([Path(x) for x in srcs], a.out, a.preset, a.caption, a.rtl,
+               a.bg, a.fg, a.bezel, a.font_scale, a.safe)
         return
 
     if a.composite:

@@ -69,6 +69,17 @@ dormant, or undocumented features; don't mention other platforms.
 Detect: features in description not present in build; placeholder screenshots.
 Fix: align metadata with the build (out of this skill's code scope — flag it).
 
+**Creative assets (product page header, search results asset) are metadata too,
+and Apple's asset guidance adds rules that are easy to break in a banner:** no
+pricing or discounts, no website URLs, no copyright symbols, no logos or mentions
+of other platforms or marketplaces, no Apple-designated recognitions (Editor's
+Choice, App of the Day, Apple Design Award) and no awards not actually received;
+content appropriate for a 4+ rating. They are reviewed on their own when
+submitted without a version, against the app's latest version — so a header that
+shows a feature the live build lacks is rejected even if the next build has it.
+Detect: read `<App>/<locale>/creative/` in the media tree and the header phrase in
+`media-script.md`. Fix: belongs to `appstore-media`; flag it.
+
 ### 2.3.10 Irrelevant platform references `[both]` 🟡
 Rule: don't reference Android/other platforms or include their names in
 metadata. Detect: "Android", competitor names in description. Fix: remove.

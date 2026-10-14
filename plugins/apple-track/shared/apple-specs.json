@@ -1,6 +1,6 @@
 {
   "_source": "https://developer.apple.com/help/app-store-connect/reference/screenshot-specifications",
-  "_checked": "2026-09-11",
+  "_checked": "2026-10-14",
   "_why": "One table, read by the scripts and rendered into the reference documents. It lived in seven places and they had already drifted: 1290x2796 was filed under 6.7\" in one and 6.9\" in another, and Apple says 6.9\". Nobody could have noticed, because each copy is correct-looking on its own.",
   "_rules": "PNG or JPG, RGB, no alpha. App Store Connect rejects any dimension not listed here exactly.",
   "screenshots": {
@@ -78,6 +78,28 @@
           [
             640,
             1136
+          ]
+        ]
+      }
+    ],
+    "iphone_duo": [
+      {
+        "family": "Duo outer",
+        "devices": "iPhone Duo, outer display",
+        "sizes": [
+          [
+            1398,
+            2034
+          ]
+        ]
+      },
+      {
+        "family": "Duo inner",
+        "devices": "iPhone Duo, inner display",
+        "sizes": [
+          [
+            2007,
+            2853
           ]
         ]
       }
@@ -242,6 +264,7 @@
     ]
   },
   "_watch_note": "For Apple Watch the SAME size must be used across every localization.",
+  "_duo_note": "iPhone Duo has two displays. In App Store Connect both sizes go into ONE set (placement group IPHONE_DUO_PROFILE, up to 10 stills, inner and outer mixed) — confirmed against the live reference data 2026-10-14. Optional today; Apple: \"Starting in April 2027, screenshots will be required for any app using the iOS 27.1 SDK or later.\" fastlane deliver does not know the Duo display type, so these go up through the App Asset Library API (app-store-deliver/scripts/upload_library_assets.rb), never through the deliver staging folder.",
   "previews": {
     "iphone": [
       [
@@ -279,6 +302,139 @@
     ]
   },
   "_preview_rules": "15-30 seconds, 30fps, H.264 High@4.0, and a conformant stereo AAC track — App Store Connect rejects a preview with missing or non-conformant audio.",
+  "_preview_duo_note": "iPhone Duo App Previews use the ordinary iPhone preview sizes (886 x 1920 / 1920 x 886); there is no Duo-specific video size.",
+  "creative_assets": {
+    "_source": "https://developer.apple.com/help/app-store-connect/reference/app-information/creative-assets-specifications",
+    "_checked": "2026-10-14",
+    "_rules": "Optional. Shown on iOS / iPadOS 27 and later. No alpha, no transparency. Videos loop; header video is muted by default and the viewer may unmute, search video is always muted. Reviewed by App Review, on their own (no app version needed) or with a version.",
+    "_universal": "A 16:9 PNG at exactly 5244 x 2950 is accepted by BOTH placements, so one file can serve as header and search asset (the 'Use header asset in search results' option).",
+    "placements": [
+      {
+        "placement": "PRODUCT_PAGE_HEADER_ASSET",
+        "label": "product page header",
+        "images": [
+          {
+            "ratio": "21:9",
+            "min": [
+              3840,
+              1646
+            ],
+            "max": [
+              3840,
+              1646
+            ],
+            "formats": [
+              "png",
+              "jpg",
+              "jpeg"
+            ]
+          },
+          {
+            "ratio": "16:9",
+            "min": [
+              5244,
+              2950
+            ],
+            "max": [
+              5244,
+              2950
+            ],
+            "formats": [
+              "png"
+            ],
+            "universal": true
+          }
+        ],
+        "video": {
+          "ratio": "21:9",
+          "min": [
+            3840,
+            1646
+          ],
+          "max": [
+            3840,
+            1646
+          ],
+          "fps": [
+            30,
+            60
+          ],
+          "seconds": [
+            5,
+            30
+          ],
+          "formats": [
+            "mov",
+            "m4v",
+            "mp4"
+          ]
+        },
+        "limit_per_localization": 1
+      },
+      {
+        "placement": "APP_STORE_SEARCH_RESULTS_ASSET",
+        "label": "search results",
+        "images": [
+          {
+            "ratio": "3:2",
+            "min": [
+              1920,
+              1280
+            ],
+            "max": [
+              3840,
+              2560
+            ],
+            "formats": [
+              "png",
+              "jpg",
+              "jpeg"
+            ]
+          },
+          {
+            "ratio": "16:9",
+            "min": [
+              5244,
+              2950
+            ],
+            "max": [
+              5244,
+              2950
+            ],
+            "formats": [
+              "png"
+            ],
+            "universal": true
+          }
+        ],
+        "video": {
+          "ratio": "3:2",
+          "min": [
+            1920,
+            1280
+          ],
+          "max": [
+            3840,
+            2560
+          ],
+          "fps": [
+            30,
+            60
+          ],
+          "seconds": [
+            5,
+            30
+          ],
+          "formats": [
+            "mov",
+            "m4v",
+            "mp4"
+          ]
+        },
+        "limit_per_localization": 1
+      }
+    ]
+  },
   "iap_review_screenshot": {
     "min": [
       640,

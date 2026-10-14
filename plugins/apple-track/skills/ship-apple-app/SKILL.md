@@ -60,7 +60,8 @@ produce it, then come back and re-verify. This skill owns only the ship itself
 | **Signing** | Apple Distribution cert + profile present; MAS build is sandboxed + Hardened Runtime | `apple-credentials` (certs/credentials) · `code-signing-provisioning` (config/errors) |
 | **Compliance** | no blockers — run the build-time checklist | `app-store-review-compliance` |
 | **Listing metadata + IAP** | every locale present and within Apple's limits (run the validator); IAP localizations + reviewer screenshot present | `app-store-metadata` authors/validates it (SoT in the hub `$APP_HUB/<slug>/store/apple/`); **`app-store-deliver`** syncs it into `fastlane/` and uploads it (listing + screenshots + IAP) at send. Verify in the hub |
-| **Screenshots** | exact sizes for every required device class, all locales — for the studio apps the source media lives in the hub at `$APP_HUB/<slug>/media/apple/` | `appstore-media` (capture) · `apple-app-store-screenshots` (conform) |
+| **Screenshots** | exact sizes for every required device class, all locales — for the studio apps the source media lives in the hub at `$APP_HUB/<slug>/media/apple/`. **iPhone Duo is a required class from April 2027** for a build on the iOS 27.1 SDK or later — check the SDK the archive uses | `appstore-media` (capture) · `apple-app-store-screenshots` (conform) |
+| **Creative assets** (optional) | header / search results in `<App>/<locale>/creative/`, `verify_assets.py` passes; on a live version they need their own approval first | `appstore-media` (produce) · `app-store-deliver` step 2b (send) |
 | **In-app localization** | UI fully localized if shipping multi-locale | `localization-i18n` |
 | **Design** (optional) | no high-impact accessibility/HIG issues | `apple-hig-design-review` |
 
@@ -128,7 +129,8 @@ Export produces `App.ipa` (iOS) or `App.pkg` (macOS).
 - **Attach the build to the version record.** Uploading does not select it; a version
   left with no build cannot be submitted, and the ASC website is the usual place this
   is done by hand. Headless, it is `select_build(build_id:)` on the edit version.
-- Upload the verified metadata/screenshots/**IAP** by **triggering the
+- Upload the verified metadata/screenshots/**IAP** — and the header, search results
+  and Duo assets, which go through the Asset Library rather than `deliver` — by **triggering the
   `app-store-deliver` skill** (the single send-surface) — don't deliver from here
   yourself. In the **hub flow** it syncs the hub tree → `fastlane/` at send time
   (not during authoring), uploads listing + screenshots + IAP via the official ASC
