@@ -1,6 +1,6 @@
 # Changelog
 
-One version across all seven tracks, because they are not independent: a delivery script
+One version across all eight tracks, because they are not independent: a delivery script
 runs `shared-track`'s copy measurer, `price-sync` reads `apple-track`'s credential
 resolver. Per-track versions would need a compatibility matrix, and an unmaintained
 compatibility matrix is worse than no version.
@@ -14,6 +14,17 @@ skill does.
 
 ## Unreleased
 
+- **A Windows track.** `windows-track` holds one skill, `windows-direct-distribution`:
+  WinSparkle wired into a Tauri app and loaded at runtime, so a missing DLL costs the
+  updater and never the app; the NSIS installer signed with the same EdDSA key as
+  Sparkle on the Mac; and a Windows appcast of its own, because a Mac release that
+  regenerates `appcast.xml` would wipe a Windows item silently. Two scripts: the DLL,
+  pinned to 0.9.4 and checksum-verified, and the signed one-item feed. No Authenticode.
+  It came from a working setup in one app, and an update installed on a real Windows
+  machine has not been seen yet, so the skill makes that its last step before "done".
+- **`enable.py` proposes it** on `tauri.windows.conf.json`, `*.nsi` or `*.wxs`, and the
+  session-start hook offers it. A Tauri app's `index.html` no longer proposes
+  `web-track`: it is the app's UI, not a site, which is the rule Capacitor already had.
 - **CI runs with RepoGuards beside it.** The workflow clones `yybd/repo-guards` (main)
   next to the checkout, so `test_init_hub` runs its 27 checks and `test_portability` its
   anchors half on every push — before, the first verified nothing and the second skipped

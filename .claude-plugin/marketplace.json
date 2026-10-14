@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "app-factory",
-  "description": "The app skills: seven tracks that build, describe and ship mobile apps to the App Store and Google Play — profile and copy, store metadata and media, signing, release and price sync. Each track is opt-in per repo: `factory-setup` reads the repo and writes its own .claude/settings.json, so App Store skills never load in a website. For many repos at once there is a separate marketplace, RepoGuards, which this one does not require.",
+  "description": "The app skills: eight tracks that build, describe and ship apps to the App Store, Google Play and Windows — profile and copy, store metadata and media, signing, release and price sync. Each track is opt-in per repo: `factory-setup` reads the repo and writes its own .claude/settings.json, so App Store skills never load in a website. For many repos at once there is a separate marketplace, RepoGuards, which this one does not require.",
   "owner": {
     "name": "App Factory"
   },
@@ -65,6 +65,15 @@
       "description": "Building a website and keeping it found: the page's structure and conversion architecture before any visual work, the Web Interface Guidelines audit of the result, and the search, indexing and funnel read on the live sites.",
       "source": "./plugins/web-track",
       "category": "web",
+      "author": {
+        "name": "App Factory"
+      }
+    },
+    {
+      "name": "windows-track",
+      "description": "Windows: a direct-download installer that updates itself — WinSparkle wired into the app, the installer signed with the same EdDSA key as Sparkle, and a Windows appcast of its own.",
+      "source": "./plugins/windows-track",
+      "category": "windows",
       "author": {
         "name": "App Factory"
       }

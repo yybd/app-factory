@@ -18,7 +18,7 @@
 **`factory/ci.py`** (כל מה שניתן לבדוק בלי להתקין כלום — הריצו לפני שאומרים שמשהו
 גמור), **`factory/deploy.py`** (העותקים של המכונה הזו; דורש RepoGuards),
 **`factory/enable.py`** (מסלולים לריפו אחד; shim ל‑`plugins/factory-setup/scripts/enable.py`,
-שהוא הקובץ שנשלח), ו‑**`factory/bump_version.py`** (הגרסה, בשמונת המקומות, ועוד צעדי
+שהוא הקובץ שנשלח), ו‑**`factory/bump_version.py`** (הגרסה, בתשעת המקומות, ועוד צעדי
 השחרור).
 
 ## מה נכתב ביד ומה נוצר

@@ -11,7 +11,7 @@ project uses in a particular way.
 
 | | |
 |---|---|
-| **track** | One plugin — a group of skills that belong together, like `apple-track` or `web-track`. Seven of them ship here. You install a track, and you enable it per repo. |
+| **track** | One plugin — a group of skills that belong together, like `apple-track` or `web-track`. Eight of them ship here. You install a track, and you enable it per repo. |
 | **skill** | One `SKILL.md` and whatever scripts it runs. A model reads its description in every session where the track is enabled, and reads the body only when the skill fires. |
 | **marketplace** | The catalogue Claude Code installs plugins from — this repo is one. Adding it teaches the machine where the tracks are; installing a track copies it. |
 | **hub** | An **optional** second repo where several apps keep their profiles, listing text, media and prices, so the copy is written once and reviewed in one place. With one app there is no reason for it. `$APP_HUB` names it. Its shape: [`docs/contracts/hub.md`](docs/contracts/hub.md). |
@@ -24,7 +24,7 @@ project uses in a particular way.
 
 ## Installing
 
-**Do I have to install all seven tracks?**
+**Do I have to install all eight tracks?**
 No, and you should not. `factory/enable.py` reads the repo and proposes the ones its
 files justify — an `.xcodeproj` means Apple, a `build.gradle` means Android. Each track
 you enable costs tokens in every session in that repo, which is the whole reason the

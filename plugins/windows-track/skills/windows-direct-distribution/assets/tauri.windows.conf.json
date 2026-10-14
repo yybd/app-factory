@@ -1,0 +1,8 @@
+{
+  "bundle": {
+    "targets": ["nsis"],
+    "resources": {
+      "winsparkle/WinSparkle.dll": "WinSparkle.dll"
+    }
+  }
+}

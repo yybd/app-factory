@@ -1,0 +1,18 @@
+# The CI half of fetch_winsparkle.sh — the same pin and checksum, in pwsh so it
+# does not lean on Git Bash's unzip. Goes before `tauri build` in a windows-latest
+# job. Keep the two pins in step: moving one without the other is a build that
+# passes on one side only.
+      - name: Fetch WinSparkle
+        shell: pwsh
+        run: |
+          $version = '0.9.4'
+          $sha256  = '6037df37fc263bd1650a1c4949681a9d40ffe991d01f35892a406cb5d103c976'
+          $zip = Join-Path $env:RUNNER_TEMP 'winsparkle.zip'
+          Invoke-WebRequest -Uri "https://github.com/vslavik/winsparkle/releases/download/v$version/WinSparkle-$version.zip" -OutFile $zip
+          $actual = (Get-FileHash -Algorithm SHA256 $zip).Hash.ToLower()
+          if ($actual -ne $sha256) { throw "WinSparkle checksum mismatch: $actual" }
+          $out = Join-Path $env:RUNNER_TEMP 'winsparkle'
+          Expand-Archive -Path $zip -DestinationPath $out -Force
+          New-Item -ItemType Directory -Force src-tauri/winsparkle | Out-Null
+          Copy-Item "$out/WinSparkle-$version/x64/Release/WinSparkle.dll" src-tauri/winsparkle/WinSparkle.dll
+          if (-not (Test-Path src-tauri/winsparkle/WinSparkle.dll)) { throw 'WinSparkle.dll missing' }

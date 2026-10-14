@@ -41,6 +41,7 @@ SIGNS = [
                        "settings.gradle.kts"]),
     ("capacitor-track", ["capacitor.config.ts", "capacitor.config.js",
                          "capacitor.config.json"]),
+    ("windows-track", ["tauri.windows.conf.json", "*.nsi", "*.wxs"]),
 ]
 
 

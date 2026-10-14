@@ -28,6 +28,7 @@ work across several repos. Without it, `factory/enable.py` enables tracks per re
 | `web-track` | 4 | the website |
 | `capacitor-track` | 2 | app repos |
 | `design-track` | 1 | apps and the site alike |
+| `windows-track` | 1 | desktop app repos that ship on Windows |
 | `factory-setup` | 1 | **everywhere** — see below |
 
 *Counted from disk, and checked: `factory/check_skills.py` fails when a number written
@@ -66,6 +67,14 @@ why they must be shared rather than living in either place.
 
 `frontend-design`. Entirely generic, and needed anywhere a user interface is built —
 HTML/CSS inside a Capacitor app or on the site.
+
+### Windows track — 1
+
+`windows-direct-distribution`. A Windows installer, downloaded from your own server,
+that updates itself through WinSparkle — signed with the same EdDSA key as Sparkle on
+the Mac, with a feed of its own. The Windows half of `macos-direct-distribution`, and
+a track of its own because a repo that ships only on Windows has no use for the
+sixteen Apple skills. No Authenticode signing, by design for now.
 
 ### Web track — 4
 

@@ -78,6 +78,9 @@ SIGNS = [
     ("android-track", ["build.gradle", "build.gradle.kts", "settings.gradle",
                        "settings.gradle.kts", "android/build.gradle", "app/build.gradle"]),
     ("capacitor-track", ["capacitor.config.ts", "capacitor.config.js", "capacitor.config.json"]),
+    # A Windows installer, declared — not Tauri as such: a Tauri app may ship on the Mac
+    # alone, and proposing a Windows track there would be a guess dressed as evidence.
+    ("windows-track", ["tauri.windows.conf.json", "*.nsi", "*.wxs"]),
     ("web-track", ["astro.config.mjs", "next.config.js", "next.config.mjs", "_config.yml",
                    "index.html", "public/index.html", "src/index.html"]),
 ]
@@ -106,7 +109,7 @@ def looks_like(root):
 def propose(found):
     """The tracks that follow from the evidence, and why each one."""
     tracks, why = [], []
-    for t in ("apple-track", "android-track", "capacitor-track"):
+    for t in ("apple-track", "android-track", "capacitor-track", "windows-track"):
         if t in found:
             tracks.append(t)
             why.append(f"{t}: {found[t]}")
@@ -114,7 +117,11 @@ def propose(found):
         tracks.append("shared-track")
         why.append("shared-track: the naming, copy, release and price work is the same "
                    "whichever store an app ships to")
-    if "web-track" in found and "capacitor-track" in found \
+    # A web UI in a native shell: Capacitor, or Tauri (its Windows config is the marker).
+    shell = "Capacitor" if "capacitor-track" in found else \
+        "Tauri" if os.path.basename(found.get("windows-track", "")) == "tauri.windows.conf.json" \
+        else None
+    if "web-track" in found and shell \
             and os.path.basename(found["web-track"]) == "index.html":
         # The only web evidence is the HTML the native shell loads. That is the app's
         # UI, not a site — and web-track's SEO and analytics skills have nothing to do
@@ -125,18 +132,18 @@ def propose(found):
         tracks += ["web-track", "design-track"]
         why.append(f"web-track: {found['web-track']}")
         why.append("design-track: visual craft, which any HTML interface needs")
-    elif tracks and "capacitor-track" in found:
+    elif tracks and shell:
         tracks.append("design-track")
-        why.append("design-track: a Capacitor app's UI is HTML and CSS")
+        why.append(f"design-track: a {shell} app's UI is HTML and CSS")
     return sorted(set(tracks)), why
 
 
-# The seven this marketplace ships. Read from disk when the checkout is reachable, and
+# The eight this marketplace ships. Read from disk when the checkout is reachable, and
 # from this list when it is not — a machine that installed from GitHub has the plugins
 # in a cache keyed by version and no `plugins/` directory to walk, and `--tracks` has
 # to keep rejecting a typo there too.
 KNOWN = ["android-track", "apple-track", "capacitor-track", "design-track",
-         "factory-setup", "shared-track", "web-track"]
+         "factory-setup", "shared-track", "web-track", "windows-track"]
 
 
 def shipped():

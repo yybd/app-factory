@@ -2,8 +2,8 @@
 
 # App Factory
 
-**40 skills that build, describe and ship mobile apps** — to the App Store and Google
-Play, and outside them. Each one loads only where it is wanted.
+**41 skills that build, describe and ship apps** — to the App Store and Google Play,
+and outside them, on the Mac and on Windows. Each one loads only where it is wanted.
 
 ![Three of the skills' scripts, run for real: enable.py picks the tracks, check_name.py audits a name against the live App Store, measure_copy.py catches a translation that dropped a claim](docs/media/app-factory-demo.gif)
 
@@ -38,12 +38,12 @@ once, whether or not it applied**.
 
 So: nothing is global. A skill is a document the agent loads *when its description
 matches what you asked for*, and the descriptions are the only part that is always in
-context. What it costs to have 40 of them available is about 7,000 tokens of
+context. What it costs to have 41 of them available is about 7,000 tokens of
 descriptions — and only in a repo where you turned them on.
 
 ## The shape
 
-Six tracks of skills, plus one that does setup:
+Seven tracks of skills, plus one that does setup:
 
 | Track | Skills | |
 |---|---|---|
@@ -53,6 +53,7 @@ Six tracks of skills, plus one that does setup:
 | `web-track` | 4 | a site's structure, an audit of it, and whether search finds it |
 | `capacitor-track` | 2 | web-in-a-shell apps, where the bugs live in the seam |
 | `design-track` | 1 | visual craft for any HTML interface |
+| `windows-track` | 1 | a Windows installer that updates itself, outside any store |
 | `factory-setup` | 1 | on everywhere; says when a repo looks like an app and no track is on |
 
 Each track's own README lists what is in it, what it costs, and what it needs installed.

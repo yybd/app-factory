@@ -28,6 +28,7 @@ fastlane already brings.
 | **design-track** | nothing beyond Python 3 | |
 | **web-track** | the project's own toolchain | the audit is pure Python; publishing runs whatever the site uses |
 | **capacitor-track** | `adb`, Node | inspecting the WebView on a device |
+| **windows-track** | `curl`, `unzip`, `shasum`; Sparkle's `sign_update` | fetching WinSparkle, signing the installer — the build itself runs in Windows CI |
 | **shared-track** | `fastlane` (some paths), Node or Gradle to read a version | the copy measurer and the profile work need nothing |
 | **android-track** | JDK (the version the project declares), Gradle wrapper, `adb`, `keytool`, `apksigner` / `jarsigner` | building, signing and verifying an AAB |
 | | `fastlane` (`supply`) | uploading a listing |

@@ -1,6 +1,6 @@
 *English · [עברית](README.he.md)*
 
-# The plugins — six tracks of skills, and one that does setup
+# The plugins — seven tracks of skills, and one that does setup
 
 **What this folder is.** The app skills, distributed as plugins from this repo's
 marketplace (`app-factory`). One directory per track.
@@ -13,10 +13,11 @@ marketplace (`app-factory`). One directory per track.
 | `web-track` | 4 | websites |
 | `capacitor-track` | 2 | Capacitor apps |
 | `design-track` | 1 | design and frontend |
+| `windows-track` | 1 | Windows direct distribution |
 | `factory-setup` | 1 | setup, and the one that is on everywhere |
-| **total** | **40** | |
+| **total** | **41** | |
 
-*Counted from disk 2026-09-11.*
+*Counted from disk 2026-10-14.*
 
 ---
 
