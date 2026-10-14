@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: compliance-trigger-he
+description: The Hebrew trigger the description quotes ("נדחה באפסטור") loads the same skill — a description is bilingual only if both halves fire.
+tags: [trigger, apple, he]
+execution:
+  prompt: |
+    האפליקציה שלי נדחתה באפסטור בגלל Guideline 5.1.1. מה בדרך כלל גורם לזה, ואיך בודקים
+    את הפרויקט לפני שמגישים שוב?
+  max_turns: 4
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: compliance-skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?app-store-review-compliance"'

@@ -209,8 +209,10 @@ def check(path):
             return [("cannot be checked", str(e)[:80])]
         # QUICKSTART promises every script answers --help. A shell script is never run
         # here, so the promise is checked the only way that executes nothing: the flag
-        # has to be handled somewhere in the file. Hooks are driven by stdin, not flags.
-        if os.sep + "hooks" + os.sep not in path:
+        # has to be handled somewhere in the file. Hooks are driven by stdin, not flags,
+        # and an eval's fixture.sh is run by `claude plugin eval` in an empty directory —
+        # neither is a command a person types.
+        if not any(os.sep + d + os.sep in path for d in ("hooks", "evals")):
             with open(path, encoding="utf-8", errors="replace") as f:
                 if "--help" not in f.read():
                     return [("no --help", "the script does not handle the flag")]

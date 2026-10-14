@@ -1,0 +1,27 @@
+schema_version: "1.1"
+name: compliance-finds-missing-usage-string
+description: >-
+  On a project that uses the camera with no NSCameraUsageDescription, the review reports
+  that key by name — findings about THIS project, not a generic checklist (QUICKSTART §4's
+  promise). Needs --scaffold for the fixture.
+tags: [behaviour, apple]
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    This directory is my iOS app. Review it against the App Store review guidelines and
+    list what would get it rejected, most serious first.
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: names-the-key
+    type: regex
+    pattern: 'NSCameraUsageDescription'
+  - name: tied-to-the-code
+    type: llm
+    criteria: >-
+      The answer says the app uses the camera (AVCaptureDevice in ScannerView.swift or
+      the scanner feature) and that Info.plist has no NSCameraUsageDescription, and calls
+      this a rejection risk under guideline 5.1.1 (or "privacy usage description"). A
+      generic list of guidelines that never connects a finding to this project's files
+      does not pass.

@@ -59,15 +59,30 @@ not something either of them decides.
 ## On measuring whether a skill triggers
 
 The one thing that matters most about a skill — does it load when it should — is the one
-thing none of this measures. `claude plugin eval` is the tool for it, and it is early
-access: it is not in this CLI, so no eval suite here could be run, and an unrunnable
-suite is worse than none. When it becomes available, the cases worth writing first are
-the ones where a skill has already failed to trigger: a request phrased in Hebrew, and a
-request that two skills could both plausibly answer.
+thing the checkers here cannot measure. `claude plugin eval` can, and since Claude Code
+2.1.283 it is in the CLI. The first suite is in `plugins/apple-track/evals/`: one skill,
+four cases — it fires on an English request, it fires on the Hebrew phrase its
+description quotes, *nothing* fires on an unrelated request, and on a fixture project
+with a camera and no usage string it names that key rather than reciting a checklist.
 
-Until then the mechanical half is what exists — a description that says *when*, in both
-languages, with a negative scope, and no phrase claimed twice — and the rest is settled
-by using the skill and noticing when it did not come.
+```bash
+python3 factory/run_evals.py apple-track
+```
+
+**Run it through that script, from a terminal.** Every track sets `defaultEnabled:
+false`, and the eval sandbox enables nothing — pointed at `plugins/apple-track` directly,
+the suite runs without the plugin and every trigger case fails. The script runs a copy
+with that line dropped. Started inside a desktop-app session the runs cannot log in.
+Each run costs model usage; `--max-cost-usd` caps it.
+
+**It is not in CI**, for the same reason `check_urls` is not: it spends money and calls
+a model, and a gate that does either fails for reasons that are not the change. Run it
+before a release that touches a description.
+
+The cases worth adding next are the ones where a skill has already failed to trigger: a
+request phrased in Hebrew, and a request two skills could both plausibly answer. The
+mechanical half still runs everywhere — a description that says *when*, in both
+languages, with a negative scope, and no phrase claimed twice.
 
 ## The rules that came from real failures
 

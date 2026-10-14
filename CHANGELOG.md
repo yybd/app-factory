@@ -18,6 +18,12 @@ skill does.
   next to the checkout, so `test_init_hub` runs its 27 checks and `test_portability` its
   anchors half on every push — before, the first verified nothing and the second skipped
   half, and the run was green anyway. Only the product-name half still skips, on purpose.
+- **The first eval suite**, in `plugins/apple-track/evals/`, for
+  `app-store-review-compliance`: it fires in English and on the Hebrew phrase its
+  description quotes, nothing fires on an unrelated request, and on a fixture with a
+  camera and no `NSCameraUsageDescription` it names the key. `factory/run_evals.py` runs
+  it on a copy of the track, because `defaultEnabled: false` keeps the track itself out
+  of the eval sandbox. Not in CI: it costs model usage.
 
 ## 0.4.4
 
