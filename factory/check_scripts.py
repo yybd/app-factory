@@ -203,9 +203,18 @@ def check(path):
         try:
             p = subprocess.run(["bash", "-n", path], capture_output=True, text=True,
                                timeout=20)
-            return [] if p.returncode == 0 else [("syntax", p.stderr.strip()[:120])]
+            if p.returncode != 0:
+                return [("syntax", p.stderr.strip()[:120])]
         except Exception as e:
             return [("cannot be checked", str(e)[:80])]
+        # QUICKSTART promises every script answers --help. A shell script is never run
+        # here, so the promise is checked the only way that executes nothing: the flag
+        # has to be handled somewhere in the file. Hooks are driven by stdin, not flags.
+        if os.sep + "hooks" + os.sep not in path:
+            with open(path, encoding="utf-8", errors="replace") as f:
+                if "--help" not in f.read():
+                    return [("no --help", "the script does not handle the flag")]
+        return []
 
     try:
         with open(path, encoding="utf-8") as f:

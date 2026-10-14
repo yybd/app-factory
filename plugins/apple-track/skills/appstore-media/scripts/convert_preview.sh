@@ -23,8 +23,9 @@ The output is padded (letterboxed with the clip's own blurred edges avoided — 
 scale+pad) if the aspect ratio differs slightly; large mismatches mean you captured
 the wrong device/window shape — fix the capture instead.
 EOF
-  exit 1
+  exit "${1:-1}"
 }
+case "${1:-}" in -h|--help) usage 0;; esac
 
 PROFILE=""
 while getopts "p:h" opt; do case $opt in p) PROFILE="$OPTARG";; *) usage;; esac; done

@@ -52,6 +52,8 @@
 #
 # The hub is READ-only here; only <app-repo>/fastlane/ is written. The repo copy
 # is disposable (git-ignore it) — the hub is the truth.
+# -h / --help prints the header above and touches nothing.
+case "${1:-}" in -h|--help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
 
 set -euo pipefail
 

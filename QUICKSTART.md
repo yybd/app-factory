@@ -89,6 +89,8 @@ loads, and anyone who clones the repo gets the same ones.
 ## 3 · Open a new session
 
 Skills load at session start. Nothing you did above affects a session already running.
+Open it from the app's root — the directory whose `.claude/settings.json` you just
+wrote — not from a folder inside it.
 
 ```bash
 cd ~/code/my-app && claude
@@ -116,12 +118,16 @@ get it rejected. It needs no credentials, no data repo, and changes nothing.
 permission with no usage description — rather than a generic checklist.
 
 **The scripts run without a session too.** Every skill's tools sit in
-`$AF/plugins/<track>/skills/<skill>/scripts/`, and each answers `--help`. For example:
+`$AF/plugins/<track>/skills/<skill>/scripts/`, and every Python, shell and Ruby script
+there answers `--help`. For example:
 
 ```bash
 python3 $AF/plugins/apple-track/skills/app-store-review-compliance/scripts/scan_project.py .
 python3 $AF/plugins/shared-track/skills/copy-edit/scripts/measure_copy.py fastlane/metadata --parity-only
 ```
+
+The second reads store listing text; on an app that has none yet, it says the folder is
+not there.
 
 ---
 
@@ -138,18 +144,19 @@ It creates a folder — outside every repo, gitignored from the first byte — w
 the files in place and copy them nowhere.
 
 With no `$KEYS_ROOT` set, it makes the folder at `~/app-keys` and prints the line that
-points the skills at it. Put that line in `~/.claude/settings.json`:
+points the skills at it. Add it to `~/.claude/settings.json`, **inside** the file's
+existing `"env"` key — or add an `"env"` key if it has none. Do not replace the file:
+it already holds the `enabledPlugins` that `claude plugin install` wrote.
 
 ```json
-{
   "env": { "KEYS_ROOT": "/Users/you/app-keys" }
-}
 ```
 
 (or `export KEYS_ROOT=…` in your shell profile). To keep the folder somewhere else, set
 `KEYS_ROOT` first and `--create` makes it there.
 
-**Check:** `python3 $AF/factory/init_keys.py` reports the folder as set up.
+**Check:** `python3 $AF/factory/init_keys.py` reports the folder as set up — and fails
+while `$KEYS_ROOT` is not set, because the skills read only that variable.
 
 ---
 

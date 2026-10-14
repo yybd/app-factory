@@ -219,6 +219,17 @@ def marketplace_known():
         return False
 
 
+def invoked_as():
+    """The command a person typed, as something they can paste again.
+
+    Through `factory/enable.py` this is the shim, not this file — printing `__file__`
+    handed a reader the plugin-cache path, a directory they never chose and that moves
+    with every version."""
+    me = globals().get("INVOKED_AS") or os.path.abspath(__file__)
+    rel = os.path.relpath(me, os.getcwd())
+    return me if rel.startswith("..") else rel
+
+
 def say_global(tracks):
     print("Switched on for EVERY directory on this machine, in ~/.claude/settings.json —")
     print("so they load in your website and everywhere else, not only here:")
@@ -286,7 +297,7 @@ def main():
                 for t in missing:
                     print(f"    claude plugin install {t}@{MARKETPLACE}")
                 return 1
-            print("✓ every enabled track is installed on this machine.")
+            print("✓ every enabled track is installed on this machine, and none is on machine-wide.")
         if not on:
             found = looks_like(root)
             want, why = propose(found)
@@ -294,7 +305,7 @@ def main():
                 print("No track is enabled here, and this looks like a repo that wants:")
                 for w in why:
                     print(f"    {w}")
-                print(f"\n  python3 {__file__}")
+                print(f"\n  python3 {invoked_as()}")
             else:
                 print("No track is enabled here, and nothing suggests one is needed.")
         return 0
@@ -326,8 +337,7 @@ def main():
         return 0
 
     if not (a.yes or a.tracks or a.none):
-        me = os.path.relpath(__file__, os.getcwd())
-        me = __file__ if me.startswith("..") else me       # a path a person can paste
+        me = invoked_as()
         print(f"\n  python3 {me} --yes      to take it")
         print(f"  python3 {me} --tracks a,b  to choose")
         return 0
@@ -352,7 +362,7 @@ def main():
             print("everywhere, and the file above is what turns them on here:")
             for t in todo:
                 print(f"    claude plugin disable {t}@{MARKETPLACE} --scope user")
-            print(f"\n  python3 {__file__} --check     confirms both")
+            print(f"\n  python3 {invoked_as()} --check     confirms both")
         else:
             print("\n✓ all of them are already installed on this machine.")
             everywhere = globally_on()

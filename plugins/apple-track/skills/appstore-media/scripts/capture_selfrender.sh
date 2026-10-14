@@ -11,6 +11,9 @@
 #         ./capture.sh video      # the App Preview video (needs Screen Recording)
 #         ./capture.sh video-ai   # staged long recording for an interactive feature
 #         REBUILD=1 ./capture.sh  # force a fresh build first
+
+# -h / --help prints the header above and touches nothing.
+case "${1:-}" in -h|--help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
 set -euo pipefail
 
 # ---- CONFIG (edit these) -----------------------------------------------------

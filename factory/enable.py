@@ -23,5 +23,6 @@ REAL = os.path.join(os.path.dirname(HERE), "plugins", "factory-setup", "scripts"
 
 if not os.path.isfile(REAL):
     sys.exit(f"✗ {REAL} is missing — this shim has nothing to run.")
-sys.argv[0] = REAL
-runpy.run_path(REAL, run_name="__main__")
+# run_path rewrites argv[0] to REAL, so the shim names itself for the messages that
+# tell a person what to run next.
+runpy.run_path(REAL, run_name="__main__", init_globals={"INVOKED_AS": os.path.abspath(__file__)})

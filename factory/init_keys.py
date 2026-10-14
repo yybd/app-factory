@@ -168,7 +168,11 @@ def create(root):
         open(gi, "w", encoding="utf-8").write(GITIGNORE)
         made.append(".gitignore")
     for slot, _who, _what in SLOTS:
-        d = os.path.join(root, os.path.dirname(slot))
+        # Only the literal part of a slot is made. `android/<app>-keystore/` is a name
+        # for the reader to fill in, and made as-is it is a folder called `<app>-keystore`.
+        parts = os.path.dirname(slot).split("/")
+        parts = parts[:next((i for i, x in enumerate(parts) if "<" in x), len(parts))]
+        d = os.path.join(root, *parts)
         if not os.path.isdir(d):
             os.makedirs(d, exist_ok=True)
             made.append(os.path.relpath(d, root) + "/")
@@ -254,11 +258,22 @@ def main():
         # say the variable to set, with its value.
         root = DEFAULT
         if not a.create:
-            print(f"$KEYS_ROOT is not set, and no credentials folder exists yet.")
-            print(f"  python3 {short(os.path.abspath(__file__))} --create     makes one at {DEFAULT_SHORT}")
-            return 0 if not os.path.isdir(root) else report(root)
+            if not os.path.isdir(root):
+                print(f"$KEYS_ROOT is not set, and no credentials folder exists yet.")
+                print(f"  python3 {short(os.path.abspath(__file__))} --create     makes one at {DEFAULT_SHORT}")
+                return 0
+            # The folder is there, but finding it here proves nothing: this script falls
+            # back to ~/app-keys, the skills' resolvers read $KEYS_ROOT and nothing else.
+            # A stranger test passed this check with the env line never added.
+            report(root)
+            print(f"\n  ✗ but $KEYS_ROOT is not set, so the skills will not look here.")
+            print("    Add it to ~/.claude/settings.json, inside the existing \"env\" key:")
+            print(f'        "KEYS_ROOT": "{root}"')
+            print("    (or `export KEYS_ROOT=…` in your shell profile), then open a new session.")
+            return 1
         rc = create(root)
-        print("\nNow tell the skills where it is — in ~/.claude/settings.json, under \"env\":")
+        print("\nNow tell the skills where it is — in ~/.claude/settings.json, inside the existing")
+        print("\"env\" key (add one if the file has none; do not replace the file):")
         print(f'    "KEYS_ROOT": "{root}"')
         print("(or `export KEYS_ROOT=…` in your shell profile). They read only that variable.")
         return rc

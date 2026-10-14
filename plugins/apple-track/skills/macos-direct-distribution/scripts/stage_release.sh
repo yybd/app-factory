@@ -19,6 +19,9 @@
 # Auth: wrangler (Cloudflare R2) needs no S3 keys — `wrangler login` once, then
 #   just BUCKET. aws/rclone need S3 Access Key + Secret (+ ENDPOINT for aws);
 #   aws-cli ≥ 2.23 may need AWS_REQUEST_CHECKSUM_CALCULATION=when_required for R2.
+
+# -h / --help prints the header above and touches nothing.
+case "${1:-}" in -h|--help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
 set -euo pipefail
 # Run from the PROJECT, not from wherever this file sits. It used to `cd` to its own
 # directory first, which was the project when the script lived in one — and is the

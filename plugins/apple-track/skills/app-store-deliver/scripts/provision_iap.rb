@@ -34,6 +34,11 @@
 #
 # Confirm with the user before running — this writes to App Store Connect.
 
+if (ARGV & %w[-h --help]).any?  # the usage needs no gems and no credentials
+  puts File.readlines(__FILE__, encoding: "UTF-8").drop(1).take_while { |l| l.start_with?("#") }.map { |l| l.sub(/^# ?/, "") }
+  exit 0
+end
+
 require_relative "asc_common"
 
 pos, _ = ASC.parse_args(ARGV)

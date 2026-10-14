@@ -20,6 +20,11 @@
 #   SPARKLE_PUBKEY     SUPublicEDKey (base64)  (default: placeholder, patch later)
 #   SPARKLE_MIN        min Sparkle version     (default: 2.0.0)
 #   LINK_SPARKLE       link Sparkle? 1/0       (default: 1)
+
+if (ARGV & %w[-h --help]).any?  # the usage needs no gems and no credentials
+  puts File.readlines(__FILE__, encoding: "UTF-8").drop(1).take_while { |l| l.start_with?("#") }.map { |l| l.sub(/^# ?/, "") }
+  exit 0
+end
 require 'xcodeproj'
 
 def env(k, default = nil) v = ENV[k]; (v && !v.empty?) ? v : default end

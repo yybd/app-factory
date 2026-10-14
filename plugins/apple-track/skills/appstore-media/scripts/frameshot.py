@@ -15,6 +15,7 @@ Hebrew and Arabic need --rtl. Pillow does the bidi reordering through RAQM; chec
 present with `python3 -c "from PIL import features; print(features.check('raqm'))"`.
 Without RAQM the text renders in logical order, i.e. backwards, so the script refuses.
 """
+from __future__ import annotations
 
 import argparse
 import json
@@ -25,9 +26,10 @@ from pathlib import Path
 try:
     from PIL import Image, ImageDraw, ImageFont, features
 except ImportError:
-    sys.exit("✗ Pillow is not installed (with RAQM, for RTL captions):\n"
-             "    brew install libraqm && python3 -m pip install --upgrade pillow\n"
-             "  Check: python3 -c \"from PIL import features; print(features.check('raqm'))\"")
+    if not {"-h", "--help"} & set(sys.argv[1:]):  # the usage needs no Pillow
+        sys.exit("✗ Pillow is not installed (with RAQM, for RTL captions):\n"
+                 "    brew install libraqm && python3 -m pip install --upgrade pillow\n"
+                 "  Check: python3 -c \"from PIL import features; print(features.check('raqm'))\"")
 
 # Largest size per family is all App Store Connect needs — it scales down to the rest.
 PRESETS = {

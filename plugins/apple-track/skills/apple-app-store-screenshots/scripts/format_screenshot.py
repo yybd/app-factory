@@ -24,10 +24,11 @@ from pathlib import Path
 try:
     from PIL import Image, ImageFilter
 except ImportError:
-    sys.stderr.write(
-        "Pillow is required. Install with:  pip install --break-system-packages Pillow\n"
-    )
-    sys.exit(2)
+    if not {"-h", "--help"} & set(sys.argv[1:]):  # the usage needs no Pillow
+        sys.stderr.write(
+            "Pillow is required. Install with:  pip install --break-system-packages Pillow\n"
+        )
+        sys.exit(2)
 
 
 def parse_hex_color(s: str) -> tuple[int, int, int]:

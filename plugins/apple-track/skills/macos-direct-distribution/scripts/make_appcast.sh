@@ -20,6 +20,9 @@
 #
 # Publish: upload the DMG(s) AND appcast.xml so the appcast is reachable at the
 # exact SUFeedURL the app was built with.
+
+# -h / --help prints the header above and touches nothing.
+case "${1:-}" in -h|--help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
 set -euo pipefail
 
 RELEASE_DIR="${1:-release}"

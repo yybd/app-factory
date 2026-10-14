@@ -14,7 +14,8 @@ import argparse, os, sys, xml.sax.saxutils as sx
 try:
     from PIL import Image
 except ImportError:
-    sys.exit("Pillow is required:  pip3 install Pillow")
+    if not {"-h", "--help"} & set(sys.argv[1:]):  # the usage needs no Pillow
+        sys.exit("Pillow is required:  pip3 install Pillow")
 
 # density -> multiplier. Adaptive layers are 108dp, legacy launcher icons 48dp.
 DENSITIES = {"mdpi": 1, "hdpi": 1.5, "xhdpi": 2, "xxhdpi": 3, "xxxhdpi": 4}

@@ -7,6 +7,9 @@
 #
 # Everything else is derived from the project, so it does not go stale:
 # the application id from build.gradle, the launcher activity from the manifest.
+
+# -h / --help prints the header above and touches nothing.
+case "${1:-}" in -h|--help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
 set -euo pipefail
 cd "$(dirname "$0")"
 

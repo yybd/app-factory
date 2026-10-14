@@ -14,6 +14,34 @@ skill does.
 
 ## Unreleased
 
+## 0.4.4
+
+A patch, from the second stranger re-test. No blockers were found; these are the places
+where the docs and the tools still disagreed.
+
+- **Every Python, shell and Ruby script answers `--help`**, as QUICKSTART says. Twenty-three
+  did not — counted from the files this release changes: the three Pillow scripts stopped on "Pillow is required" before printing
+  their usage, `verify_assets.py` read `--help` as a file name, `capture_*.sh` and
+  `run_diagnostics.sh` knew only `-h`, and the rest ignored the flag — `run-android.sh`
+  and `read_app_identity.sh` went straight to work and exited 1. Each now prints its
+  header and touches nothing. `check_scripts.py` fails a shell script that does not
+  handle the flag.
+- **`measure_copy.py` on a missing path** says so in one line, instead of a
+  `FileNotFoundError` traceback. QUICKSTART's example points it at
+  `fastlane/metadata`, which a fresh app does not have.
+- **`init_keys.py` without `$KEYS_ROOT`** no longer says "not set, no folder" and then
+  "✓ it is there". When the folder exists at `~/app-keys` but the variable is not set,
+  it fails and prints the line to add — the skills read only the variable, so the old
+  check passed on a setup that did not work.
+- **`init_keys.py --create`** no longer makes a folder literally called
+  `android/<app>-keystore/`; it makes the literal part of each slot.
+- **QUICKSTART** says to add the `env` key *inside* the existing
+  `~/.claude/settings.json`, not to paste a whole file — pasted as one, it replaced the
+  `enabledPlugins` that `install` wrote. It also says to open `claude` from the app's
+  root.
+- **`enable.py`** prints the command you ran (`$AF/factory/enable.py`), not the plugin
+  copy's path, and `--check` says when no track is on machine-wide.
+
 ## 0.4.3
 
 A patch, from a stranger-install test that followed README and QUICKSTART to the letter

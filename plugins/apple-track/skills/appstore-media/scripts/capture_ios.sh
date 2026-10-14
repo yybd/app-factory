@@ -21,8 +21,9 @@ Options:
 Example:
   capture_ios.sh -s MyApp -p MyApp.xcodeproj -t MyAppUITests/DemoFlowTests -l he,en-US -m both
 EOF
-  exit 1
+  exit "${1:-1}"
 }
+case "${1:-}" in -h|--help) usage 0;; esac
 
 DEVICE="iPhone 17 Pro Max"; LOCALES="en-US"; MODE="both"; OUT="./AppStoreMedia"
 SCHEME=""; CONTAINER=(); TEST=""; APPNAME=""
@@ -37,6 +38,7 @@ while getopts "s:w:p:t:d:l:m:o:n:h" opt; do
     m) MODE="$OPTARG";;
     o) OUT="$OPTARG";;
     n) APPNAME="$OPTARG";;
+    h) usage 0;;
     *) usage;;
   esac
 done

@@ -11,6 +11,8 @@
 # It prefers a literal scan of project.pbxproj / Info.plist (fast, no build) over
 # `xcodebuild -showBuildSettings` (slow, needs a scheme). For the authoritative
 # resolved value, run the xcodebuild line printed at the end.
+# -h / --help prints the header above and touches nothing.
+case "${1:-}" in -h|--help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
 
 set -euo pipefail
 root="${1:-.}"

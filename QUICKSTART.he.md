@@ -85,6 +85,8 @@ claude plugin disable shared-track@app-factory --scope user
 ## 3 · פתיחת סשן חדש
 
 סקילים נטענים בפתיחת הסשן. שום דבר ממה שעשית למעלה לא משפיע על סשן שכבר רץ.
+פותחים אותו משורש האפליקציה — התיקייה שבה נכתב עכשיו `.claude/settings.json` — ולא
+מתיקייה שבתוכה.
 
 ```bash
 cd ~/code/my-app && claude
@@ -111,12 +113,15 @@ apple-track@app-factory` מונה את הסקילים שמסלול מביא. ב�
 שימוש — ולא רשימת תיוג גנרית.
 
 **הסקריפטים רצים גם בלי סשן.** הכלים של כל סקיל יושבים ב-
-`$AF/plugins/<track>/skills/<skill>/scripts/`, וכל אחד עונה ל-`--help`. למשל:
+`$AF/plugins/<track>/skills/<skill>/scripts/`, וכל סקריפט Python, shell ו-Ruby שם עונה
+ל-`--help`. למשל:
 
 ```bash
 python3 $AF/plugins/apple-track/skills/app-store-review-compliance/scripts/scan_project.py .
 python3 $AF/plugins/shared-track/skills/copy-edit/scripts/measure_copy.py fastlane/metadata --parity-only
 ```
+
+השני קורא את טקסט דף החנות; באפליקציה שעוד אין לה כזה, הוא אומר שהתיקייה לא קיימת.
 
 ---
 
@@ -133,18 +138,19 @@ python3 $AF/factory/init_keys.py --create
 אותם לשום מקום.
 
 כש-`$KEYS_ROOT` לא מוגדר, הוא יוצר את התיקייה ב-`~/app-keys` ומדפיס את השורה שמכוונת
-אליה את הסקילים. שימו אותה ב-`~/.claude/settings.json`:
+אליה את הסקילים. מוסיפים אותה ל-`~/.claude/settings.json`, **בתוך** המפתח `"env"`
+הקיים בקובץ — או מוסיפים מפתח `"env"` אם אין. לא מחליפים את הקובץ: כבר יושב בו
+ה-`enabledPlugins` ש-`claude plugin install` כתב.
 
 ```json
-{
   "env": { "KEYS_ROOT": "/Users/you/app-keys" }
-}
 ```
 
 (או `export KEYS_ROOT=…` בקובץ הפרופיל של המעטפת). כדי שהתיקייה תהיה במקום אחר, מגדירים
 קודם את `KEYS_ROOT`, ו-`--create` יוצר אותה שם.
 
-**בדיקה:** `python3 $AF/factory/init_keys.py` מדווח שהתיקייה מוכנה.
+**בדיקה:** `python3 $AF/factory/init_keys.py` מדווח שהתיקייה מוכנה — ונכשל כל עוד
+`$KEYS_ROOT` לא מוגדר, כי הסקילים קוראים רק את המשתנה הזה.
 
 ---
 

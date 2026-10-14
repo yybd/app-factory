@@ -578,6 +578,10 @@ def main():
                          "carries a different number of claims — for a delivery gate")
     a = ap.parse_args()
 
+    missing = [p for p in a.paths if not os.path.exists(p)]
+    if missing:
+        sys.exit(f"measure_copy: no such file or directory: {', '.join(missing)}")
+
     out, seen_locales, catalogs = [], {}, []
     limits = (a.max_words, a.max_chars)
     n_files = 0

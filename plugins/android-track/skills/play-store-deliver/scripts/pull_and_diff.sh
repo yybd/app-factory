@@ -13,6 +13,9 @@
 # "Local" is the hub when there is one, and the app repo's fastlane/metadata/android
 # tree when there is not — the same two modes sync_from_hub.sh has. This guard is
 # MANDATORY in both; it used to exit 1 in the second.
+
+# -h / --help prints the header above and touches nothing.
+case "${1:-}" in -h|--help) awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
 set -euo pipefail
 
 slug="${1:-}"; pkg="${2:-}"

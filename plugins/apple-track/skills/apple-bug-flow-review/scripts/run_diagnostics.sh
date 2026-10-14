@@ -25,6 +25,8 @@
 
 set -uo pipefail
 
+case "${1:-}" in --help) set -- -h;; esac
+
 SCHEME=""
 DEST=""
 PROJECT_FLAG=()

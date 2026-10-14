@@ -24,14 +24,16 @@ Typical flow per locale:
   open -a "MyApp" --args -AppleLanguages "(he)" -DemoMode -CaptureMode
   capture_mac.sh -a MyApp -l he -m both        # run while the XCUITest flow drives the app
 EOF
-  exit 1
+  exit "${1:-1}"
 }
+case "${1:-}" in -h|--help) usage 0;; esac
 
 APP=""; MODE="both"; W=1440; H=900; OUT="./AppStoreMedia"; LOCALE="current"; SECS=40; NAME="capture"
 while getopts "a:m:W:H:o:l:s:n:h" opt; do
   case $opt in
     a) APP="$OPTARG";; m) MODE="$OPTARG";; W) W="$OPTARG";; H) H="$OPTARG";;
     o) OUT="$OPTARG";; l) LOCALE="$OPTARG";; s) SECS="$OPTARG";; n) NAME="$OPTARG";;
+    h) usage 0;;
     *) usage;;
   esac
 done
