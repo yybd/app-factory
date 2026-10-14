@@ -67,7 +67,7 @@ path, hub slug and the bundle id / package name per store. That is what makes
 `change_directory` and task-spawning reliable, and what the dashboard reads.
 
 `deploy.py` finds it through `factory/repo_guards.py`, which tries `$REPO_GUARDS`, then a
-`cross-repo-guards` checkout beside this one, then the installed plugin copy.
+`repo-guards` (or older `cross-repo-guards`) checkout beside this one, then the installed plugin copy.
 
 ## The guards are RepoGuards'
 

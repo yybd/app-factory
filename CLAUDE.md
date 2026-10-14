@@ -9,7 +9,7 @@ and what follows adds to them.
 
 **RepoGuards is the other half of the maintainer's setup, and it is optional for everyone
 else.** The guards, the registry, the anchors and `close.py` live in the
-`cross-repo-guards` repo and install as their own marketplace. This repo is the app
+`repo-guards` repo and install as their own marketplace. This repo is the app
 skills: what builds, describes and ships an app. Anything below about crossing a repo
 boundary is RepoGuards', and is named here only because it applies while you work in this
 one — a person who installed the skills alone runs none of it.

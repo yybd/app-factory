@@ -4,7 +4,7 @@
 
 This document explains the technical mechanics of the Factory: how a Skill you write loads into the AI agent's memory, why it only loads in specific projects, and how the Cache mechanism actually works.
 
-> **RepoGuards is optional.** [RepoGuards (cross-repo-guards)](https://github.com/yybd/repo-guards) decides which tracks load where from one central registry, and adds guards for working across several repos. Without it, `factory/enable.py` writes the same setting per repo, and everything below works the same way. This document is about how a track **loads**, which is the same either way.
+> **RepoGuards is optional.** [RepoGuards](https://github.com/yybd/repo-guards) decides which tracks load where from one central registry, and adds guards for working across several repos. Without it, `factory/enable.py` writes the same setting per repo, and everything below works the same way. This document is about how a track **loads**, which is the same either way.
 
 ---
 
