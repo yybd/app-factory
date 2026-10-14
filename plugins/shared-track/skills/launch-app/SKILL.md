@@ -103,7 +103,7 @@ Four routes exist, and an app is usually on more than one:
 | **App Store** | a released version | `ship-apple-app` → `app-store-deliver` |
 | **Google Play** | a released version | `play-store-ship` → `play-store-deliver` |
 | **direct download (macOS)** | a notarized DMG at its URL + a Sparkle appcast | `macos-direct-distribution` → `notarize-and-distribute` |
-| **direct download (Windows)** | an installer at its URL | **nothing in the factory covers this — say so** |
+| **direct download (Windows)** | an NSIS installer at its URL + a signed Windows appcast | `windows-direct-distribution` |
 
 ### Common to every route
 
@@ -135,10 +135,12 @@ and appcast where the download link points.
 the site page follows a listing that already exists; on a direct route the page *is*
 the distribution — the download link, and every constraint that has to sit beside it.
 
-**Windows is a real gap.** The factory has no skill for it. If the app ships a
-Windows installer, say plainly that this part is unmanaged, and record in the state
-file what it needs. A measured case: an unsigned NSIS build, so SmartScreen warns on
-first run, and no auto-updater at all because Sparkle is macOS-only.
+**Windows is covered for direct download only.** `windows-direct-distribution` wires
+WinSparkle into the app and signs the installer with the same EdDSA key as Sparkle on
+the Mac, with a Windows feed of its own. Two things it does not do, and the launch
+state file records both: there is no Authenticode signature, so SmartScreen warns on
+first run — say so beside the download link at stage 6 — and there is no Microsoft
+Store route at all.
 
 ## Order that is not negotiable — and what it depends on
 

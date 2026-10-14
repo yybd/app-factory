@@ -25,6 +25,9 @@ skill does.
 - **`enable.py` proposes it** on `tauri.windows.conf.json`, `*.nsi` or `*.wxs`, and the
   session-start hook offers it. A Tauri app's `index.html` no longer proposes
   `web-track`: it is the app's UI, not a site, which is the rule Capacitor already had.
+- **`launch-app` routes a Windows release to it.** The route table and the paragraph
+  after it still said the factory had no skill for Windows; they now name
+  `windows-direct-distribution`, and what it leaves out: Authenticode and a Store route.
 - **CI runs with RepoGuards beside it.** The workflow clones `yybd/repo-guards` (main)
   next to the checkout, so `test_init_hub` runs its 27 checks and `test_portability` its
   anchors half on every push — before, the first verified nothing and the second skipped
