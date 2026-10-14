@@ -1,0 +1,21 @@
+name: New skill or track
+description: Something in shipping an app that is still done by hand, and should not be.
+labels: [skill-request]
+body:
+  - type: textarea
+    id: task
+    attributes:
+      label: The task
+      description: What you do by hand today, step by step, and on which store or platform.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it is not an existing skill
+      description: Which skill comes closest (see SKILLS.md), and where it stops short.
+  - type: dropdown
+    id: track
+    attributes:
+      label: The track it belongs to
+      options: [apple-track, android-track, shared-track, web-track, capacitor-track, design-track, a new track, not sure]

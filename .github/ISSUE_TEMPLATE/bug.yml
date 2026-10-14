@@ -1,0 +1,32 @@
+name: Bug
+description: A skill did the wrong thing, a script failed, or a track did not load.
+labels: [bug]
+body:
+  - type: input
+    id: skill
+    attributes:
+      label: Track and skill
+      placeholder: apple-track / app-store-deliver
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you asked for, what the agent ran, and the output. Paste errors whole, but remove keys, issuer IDs and anything else secret.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected instead
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: OS, Python version, Claude Code version, app-factory version
+      placeholder: macOS 15, Python 3.12, Claude Code 2.x, 0.4.0
+    validations:
+      required: true
