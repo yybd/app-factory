@@ -115,4 +115,4 @@ RepoGuards לא מחליט כאן ולא מזהיר. הוא נותן לסוכן 
 
 RepoGuards הוא בקוד פתוח (MIT): **[github.com/yybd/repo-guards](https://github.com/yybd/repo-guards)**. הוא עומד בפני עצמו, ולא צריך שום דבר אחר כדי לעבוד.
 
-*בחלק השני: למה הפסקתי לכתוב קובץ הוראות ענק, ומה בא במקומו. 40 סקילים שנטענים רק איפה שהם נחוצים, ב-[App Factory](https://github.com/yybd/app-factory).*
+*בחלק השני: למה הפסקתי לכתוב קובץ הוראות ענק, ומה בא במקומו. 41 סקילים שנטענים רק איפה שהם נחוצים, ב-[App Factory](https://github.com/yybd/app-factory).*

@@ -118,4 +118,4 @@ You can't rely on a language model's self-discipline in a three-hour session. Yo
 
 RepoGuards is open source (MIT): **[github.com/yybd/repo-guards](https://github.com/yybd/repo-guards)**. It is built for Claude Code and tested only there. The hooks use Claude Code's hook protocol and tool names. The idea carries over to any agent that has a pre-tool hook; the code doesn't, yet. It stands on its own and needs nothing else to work.
 
-*Part two: why I stopped writing one giant instructions file, and what replaced it. 40 skills that load only where they're needed, in [App Factory](https://github.com/yybd/app-factory).*
+*Part two: why I stopped writing one giant instructions file, and what replaced it. 41 skills that load only where they're needed, in [App Factory](https://github.com/yybd/app-factory).*

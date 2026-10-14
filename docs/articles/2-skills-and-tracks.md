@@ -1,6 +1,6 @@
 *English · [עברית](2-skills-and-tracks.he.md)*
 
-# An app factory: 40 skills that take an app from code to the App Store and Google Play
+# An app factory: 41 skills that take an app from code to the App Store and Google Play
 
 The usual way to steer a coding agent is one big instructions file: how to ship to Apple, how to write tests, how to update a price list.
 
@@ -14,7 +14,7 @@ This is part two of a series on running AI agents across several repos. It cover
 
 ## A skill is instructions plus the tool
 
-In Claude Code, a skill is an instructions document that the agent loads **only when its description matches what you asked for**. Having 40 skills available costs about 7,000 tokens of descriptions, and you pay even that only in a repo where you turned them on.
+In Claude Code, a skill is an instructions document that the agent loads **only when its description matches what you asked for**. Having 41 skills available costs about 8,100 tokens of descriptions, and you pay even that only in a repo where you turned them on.
 
 The bigger difference is something else. An instructions file tells the agent *what* to do. A skill in the factory also brings a script that does it and checks the result. The agent orchestrates; the scripts execute.
 
@@ -62,6 +62,7 @@ Two orchestrators sit above these steps. **`launch-app`** runs a first launch an
 
 The line goes beyond the stores, too:
 - direct Mac distribution: a separate target with Sparkle for updates, plus notarization and signing;
+- direct Windows distribution: an NSIS installer that updates itself through WinSparkle, signed with the same key as the Mac build and listed in a feed of its own. It isn't code-signed, so Windows warns on the first run;
 - WebView traps measured on real devices, for Capacitor apps;
 - an SEO audit for the app's website.
 
@@ -74,13 +75,13 @@ The line stops on purpose at a few points, and that is written down in its own f
 - **A price never changes automatically.**
 - **Nothing is pushed to git** unless you ask in that moment.
 
-It also says what it doesn't do: signing certificates are created in Xcode, Play's Console forms are manual work, and Windows isn't covered.
+It also says what it doesn't do: signing certificates are created in Xcode, Play's Console forms are manual work, and Windows has no store route: it gets a direct download that updates itself, without a code-signing certificate.
 
 ---
 
 ## What loads where
 
-The skills are grouped into seven tracks, and each track is its own plugin:
+The skills are grouped into eight tracks, and each track is its own plugin:
 
 | Track | Skills | Covers |
 |---|---|---|
@@ -90,6 +91,7 @@ The skills are grouped into seven tracks, and each track is its own plugin:
 | `web-track` | 4 | a site's structure, an audit of it, and SEO |
 | `capacitor-track` | 2 | web-in-a-shell apps |
 | `design-track` | 1 | design for any HTML interface |
+| `windows-track` | 1 | a Windows installer that updates itself, outside any store |
 | `factory-setup` | 1 | says when a repo looks like an app and no track is on |
 
 **Nothing is global.** You turn a track on for one repo:

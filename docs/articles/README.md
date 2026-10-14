@@ -18,9 +18,15 @@ Both were revised on 2026-09-29, when the two repositories went public: the link
 place, and the second describes per-repo tracks through `enable.py` rather than a
 registry every user must have.
 
-**Last checked against the code on 2026-10-14** (App Factory 0.4.4, RepoGuards 0.3.1).
-The two guard messages quoted in the first are the real hook's output on that day, on
-throwaway repos named like the real ones — the push refusal now lists the commits it
-would publish, and no longer quotes a dated incident, so the quotes were replaced. The
-counts in both (40 skills) were recounted from disk. Neither article has been published
-yet; the plan for where and when is kept outside the repository.
+**Published on 2026-10-14 on the author's own site**, in English and Hebrew. That
+site is now the articles' home: its sources live in the website repo
+(`text/<lang>/blog/*.md`), and that is the copy to edit. The files here are the drafts
+they started from, kept because the argument in them is the one this project is built
+on — they may lag the published version, and a difference between the two is resolved
+in favour of the site.
+
+**Last checked against the code on 2026-10-14** (App Factory with `windows-track`, 41
+skills in eight tracks; RepoGuards 0.3.1). The two guard messages quoted in the first
+are the real hook's output on that day, on throwaway repos named like the real ones.
+The second gained the Windows track, and its counts — skills, tracks, and the size of
+their descriptions, about 8,100 tokens — were recounted from disk.
