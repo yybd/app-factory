@@ -5,6 +5,8 @@
 **40 skills that build, describe and ship mobile apps** — to the App Store and Google
 Play, and outside them. Each one loads only where it is wanted.
 
+![Three of the skills' scripts, run for real: enable.py picks the tracks, check_name.py audits a name against the live App Store, measure_copy.py catches a translation that dropped a claim](docs/media/app-factory-demo.gif)
+
 They are Claude Code plugins. You enable the tracks a repo needs, and a session opened
 there carries them; a session opened anywhere else does not.
 
