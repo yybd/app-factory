@@ -19,6 +19,7 @@ macOS only (uses `security`). Stdlib otherwise.
 """
 
 import argparse
+import datetime
 import glob
 import json
 import os
@@ -136,7 +137,10 @@ def main():
         for c in grp:
             if c["team"]:
                 teams.add(c["team"])
-    expired = [p for p in profiles if p["expires"] and p["expires"] < "2026-06-02"]
+    # Compared with today, not with a date written into the script: a fixed date
+    # stopped flagging anything that expired after the day it was written.
+    today = datetime.date.today().isoformat()
+    expired = [p for p in profiles if p["expires"] and p["expires"][:10] < today]
 
     report = {
         "project_root": root,

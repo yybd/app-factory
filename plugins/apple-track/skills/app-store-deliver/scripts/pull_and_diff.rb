@@ -53,7 +53,8 @@ ver    = ASC.version(app_id, platform: platform, version: version)
 state  = ver["attributes"]["appStoreState"]
 
 puts "app #{bundle}  version #{version} [#{platform}]  state=#{state}"
-if %w[WAITING_FOR_REVIEW IN_REVIEW PENDING_APPLE_RELEASE].include?(state)
+frozen = %w[WAITING_FOR_REVIEW IN_REVIEW PENDING_APPLE_RELEASE].include?(state)
+if frozen
   puts "!! metadata is FROZEN in this state — uploading requires removing the"
   puts "!! submission from review and losing its place in the queue. Stop and ask."
 end
@@ -178,6 +179,13 @@ else
   puts "  media     checked #{seen.values.flatten.size} asset(s) against #{local.size} #{src} file(s)"
 end
 
+# A frozen version is never "safe to deliver", whatever the diff says: the warning
+# above used to be followed by exit 0 when nothing differed, and a caller that reads
+# only the exit code would have uploaded into a submission under review.
+if frozen
+  puts "\n== version #{version} is #{state} — metadata is frozen. Do not deliver."
+  exit 3
+end
 if diffs.empty?
   puts "\n== #{src} matches App Store Connect — safe to deliver."
   exit 0

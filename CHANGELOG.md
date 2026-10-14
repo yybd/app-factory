@@ -14,6 +14,29 @@ skill does.
 
 ## Unreleased
 
+## 0.4.2
+
+A patch: five places where a script did less than its skill said, found by reading
+every skill against its scripts for the launch articles.
+
+- **`code-signing-provisioning`: expired profiles are judged against today.**
+  `diagnose_signing.py` compared expiry with a date written into the script, so a
+  profile that expired after that day was never flagged. The skill also claimed an
+  entitlements-vs-profile cross-check the script never ran; it now says so and tells
+  you to read the profile's `Entitlements` yourself.
+- **`appstore-media`: a failing UI test is reported again.** `capture_ios.sh` piped
+  `xcodebuild` through `grep … || true`, so its exit status was always 0 and the
+  "test exited non-zero" warning could not fire. It reads `PIPESTATUS` now. The help
+  text's default locales also matched the code's (`en-US`).
+- **`app-store-deliver`: a version in review stops `pull_and_diff.rb`.** It printed
+  "metadata is FROZEN" and then exited 0 when nothing differed — "safe to deliver" to
+  any caller reading the exit code. It exits 3 now.
+- **`play-store-deliver`: the sync enforces Play's length limits.** The skill said an
+  over-limit field stops the upload; the sync only checked that fields existed.
+  `sync_from_hub.sh` now runs `validate_metadata.py` and stops on an error.
+- **`android-icon-generator`: the store icon lands where it is uploaded from.** The
+  documented `--play-icon` path was one `play-store-deliver` never reads.
+
 ## 0.4.1
 
 A patch: no skill does anything different. Grove, the optional multi-repo layer, is

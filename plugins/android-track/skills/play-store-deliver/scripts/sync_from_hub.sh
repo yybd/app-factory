@@ -242,6 +242,28 @@ if [[ ${#warn[@]} -gt 0 ]]; then
   printf '   - %s\n' "${warn[@]}"
 fi
 
+# ── the length gate ────────────────────────────────────────────────────────────
+# The check above asks only whether a field exists. Play's limits (title 30, short
+# 80, full 4000, release notes 500) were enforced nowhere on this path, although the
+# skill said an over-limit field stops the upload — so supply was the first thing to
+# notice. validate_metadata.py ships in this same track, so a relative walk finds it
+# in a checkout and in the installed cache alike.
+validator="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../play-store-metadata/scripts" 2>/dev/null && pwd)/validate_metadata.py"
+if [[ ! -f "$validator" ]]; then
+  echo "✗ LENGTH CHECK UNAVAILABLE — validate_metadata.py not found beside this skill."
+  echo "Not uploading — the listing was never checked against Play's limits."
+  exit 1
+fi
+if ! len_out="$(python3 "$validator" "$dst" 2>&1)"; then
+  echo
+  printf '%s\n' "$len_out" | grep -E "ERROR" || printf '%s\n' "$len_out"
+  echo
+  echo "✗ LENGTH CHECK FAILED — a field is over Play's limit, or an image is a folder."
+  echo "Fix it in the source ($src), then re-sync."
+  exit 1
+fi
+echo "✓ length check — every field within Play's limits"
+
 # ── the copy gate ──────────────────────────────────────────────────────────────
 # Completeness is not correctness. A locale can have every required field and
 # still ship a translation that lost a claim, gained one, or was never translated

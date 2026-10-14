@@ -13,7 +13,7 @@ Options:
   -p PATH        .xcodeproj path
   -t TEST        Test to run, e.g. MyAppUITests/DemoFlowTests (default: whole UI test target detection fails -> required)
   -d DEVICE      Simulator name (default: "iPhone 17 Pro Max")
-  -l LOCALES     Comma-separated locales (default: "he,en-US")
+  -l LOCALES     Comma-separated locales (default: "en-US")
   -m MODE        screenshots | video | both (default: both)
   -o DIR         Output root (default: ./AppStoreMedia)
   -n APPNAME     App name for output folder (default: scheme)
@@ -77,8 +77,8 @@ for LOC in "${LOCS[@]}"; do
     -destination "platform=iOS Simulator,id=$UDID" \
     -only-testing:"$TEST" \
     -testLanguage "${LOC%%-*}" -testRegion "$REGION" \
-    -resultBundlePath "$RESULT" | grep -E "Test (Case|Suite)|error|passed|failed" || true
-  TEST_STATUS=$?
+    -resultBundlePath "$RESULT" | grep -E "Test (Case|Suite)|error|passed|failed"
+  TEST_STATUS=${PIPESTATUS[0]}            # xcodebuild's, not grep's — `|| true` hid it
   set -e
 
   # --- stop recording ---------------------------------------------------------

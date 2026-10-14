@@ -187,8 +187,9 @@ nothing. Pass `--standalone`, or simply have no `$APP_HUB` — an unreachable hu
 this mode on its own and says so.
 
 **The verification runs either way**, and that is the half that matters: a missing
-locale, an over-limit field or release notes for the wrong version stop the upload
-before anything reaches the store. Only the copying is conditional.
+locale, a missing field, an over-limit field or a translation that drops a claim stop
+the upload before anything reaches the store. Release notes missing for this
+versionCode are reported as a warning, not a stop. Only the copying is conditional.
 
 ## Boundaries
 - **Outward-facing — confirm before upload.** Don't author content here; fix it in

@@ -228,7 +228,8 @@ inapplicable: the question this step asks is whether anyone edited the listing o
 the website since the last deliver, and the record those edits landed on is the
 live one. Diff that, then deliver the new version.
 Exit 0 = the hub matches the store, proceed. Exit 2 = fields differ; it prints
-store-vs-hub for each. Classification:
+store-vs-hub for each. Exit 3 = the version is in review and its metadata is frozen
+(below) — whatever the diff says, do not deliver. Classification:
 - `hub adds` — the store field is empty (e.g. `whatsNew` on a first version).
   Safe: delivering only adds content.
 - `CONFLICT` — both sides have content and they disagree. **Stop.** The store is

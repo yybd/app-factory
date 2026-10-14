@@ -1,6 +1,6 @@
 {
   "name": "capacitor-track",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Capacitor apps: the strings that live in JS and HTML, and the WebView traps that only show up on a device.",
   "license": "MIT",
   "defaultEnabled": false,

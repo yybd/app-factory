@@ -64,7 +64,9 @@ It reports: the target's signing build settings (automatic vs manual, team,
 identity, profile specifier), the signing identities in the keychain (grouped by
 type), installed provisioning profiles decoded (name, team, App ID, dev vs
 distribution, **expiry**, certificates), and cross-checks (team consistency,
-expired profiles, entitlements vs profile). Read it before concluding anything.
+expired profiles). It does **not** compare the app's entitlements with a profile's —
+when a capability is the suspect, decode the profile and read its `Entitlements`
+yourself. Read the report before concluding anything.
 
 ### 3. Map the goal to the right certificate
 Pick the type for the goal (full table in the `apple-credentials` skill):

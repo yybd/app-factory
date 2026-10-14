@@ -23,8 +23,10 @@ description: >-
 - **Tools:** `Pillow` (`pip3 install Pillow`) for the generator script; nothing else
   beyond Claude Code and Android Studio.
 - **Credentials:** none.
-- **Hub (`$APP_HUB`):** optional — `--play-icon` writes the 512 px store icon into
-  `$APP_HUB/<slug>/media/play/`; without a hub, drop the flag and keep the icon elsewhere.
+- **Hub (`$APP_HUB`):** optional. `--play-icon` writes the 512 px store icon wherever
+  `play-store-deliver` reads it: `$APP_HUB/<slug>/media/play/<locale>/images/icon.png`
+  with a hub, or `<app-repo>/fastlane/metadata/android/<locale>/images/icon.png` without
+  one. Any other path is a file nothing uploads.
 - **Other tracks:** none.
 
 ## Why this is not the Apple skill with a flag
@@ -62,7 +64,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/android-icon-generator/scripts/generate_and
   --source icon-1024.png \
   --res <android-root>/app/src/main/res \
   --background "#fcfbf6" \
-  --play-icon $APP_HUB/<slug>/media/play/icon-512.png   # or <app-repo>/fastlane/metadata/android/<locale>/images/icon.png
+  --play-icon $APP_HUB/<slug>/media/play/<locale>/images/icon.png   # or <app-repo>/fastlane/metadata/android/<locale>/images/icon.png
 ```
 
 - `--background` takes a colour (written as a colour resource — the lightest option
