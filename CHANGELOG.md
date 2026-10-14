@@ -14,6 +14,15 @@ skill does.
 
 ## Unreleased
 
+## 0.6.1
+
+- **`upload_library_assets.rb` uploads.** Its first real run, for one app's header in two
+  locales, was refused at the reservation: the relationship is `assetLibrary`, not the
+  `appAssetLibrary` the script sent. Fixed; both locales then uploaded, processed and were
+  placed on the header and search results, and a re-run reuses the asset instead of
+  uploading it again. The reference now records the name and the `ACTIVE` placement state
+  Apple's documentation does not list.
+
 ## 0.6.0
 
 A minor: the App Store's October 2026 marketing surfaces — the product page header, the

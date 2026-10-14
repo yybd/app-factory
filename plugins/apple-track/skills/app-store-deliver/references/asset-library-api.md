@@ -44,6 +44,11 @@ Surfaces a placement can attach to: `appStoreVersionLocalization`,
   to range specs only.
 - The universal 16:9 spec (`5244×2950`, PNG) lists both `PRODUCT_PAGE_HEADER_ASSET` and
   `APP_STORE_SEARCH_RESULTS_ASSET` in `compatiblePlacementTypes`.
+- **The reservation's relationship is `assetLibrary`**, not `appAssetLibrary` — the
+  first real upload was refused with "'appAssetLibrary' is not a relationship". Nothing
+  is created when it fails, so a retry after the fix is clean.
+- **A placed creative asset reads `ACTIVE`**, a placement state Apple's enum does not
+  list, while the version is still `PREPARE_FOR_SUBMISSION`.
 - The listing's existing screenshots already appear as placements on the version
   localization — the library holds what `deliver` uploaded through the old set API.
 
@@ -53,7 +58,7 @@ Surfaces a placement can attach to: `appStoreVersionLocalization`,
 GET   /v1/apps/{id}/assetLibrary                    → library id (stable for the app's life)
 GET   /v1/appAssetLibraryRefData                    → specs, groups, types, limits
 POST  /v1/appAssetLibraryImages                     {fileName, fileSize, category, referenceName?}
-                                                     + relationships.appAssetLibrary
+                                                     + relationships.assetLibrary (type appAssetLibraries)
 PUT   <uploadOperations[].url>                      bytes[offset, length]; NO JWT on these URLs
 PATCH /v1/appAssetLibraryImages/{id}                {uploaded: true}   ← nothing else; a checksum is rejected
 GET   /v1/appAssetLibraryImages/{id}                poll: AWAITING_UPLOAD → UPLOAD_COMPLETE → PREPARE_FOR_SUBMISSION

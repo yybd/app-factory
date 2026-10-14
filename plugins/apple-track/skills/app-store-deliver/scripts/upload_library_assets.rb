@@ -279,7 +279,7 @@ files.each do |path|
     body = { data: { type: res_type,
                      attributes: { fileName: name, fileSize: File.size(path), category: category,
                                    referenceName: ref_name },
-                     relationships: { appAssetLibrary: { data: { type: "appAssetLibraries", id: lib_id } } } } }
+                     relationships: { assetLibrary: { data: { type: "appAssetLibraries", id: lib_id } } } } }
     body[:data][:attributes][:previewFrameTimeCode] = opts[:frame] if video && opts[:frame]
     r = ASC.body(rc.post("v1/#{res_type}", body))["data"]
     asset_id = r["id"]
