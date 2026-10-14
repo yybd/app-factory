@@ -15,6 +15,12 @@ not a bug.
 | 2 — skills and tracks: [English](2-skills-and-tracks.md) · [עברית](2-skills-and-tracks.he.md) | why one large instruction file does not hold, and what replaces it |
 
 Both were revised on 2026-09-29, when the two repositories went public: the link is in
-place, the guard messages quoted in the first are real ones, and the second describes
-per-repo tracks through `enable.py` rather than a registry every user must have. Neither
-has been published yet; the plan for where and when is kept outside the repository.
+place, and the second describes per-repo tracks through `enable.py` rather than a
+registry every user must have.
+
+**Last checked against the code on 2026-10-14** (App Factory 0.4.4, RepoGuards 0.3.1).
+The two guard messages quoted in the first are the real hook's output on that day, on
+throwaway repos named like the real ones — the push refusal now lists the commits it
+would publish, and no longer quotes a dated incident, so the quotes were replaced. The
+counts in both (40 skills) were recounted from disk. Neither article has been published
+yet; the plan for where and when is kept outside the repository.

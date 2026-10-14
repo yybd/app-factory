@@ -48,14 +48,17 @@ RepoGuards יושב בין הסוכן לבין הפקודות שהוא מריץ.
 
 אבל לעצור זה רק חצי מהעבודה. סירוב סתמי בנוסח "Access Denied" רק שולח את הסוכן לנסות שוב בדרך אחרת. לכן RepoGuards מסביר *למה* הפעולה נעצרה, ומה כדאי לבדוק קודם.
 
-זו הודעה אמיתית, לא דוגמה שהומצאה למאמר. קיבלתי אותה היום, בזמן שפרסמתי את הפרויקט הזה. סשן שעמד בריפו של RepoGuards עצמו התבקש לדחוף את הריפו של App Factory שלידו, ואני כבר אישרתי לו את הדחיפה, בצ'אט:
+זו ההודעה, מילה במילה, כפי שהגארד מדפיס אותה היום. זה הפלט של ההוק האמיתי על שני ריפואים זמניים שקרויים כמו שלי, לא דוגמה שנכתבה למאמר. נתקלתי בה לראשונה ב-29 בספטמבר, בזמן שפרסמתי את הפרויקט הזה. סשן שעמד בריפו של RepoGuards עצמו התבקש לדחוף את הריפו של App Factory שלידו, ואני כבר אישרתי לו את הדחיפה, בצ'אט.
 
 ```
 `git push` targets the 'app-factory' repo (…/app-factory), which this
 session is not standing in — this session is in …/cross-repo-guards.
 A push publishes a WHOLE BRANCH, not the commit you just made, and it
-cannot be undone. On 2026-09-07 this sent 20 commits in one app repo,
-18 of them written before that session existed.
+cannot be undone — including commits that were there before this session.
+It would publish 3 commit(s):
+  d0fe45b 0.4.4: every script answers --help, and the docs match the tools
+  ac5456f ci: clone RepoGuards beside the checkout, so the skipped checks run
+  87b75ce evals: a first suite for app-store-review-compliance, and a runner
 Look first, from here:
   git -C …/app-factory log @{u}..HEAD --oneline    # everything this would publish
   python3 $REPO_GUARDS/tools/close.py              # every place, and its push radius
@@ -63,19 +66,21 @@ Then either move the session to …/app-factory and push there, or ask
 the owner to push. Do not push a branch you have no picture of.
 ```
 
-האישור שלי לא נחשב, וזה בכוונה: ההוק לא יכול להבחין בין אישור אמיתי לאישור שהמודל דמיין, והוא גם לא מנסה. הסוכן העביר את הסשן לריפו הנכון, קרא את שישה הקומיטים שעמדו לצאת (שלושה מהם בני שבועיים), ודחף משם.
+האישור שלי לא נחשב, וזה בכוונה: ההוק לא יכול להבחין בין אישור אמיתי לאישור שהמודל דמיין, והוא גם לא מנסה. באותו יום הסוכן העביר את הסשן לריפו הנכון, קרא את שישה הקומיטים שעמדו לצאת (שלושה מהם בני שבועיים), ודחף משם. מאז הסירוב עושה את הקריאה בעצמו: הוא מונה את מה שהדחיפה הייתה מפרסמת, כך שהסוכן, וגם אתה, רואים את הענף כולו לפני שמשהו יוצא מהמחשב.
 
 #### 2. מראה לסוכן את מה שהוא לא רואה
 
 רוב הפעולות במאגר זר הן לגיטימיות. למשל, כתיבה לקובץ מסוים או קומיט של נתיבים מפורשים. RepoGuards לא חוסם אותן, אבל הוא גם לא נותן להן לרוץ בעיניים עצומות. הוא מצרף לפקודה את **תמונת המצב של המאגר השני**: על איזה ענף הוא עומד, מה פתוח בו, וכמה קומיטים ממתינים לדחיפה.
 
 ```
-[foreign] `git reset` reaches into 'repo-guards', and this session stands in
-…/app-factory. What is dirty there is invisible from here — this is it:
+[foreign] `git reset` reaches into 'repo-guards' (…/repo-guards), and this
+session stands in …/app-factory. What is dirty there is invisible from here —
+this is it:
   [current branch there: main]
   (clean — nothing uncommitted there)
   (13 commits there are unpushed — a push publishes all of them)
-Stage only what you wrote.
+Stage only what you wrote. `python3 $REPO_GUARDS/tools/close.py` shows every
+place at once.
 ```
 
 RepoGuards לא מחליט כאן ולא מזהיר. הוא נותן לסוכן את מה שהיה רואה אילו עמד שם בעצמו, והסוכן מחליט על סמך תמונה מלאה.

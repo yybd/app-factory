@@ -48,14 +48,17 @@ Two operations are not allowed in a foreign repo: **a sweep** (`commit -a`, `add
 
 Refusing is only half the job. A bare "Access Denied" just sends the agent off to try a different route. So RepoGuards says *why* the operation stopped and what to look at first.
 
-This message is real, not made up for the post. I got it today while publishing this project. I had a session standing in RepoGuards' own repo and asked it to push the App Factory repo next door. I had already approved that push myself, in chat:
+This is the message, word for word, as the guard prints it today: it is the real hook's output on two throwaway repos named like mine, not a mock-up written for the post. I first ran into it on 29 September, while publishing this project. A session standing in RepoGuards' own repo was asked to push the App Factory repo next door, and I had already approved that push myself, in chat.
 
 ```
 `git push` targets the 'app-factory' repo (…/app-factory), which this
 session is not standing in — this session is in …/cross-repo-guards.
 A push publishes a WHOLE BRANCH, not the commit you just made, and it
-cannot be undone. On 2026-09-07 this sent 20 commits in one app repo,
-18 of them written before that session existed.
+cannot be undone — including commits that were there before this session.
+It would publish 3 commit(s):
+  d0fe45b 0.4.4: every script answers --help, and the docs match the tools
+  ac5456f ci: clone RepoGuards beside the checkout, so the skipped checks run
+  87b75ce evals: a first suite for app-store-review-compliance, and a runner
 Look first, from here:
   git -C …/app-factory log @{u}..HEAD --oneline    # everything this would publish
   python3 $REPO_GUARDS/tools/close.py              # every place, and its push radius
@@ -63,19 +66,21 @@ Then either move the session to …/app-factory and push there, or ask
 the owner to push. Do not push a branch you have no picture of.
 ```
 
-My approval didn't count, and that is deliberate: the hook can't tell a real approval from a hallucinated one, and it doesn't try to. The agent moved the session into the right repo, read the six commits that were about to go out (three of them a fortnight old), and pushed from there.
+My approval didn't count, and that is deliberate: the hook can't tell a real approval from a hallucinated one, and it doesn't try to. That day the agent moved the session into the right repo, read the six commits that were about to go out (three of them a fortnight old), and pushed from there. Since then the refusal does the reading itself: it lists what the push would publish, so the agent, and you, see the whole branch before anything leaves the machine.
 
 ### 2. It shows the agent what it can't see
 
 Most writes into a foreign repo are legitimate, such as editing one file or committing explicit paths. RepoGuards doesn't block them, but it doesn't let them run blind either. It attaches **the other repo's state** to the command: which branch it is on, what is open there, and how many commits are waiting to be pushed.
 
 ```
-[foreign] `git reset` reaches into 'repo-guards', and this session stands in
-…/app-factory. What is dirty there is invisible from here — this is it:
+[foreign] `git reset` reaches into 'repo-guards' (…/repo-guards), and this
+session stands in …/app-factory. What is dirty there is invisible from here —
+this is it:
   [current branch there: main]
   (clean — nothing uncommitted there)
   (13 commits there are unpushed — a push publishes all of them)
-Stage only what you wrote.
+Stage only what you wrote. `python3 $REPO_GUARDS/tools/close.py` shows every
+place at once.
 ```
 
 RepoGuards doesn't decide anything here, and it doesn't warn. It gives the agent what it would have seen if it had been standing there, and the agent decides with the full picture.
