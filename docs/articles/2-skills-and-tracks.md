@@ -20,7 +20,7 @@ The bigger difference is something else. An instructions file tells the agent *w
 
 ---
 
-## The production line
+## The production line: agents that build an app from zero to distribution
 
 ```
 0  identity        name, features, one dossier everyone quotes
