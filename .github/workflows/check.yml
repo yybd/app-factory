@@ -24,6 +24,22 @@ jobs:
       # to start without it. `check_scripts.py` treats that as "checked statically only"
       # rather than a failure — correct for a person running it on a bare machine, and
       # wrong for the gate, which would then never exercise those three at all. So the
-      # runner installs it, and CI checks all 57.
+      # runner installs it, and CI checks every one of them.
       - run: python3 -m pip install --quiet Pillow
+      # RepoGuards, beside this checkout. Without it `test_init_hub` verified nothing and
+      # `test_portability` skipped its anchors half — green here was not green. Its main
+      # branch, not a tag: `claude plugin marketplace add yybd/repo-guards` gives a user
+      # main, so main is what this has to work with. A fresh clone has no registry, which
+      # is also what a user has before their first deploy. The product-name half of
+      # `test_portability` still skips, on purpose: that list lives on no server.
+      #
+      # checkout can only write inside the workspace, and inside it the checkers read the
+      # clone as this repo's own files (17 broken references on the first try). So it is
+      # moved beside the checkout — the layout the install docs produce, which
+      # `factory/repo_guards.py` finds without being told.
+      - uses: actions/checkout@v4
+        with:
+          repository: yybd/repo-guards
+          path: .repo-guards
+      - run: mv .repo-guards ../repo-guards
       - run: python3 factory/ci.py --metrics

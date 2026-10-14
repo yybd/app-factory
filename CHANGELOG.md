@@ -14,6 +14,11 @@ skill does.
 
 ## Unreleased
 
+- **CI runs with RepoGuards beside it.** The workflow clones `yybd/repo-guards` (main)
+  next to the checkout, so `test_init_hub` runs its 27 checks and `test_portability` its
+  anchors half on every push — before, the first verified nothing and the second skipped
+  half, and the run was green anyway. Only the product-name half still skips, on purpose.
+
 ## 0.4.4
 
 A patch, from the second stranger re-test. No blockers were found; these are the places

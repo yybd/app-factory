@@ -30,7 +30,7 @@ follows**. Three things follow from that, and none of them is true of a guard:
 |---|---|---|---|
 | **every turn** | RepoGuards' Stop guards, in whatever repo you are standing in | automatic | milliseconds |
 | **every change to `plugins/`** | `python3 factory/deploy.py` — the registry into settings, the repo into the installed copies, then verification | a person | seconds |
-| **every push** | `python3 factory/ci.py` — everything that needs no installation, **and no RepoGuards** | GitHub Actions | ~20s |
+| **every push** | `python3 factory/ci.py` — everything that needs no installation, with RepoGuards cloned beside it | GitHub Actions | ~20s |
 | **before a submission** | `python3 factory/check_urls.py --slug <app>` | a person | seconds, and it needs the network |
 | **monthly** | the list in *What no machine can check* | a person | an hour |
 
@@ -40,17 +40,16 @@ python3 factory/ci.py --metrics   # …and the numbers as JSON
 python3 factory/ci.py --record    # …appended to factory/metrics.jsonl
 ```
 
-**`ci.py` runs without RepoGuards on purpose** — a runner has this repo and nothing else — and
-that is also its limit. What runs there: every path written as a filename, every script
-parsed with its imports resolved, every bilingual pair, and that no skill names a machine
-path. What is **skipped, loudly**: the hub pipeline, and the check that every `$ANCHOR` a
-skill stands on is one a deploy actually writes. Both read RepoGuards' registry.
+**`ci.py` runs without RepoGuards when it has to** — a person may have installed the skills
+alone — and says so loudly: the hub pipeline and the check that every `$ANCHOR` a skill
+stands on is one a deploy actually writes both read RepoGuards' registry, and skip
+without it.
 
-**Closing that gap needs a credential**, and it has not been taken: a runner could clone
-RepoGuards, but a private repo needs a token stored as a secret, and the two checks it would
-buy are cheap to run by hand. `deploy.py` on a real machine runs all of them, which is
-where they are covered today. Worth revisiting if either repo goes public — a public
-checkout needs no token.
+**On the runner it is there, since 2026-10-14.** Closing the gap needed a token while
+RepoGuards was private; once both repos were public, the workflow clones
+`yybd/repo-guards` beside the checkout — main, because that is what a user's
+`marketplace add` gives them — and both checks run on every push. What still skips there
+is the product-name half of `test_portability`, on purpose: that list lives on no server.
 
 **`check_urls` is not in CI, deliberately.** It is the only thing here that reaches the
 network: slow by comparison, fails when you are offline, and a check that cries wolf on
