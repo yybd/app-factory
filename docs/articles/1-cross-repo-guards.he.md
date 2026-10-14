@@ -1,3 +1,5 @@
+*[English](1-cross-repo-guards.md) · עברית*
+
 # הסוכן עומד בריפו אחד וכותב לתוך ריפו אחר: איך עצרתי את Claude Code מלעשות commit ו-push עיוורים
 
 סוכני קוד כמו Claude Code מצוינים בתוך תיקייה אחת. הם קוראים פרויקט שלם, מאתרים באגים ומשחררים פיצ'רים. אבל ברגע שמשימה חוצה גבול בין מאגרים (repositories), משהו בסיסי נשבר, ואף אחד לא מתריע על זה.
@@ -46,20 +48,22 @@ RepoGuards יושב בין הסוכן לבין הפקודות שהוא מריץ.
 
 אבל לעצור זה רק חצי מהעבודה. סירוב סתמי בנוסח "Access Denied" רק שולח את הסוכן לנסות שוב בדרך אחרת. לכן RepoGuards מסביר *למה* הפעולה נעצרה, ומה כדאי לבדוק קודם.
 
-זו הודעה אמיתית, לא דוגמה שהומצאה למאמר. קיבלתי אותה בזמן שהכנתי את ההשקה הזאת, כשניסיתי לדחוף את RepoGuards מתוך סשן שעמד בריפו אחר:
+זו הודעה אמיתית, לא דוגמה שהומצאה למאמר. קיבלתי אותה היום, בזמן שפרסמתי את הפרויקט הזה. סשן שעמד בריפו של RepoGuards עצמו התבקש לדחוף את הריפו של App Factory שלידו, ואני כבר אישרתי לו את הדחיפה, בצ'אט:
 
 ```
-`git push` targets the 'repo-guards' repo (…/cross-repo-guards), which this
-session is not standing in — this session is in …/app-factory.
+`git push` targets the 'app-factory' repo (…/app-factory), which this
+session is not standing in — this session is in …/cross-repo-guards.
 A push publishes a WHOLE BRANCH, not the commit you just made, and it
-cannot be undone.
+cannot be undone. On 2026-09-07 this sent 20 commits in one app repo,
+18 of them written before that session existed.
 Look first, from here:
-  git -C …/cross-repo-guards log @{u}..HEAD --oneline
-Then either move the session to …/cross-repo-guards and push there,
-or ask the owner to push.
+  git -C …/app-factory log @{u}..HEAD --oneline    # everything this would publish
+  python3 $REPO_GUARDS/tools/close.py              # every place, and its push radius
+Then either move the session to …/app-factory and push there, or ask
+the owner to push. Do not push a branch you have no picture of.
 ```
 
-הכלי שבניתי עצר גם אותי, וזה בדיוק מה שהוא אמור לעשות. עברתי לריפו הנכון, בדקתי מה עומד לצאת, ורק אז דחפתי.
+האישור שלי לא נחשב, וזה בכוונה: ההוק לא יכול להבחין בין אישור אמיתי לאישור שהמודל דמיין, והוא גם לא מנסה. הסוכן העביר את הסשן לריפו הנכון, קרא את שישה הקומיטים שעמדו לצאת (שלושה מהם בני שבועיים), ודחף משם.
 
 #### 2. מראה לסוכן את מה שהוא לא רואה
 
