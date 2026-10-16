@@ -87,7 +87,9 @@ demo_pass = read.("demo_password")
 attrs = {
   contactFirstName: read.("first_name"), contactLastName: read.("last_name"),
   contactPhone: read.("phone_number"), contactEmail: read.("email_address"),
-  notes: read.("notes"),
+  # A universal app's per-platform notes (notes.osx.txt / notes.ios.txt), as
+  # sync_from_hub.sh --platform resolves them; the canonical notes.txt otherwise.
+  notes: (o = read.("notes.#{platform == 'MAC_OS' ? 'osx' : 'ios'}")).empty? ? read.("notes") : o,
   demoAccountRequired: !(demo_user.empty? && demo_pass.empty?)
 }
 attrs[:demoAccountName]     = demo_user unless demo_user.empty?
