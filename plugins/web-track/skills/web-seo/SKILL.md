@@ -168,10 +168,37 @@ What to collect, per property, against the baseline:
 | impressions and clicks, per query | impressions without clicks is a different problem from neither |
 | pages that **lost** indexing since the last reading | the only finding here that is urgent |
 | the conversion step this site exists for | §6 |
+| for a blog with its own counter: opened / read / tool per article, and sources | the subsection below — analytics alone cannot be trusted for it |
 
 A 403 from Search Console has two causes that look identical and have different fixes:
 the API is switched off in the Cloud project, or nobody shared the property with the
 service account. Check both before assuming either.
+
+### A blog — its own counter is the count, analytics is the undercount
+
+A blog promoted to developers (LinkedIn, Medium, Hacker News) is read by exactly the
+people whose browsers block `google-analytics.com`, so GA4 can show an article as
+"one user" — or no row at all — while people are reading it (why: see
+[LESSONS.md](LESSONS.md#ga4-saw-a-blog-that-was-being-read-as-one-nobody-read)). Where the site
+counts its own reads first-party — the descriptor's `blog_counter` entry says what it
+counts and how to read it — **that counter is the number, and GA4 is read through the
+ratio between them, never on its own.** Without such an entry, say that the blog's
+numbers are a floor, not a count.
+
+Read four things per article, over the same range for both sources (a counter that
+keeps monthly totals is compared with GA4 over those months, starting no earlier than
+the day the counter began — otherwise the ratio is diluted by days it never saw):
+
+| number | healthy | worrying | what to do |
+|---|---|---|---|
+| **counter ÷ analytics** | stable from one reading to the next, whatever its size (2–5× is ordinary for a developer audience) | jumps or collapses between readings; or **below 1** | A steady ratio is a fact about the audience — use it to correct GA4's other numbers, and do not "fix" it. A sudden change means one of the two broke: a below-1 ratio is almost always the counter failing (credentials, a blocked endpoint, an origin check), so check it before anything else. |
+| **read ÷ opened** (reached the end) | roughly a third or more on a long article | under ~15% | Low means people open and leave. Look at what the first screen promises against what the headline (and the post that shared it) promised — the mismatch is usually there, not in the prose. Compare languages: one translation far below the other is a translation problem. |
+| **tool ÷ opened** (clicked the article's one call to action) | a few percent, and higher among readers who reached the end | zero while reads are healthy | People finish and are not offered a next step they want. That is a §6 problem — the closing box's wording or the link's target — not a traffic one. |
+| **sources** | each promotion shows up under its own name | almost everything `direct` | LinkedIn's and Medium's apps often send no referrer, so their readers land in `direct`. Put `?utm_source=linkedin` (or `medium`, …) on every link you share; the counter names a `utm_source` before it looks at the referrer. Then compare: which channel sends readers who **finish**, not only who open. |
+
+A handful of opens is noise: the owner's own test loads look exactly like readers. Say
+how many there are rather than turning three opens into a percentage, and read the
+rates only once an article has a few dozen opens.
 
 ### After a deploy that changed pages
 
@@ -318,7 +345,9 @@ UI-only. Say so plainly rather than appearing to have done them.
 ## 10. Report
 
 Lead with the number that decides everything else — index coverage per property,
-against the previous snapshot. Then impressions, then clicks, then the funnel.
+against the previous snapshot. Then impressions, then clicks, then the funnel — and,
+for a blog with its own counter, the counter's numbers first and GA4's beside them,
+never GA4's alone.
 Name what moved, what did not, and which of the four states each property is in.
 Recommend the cheapest available action, and say what you did not do.
 

@@ -115,6 +115,21 @@ being read as a traffic problem.
 **Cost of forgetting:** sessions rise on the free properties, the funnel number stays
 at zero, and the response is more search work instead of one link on the page.
 
+## GA4 saw a blog that was being read as one nobody read
+
+*The run that produced the blog subsection.* The site's articles had been shared on
+LinkedIn and Medium, and the expectation was that GA4's page report would say who read
+them. It showed almost nothing — a single user per article, which was the owner, and on
+some days no article rows at all — while the owner's own browser was failing to reach
+GA4's collect endpoint. Ad blockers stop `google-analytics.com`, and a developer
+audience runs them more than most. A first-party counter (a site function that adds
+one to a number per article, with no identifier) was built in response, and the
+reading now sets it beside GA4 as a ratio. This is why §3 treats the counter as the
+count and GA4 as the undercount.
+
+**Cost of forgetting:** a blog that people are reading is reported as one nobody reads,
+and the promotion that works is the one that gets stopped.
+
 ## Why no Search Console client ships here
 
 *A design decision, recorded so it is not re-litigated.* A Google API client is a

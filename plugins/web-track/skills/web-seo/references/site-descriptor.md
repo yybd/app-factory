@@ -35,6 +35,12 @@ seven hostnames, which is what kept it in a private repo instead of in the skill
   "analytics": {
     "ga4_property": "properties/000000000",
     "credentials": "$KEYS_ROOT/google/analytics.json"
+  },
+  "blog_counter": {
+    "_comment": "Only for a site that counts its own blog reads first-party. What it counts and how to read it; the token stays in the site's git-ignored env file.",
+    "counts": ["opened", "read to the end", "tool link clicked", "source"],
+    "since": "YYYY-MM-DD",
+    "read_command": "npm run reads"
   }
 }
 ```
@@ -49,6 +55,7 @@ seven hostnames, which is what kept it in a private repo instead of in the skill
 | `sitemap_command` | a missing sitemap is reported without a fix | the report names the command that generates it |
 | `publish_command` | the skill says "publish it however this project publishes" | the skill can say exactly what to run |
 | `search_console` / `analytics` | the offline audit still runs in full | the live reading is possible |
+| `blog_counter` | blog numbers are reported as GA4's floor, not a count | the counter is the count, and GA4 is read as a ratio against it from `since` on (SKILL §3) |
 
 ## The rule these follow
 
