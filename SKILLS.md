@@ -29,6 +29,7 @@ work across several repos. Without it, `factory/enable.py` enables tracks per re
 | `capacitor-track` | 2 | app repos |
 | `design-track` | 1 | apps and the site alike |
 | `windows-track` | 1 | desktop app repos that ship on Windows |
+| `announce-track` | 1 | any repo you announce from — an app's, a tool's, a site's |
 | `factory-setup` | 1 | **everywhere** — see below |
 
 *Counted from disk, and checked: `factory/check_skills.py` fails when a number written
@@ -75,6 +76,15 @@ that updates itself through WinSparkle — signed with the same EdDSA key as Spa
 the Mac, with a feed of its own. The Windows half of `macos-direct-distribution`, and
 a track of its own because a repo that ships only on Windows has no use for the
 sixteen Apple skills. No Authenticode signing, by design for now.
+
+### Announce track — 1
+
+`announce`. The posts that announce a release, a launch or an article — Hacker News,
+Reddit, LinkedIn, X, Bluesky and dev.to/Medium copies — written from one source of truth
+into a git-excluded folder, then checked against each channel's mechanical rules by
+`check_drafts.py`: an HN title past 80 characters, Markdown in an HN comment, a
+cross-post whose front matter is not first or that has no canonical URL. It never posts.
+A track of its own because it loads in repos that are not apps at all.
 
 ### Web track — 4
 

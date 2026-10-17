@@ -135,7 +135,7 @@ between releases the cache stays on the old bytes however many times it is "upda
 Measured on 2026-09-11 — six tracks answering "already at the latest version" over
 copies a byte comparison called stale.
 
-The version sits in nine files (eight `plugin.json` and `marketplace.json`) and they
+The version sits in ten files (nine `plugin.json` and `marketplace.json`) and they
 have to agree; `ci.py` fails when they do not.
 
 ```bash
@@ -148,7 +148,7 @@ It writes the number and prints the rest, which it deliberately does not do: ren
 `factory/ci.py`, commit, **tag** `v<version>` (the tag is how a release is found later),
 push both, then `factory/deploy.py` for this machine's own copies.
 
-**One version for all eight tracks.** They are not independent — a delivery script runs
+**One version for all nine tracks.** They are not independent — a delivery script runs
 `shared-track`'s copy measurer, `price-sync` reads `apple-track`'s credential resolver —
 so per-track versions would need a compatibility matrix, and an unmaintained
 compatibility matrix is worse than no version at all.

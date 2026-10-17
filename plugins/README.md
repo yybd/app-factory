@@ -14,8 +14,9 @@ marketplace (`app-factory`). One directory per track.
 | `capacitor-track` | 2 | Capacitor apps |
 | `design-track` | 1 | design and frontend |
 | `windows-track` | 1 | Windows direct distribution |
+| `announce-track` | 1 | announcement drafts, per channel |
 | `factory-setup` | 1 | setup, and the one that is on everywhere |
-| **total** | **41** | |
+| **total** | **42** | |
 
 *Counted from disk 2026-10-14.*
 

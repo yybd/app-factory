@@ -24,7 +24,7 @@ skills** runs only the first group; everything below it is the maintainer's.
 | `check_bilingual.py` | do the two language copies of a document still agree | no |
 | `check_commit_message.py` | does a commit message name a machine, a site or a product (`--install` puts it on `commit-msg`) | no |
 | `render_track_readmes.py` | generate each track's README from its skills (`--check`) | no |
-| `bump_version.py` | move the version in all nine places, and print the release steps | no |
+| `bump_version.py` | move the version in all ten places, and print the release steps | no |
 | `run_evals.py` | a track's eval suite, on a copy the sandbox will load (from a terminal; costs model usage) | no |
 | `tests/` | portability, and `init_hub` against a throwaway tree | one skips without it |
 | | | |

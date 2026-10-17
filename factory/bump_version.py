@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
-"""Move the version — in all nine places, and in the one order that works.
+"""Move the version — in all ten places, and in the one order that works.
 
     python3 factory/bump_version.py patch      0.1.0 → 0.1.1
     python3 factory/bump_version.py minor      0.1.0 → 0.2.0
     python3 factory/bump_version.py 0.3.0      an exact version
     python3 factory/bump_version.py --check    what the version is, and whether it agrees
 
-**Why a script for nine numbers.** A user gets an update only when the version moves:
+**Why a script for ten numbers.** A user gets an update only when the version moves:
 `claude plugin update` compares versions, not content, so a release whose version did
 not change reaches nobody — measured, on 2026-09-11, as six tracks reporting "already
 at the latest version" over a cache that was demonstrably stale. And the version lives
-in eight `plugin.json` files plus `marketplace.json`, which have to agree: `ci.py`
-fails when they do not, and nine hand edits is how they stop agreeing.
+in nine `plugin.json` files plus `marketplace.json`, which have to agree: `ci.py`
+fails when they do not, and ten hand edits is how they stop agreeing.
 
 **What it does not do.** It does not commit, does not tag and does not push. It prints
 the release procedure, because the steps after the number are the ones that actually

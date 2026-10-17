@@ -37,7 +37,7 @@ implying otherwise.
 
 ## Scope
 
-**In scope:** anything shipped in this repository — the eight tracks, their scripts, the
+**In scope:** anything shipped in this repository — the nine tracks, their scripts, the
 hooks, and the tools under `factory/`.
 
 **Out of scope**, because they are somebody else's: Claude Code itself and its plugin

@@ -24,7 +24,7 @@ project uses in a particular way.
 
 ## Installing
 
-**Do I have to install all eight tracks?**
+**Do I have to install all nine tracks?**
 No, and you should not. `factory/enable.py` reads the repo and proposes the ones its
 files justify — an `.xcodeproj` means Apple, a `build.gradle` means Android. Each track
 you enable costs tokens in every session in that repo, which is the whole reason the

@@ -14,6 +14,17 @@ skill does.
 
 ## Unreleased
 
+- **An announce track.** `announce-track` holds one skill, `announce`: the posts that
+  announce a release, a launch or an article — a Show HN title and first comment, Reddit,
+  LinkedIn, an X or Bluesky thread, dev.to and Medium copies — written from one source of
+  truth into a folder excluded in `.git/info/exclude`, never posted. `check_drafts.py`
+  checks them against what each channel enforces or silently breaks: an HN title past 80
+  characters, Markdown in an HN comment, a post over X's 280 (URLs counted as 23), a
+  cross-post whose front matter is not first, has no `canonical_url`, carries more than
+  four dev.to tags or a relative link; `--links` fetches every URL. It came from
+  announcing RepoGuards by hand, where the first three of those were each got wrong once.
+  A track of its own because it loads in repos that are not apps.
+
 ## 0.6.1
 
 - **`upload_library_assets.rb` uploads.** Its first real run, for one app's header in two

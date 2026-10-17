@@ -21,7 +21,7 @@ up constantly: **`factory/ci.py`** (everything checkable without installing — 
 before saying anything is done), **`factory/deploy.py`** (this machine's copies; needs
 RepoGuards), **`factory/enable.py`** (tracks for one repo; a shim for
 `plugins/factory-setup/scripts/enable.py`, which is the file that ships), and
-**`factory/bump_version.py`** (the version, in all nine places, plus the release steps).
+**`factory/bump_version.py`** (the version, in all ten places, plus the release steps).
 
 ## What is written by hand and what is generated
 

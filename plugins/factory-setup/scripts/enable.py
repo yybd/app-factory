@@ -138,12 +138,12 @@ def propose(found):
     return sorted(set(tracks)), why
 
 
-# The eight this marketplace ships. Read from disk when the checkout is reachable, and
+# The nine this marketplace ships. Read from disk when the checkout is reachable, and
 # from this list when it is not — a machine that installed from GitHub has the plugins
 # in a cache keyed by version and no `plugins/` directory to walk, and `--tracks` has
 # to keep rejecting a typo there too.
 KNOWN = ["android-track", "apple-track", "capacitor-track", "design-track",
-         "factory-setup", "shared-track", "web-track", "windows-track"]
+         "factory-setup", "shared-track", "web-track", "windows-track", "announce-track"]
 
 
 def shipped():
