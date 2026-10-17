@@ -1,6 +1,6 @@
 {
   "name": "apple-track",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Apple: App Store and direct macOS distribution — identity, signing, compliance, metadata, media, icons, ASO, localization, shipping.",
   "license": "MIT",
   "defaultEnabled": false,

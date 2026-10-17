@@ -1,6 +1,6 @@
 {
   "name": "windows-track",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "Windows: a direct-download installer that updates itself — WinSparkle wired into the app, the installer signed with the same EdDSA key as Sparkle, and a Windows appcast of its own.",
   "license": "MIT",
   "defaultEnabled": false,

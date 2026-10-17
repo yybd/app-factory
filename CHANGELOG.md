@@ -14,6 +14,12 @@ skill does.
 
 ## Unreleased
 
+## 0.7.0
+
+A minor: a new track. App Factory can now announce what it ships — the drafts, checked
+per channel, and never posted. 42 skills in nine tracks. No existing skill behaves
+differently.
+
 - **An announce track.** `announce-track` holds one skill, `announce`: the posts that
   announce a release, a launch or an article — a Show HN title and first comment, Reddit,
   LinkedIn, an X or Bluesky thread, dev.to and Medium copies — written from one source of
