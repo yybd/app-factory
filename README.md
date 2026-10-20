@@ -54,7 +54,7 @@ Eight tracks of skills, plus one that does setup:
 | `capacitor-track` | 2 | web-in-a-shell apps, where the bugs live in the seam |
 | `design-track` | 1 | visual craft for any HTML interface |
 | `windows-track` | 1 | a Windows installer that updates itself, outside any store |
-| `announce-track` | 1 | the posts that announce a release or an article, checked per channel, never posted |
+| `announce-track` | 1 | the posts that announce a release or an article, checked per channel, posted only on a yes per post |
 | `factory-setup` | 1 | on everywhere; says when a repo looks like an app and no track is on |
 
 Each track's own README lists what is in it, what it costs, and what it needs installed.

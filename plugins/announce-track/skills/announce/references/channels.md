@@ -27,6 +27,12 @@ not documented by the channel, and said as such.
 ## LinkedIn
 
 - **For:** people who know the author. Write in their language.
+- **Mechanical:** no Markdown — `**`, backticks, `#` headings and `[text](url)` show as
+  typed. Plain paragraphs; a bare URL becomes a link.
+- **Mechanical, in a right-to-left UI:** when the LinkedIn interface is in Hebrew (or
+  another RTL language), an @mention at the **start** of an English comment or reply is
+  wrapped in U+200F (right-to-left) marks, and the whole comment flips right-to-left.
+  Put the mention at the end, or leave it out, and check the rendered comment.
 - **Convention:** the link goes in the first comment rather than the post body — posts
   with external links are commonly believed to be shown less. A belief, not a documented
   rule; say so if asked.
@@ -48,3 +54,19 @@ not documented by the channel, and said as such.
 - **Both:** absolute links only. Add an "Originally published at" line.
 - **When:** after the launch channel, not before — the launch is where it should be seen
   first.
+
+## Posting by browser
+
+For step 6 of the skill, when the user asked Claude to post. Practical, learned by doing:
+
+- **File inputs.** The image button on most composers creates its `<input type="file">`
+  on click and opens the operating system's file picker, which the browser tools cannot
+  drive. Do not click it: find the input (or expose the one the button creates) and use
+  the browser tool's file-upload action on it. Then confirm the preview appeared.
+- **Line breaks.** Type paragraphs with the channel's own line-break key — in comment
+  boxes Enter often submits, and shift+Enter is the line break. After typing, count the
+  paragraphs in the composer against the draft before asking for the yes.
+- **What you see is the check.** Read the rendered post or comment after it is live, not
+  the composer: direction, paragraphs, the link and the image are only certain there.
+- **Login pages are a stop.** A sign-in form, a consent banner or a "create account"
+  step is the user's to handle; ask them and wait.

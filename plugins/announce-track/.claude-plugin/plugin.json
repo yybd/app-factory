@@ -1,7 +1,7 @@
 {
   "name": "announce-track",
   "version": "0.7.0",
-  "description": "Announcing a release or an article: drafts for Hacker News, Reddit, LinkedIn, X, Bluesky and dev.to/Medium, written from a source of truth and checked against each channel's mechanical rules — never posted.",
+  "description": "Announcing a release or an article: drafts for Hacker News, Reddit, LinkedIn, X, Bluesky and dev.to/Medium, written from a source of truth and checked against each channel's mechanical rules; posted only when asked, one confirmed post at a time, in a browser the user is already signed in to — never signs in or creates accounts.",
   "license": "MIT",
   "defaultEnabled": false,
   "author": {

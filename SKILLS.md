@@ -83,7 +83,9 @@ sixteen Apple skills. No Authenticode signing, by design for now.
 Reddit, LinkedIn, X, Bluesky and dev.to/Medium copies — written from one source of truth
 into a git-excluded folder, then checked against each channel's mechanical rules by
 `check_drafts.py`: an HN title past 80 characters, Markdown in an HN comment, a
-cross-post whose front matter is not first or that has no canonical URL. It never posts.
+cross-post whose front matter is not first or that has no canonical URL, Markdown in a
+LinkedIn post. It posts only when asked — one post at a time, each after an explicit yes,
+in a browser the user is already signed in to — and never signs in or creates accounts.
 A track of its own because it loads in repos that are not apps at all.
 
 ### Web track — 4

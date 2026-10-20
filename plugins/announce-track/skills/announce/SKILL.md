@@ -7,8 +7,9 @@ description: >-
   the user wants to announce or promote something they shipped, asks for a Show HN, a
   LinkedIn post, a tweet or thread, a Reddit post or a dev.to copy, or says "תכתוב פוסט",
   "הכרזה על הגרסה", "טיוטה ללינקדאין", "איפה לפרסם". It writes drafts into a git-excluded
-  folder and NEVER posts, submits or creates accounts — publishing is the owner's, by
-  hand. It does not write store listings (store-metadata-writer) or the article itself.
+  folder and hands them over; it posts only when the user asks, one confirmed post at a
+  time, through a browser they are already signed in to — and never signs in or creates
+  accounts. It does not write store listings (store-metadata-writer) or the article itself.
 ---
 
 # Announcing something you shipped
@@ -21,7 +22,10 @@ checks the drafts mechanically before anyone pastes them.
 ## Prerequisites
 
 - **Tools:** Python 3 (the checker is stdlib only). Network only for `--links`.
-- **Credentials:** none. Nothing here posts, so nothing here logs in.
+- **Credentials:** none. Nothing here logs in: the optional publish step works only in
+  a browser where the user is already signed in to the channel.
+- **Browser (optional, step 6 only):** Claude in Chrome or the desktop app's built-in
+  browser pane.
 - **Hub (`$APP_HUB`):** optional — an app's `profile.md` there is a good source of truth.
 - **Other tracks:** none. `shared-track`'s `copy-edit` is worth running on long drafts.
 
@@ -79,13 +83,49 @@ Fix every ✗. A ⚠ is a convention, not a rule — say which ones you are keep
 
 ### 5. Hand over
 
-Tell the owner, per file: where to paste it, which field is which, and when. Posting,
-submitting and creating accounts are theirs — this skill stops at the draft.
+Tell the owner, per file: where to paste it, which field is which, and when. Then ask how
+it gets published:
+
+- **(a) The owner pastes it** — the default. The skill stops at the draft.
+- **(b) Claude posts it, in a browser the owner is signed in to.** Only on their request.
+  Ask which browser — **Claude in Chrome** (their own Chrome, with their sign-ins) or the
+  **built-in browser pane** of the desktop app — and load the matching browser skill
+  (`chrome-browser` or `built-in-browser`) before the first browser step.
+
+### 6. Publish — only if the user asks, and only with a yes per post
+
+**Never sign in, type a password, create an account or accept terms for the user.** If a
+channel shows a login page, a consent wall or a new-account flow, stop, ask the user to
+do it themselves, and continue once they say it is done.
+
+Per post, one at a time:
+
+1. **Fill the composer** with the checked draft — exactly the file's text, nothing
+   rewritten on the way. Attach the image if there is one (the lessons in
+   [references/channels.md](references/channels.md#posting-by-browser) save time here).
+2. **Show the user the final text and a screenshot** of the filled composer, and ask for
+   a yes for **this** post.
+3. **Post only after that explicit yes.** A yes for one post does not carry to the next,
+   or to its own first comment — unless the user said so for both at once.
+4. **Add the first comment** where the channel's convention puts the link there
+   (LinkedIn), with its own yes as above.
+5. **Verify** that the post and the comment are visible on the live page, rendered as
+   intended — paragraphs, direction, link.
+6. **Record** the live URL and the date next to the draft: in the drafts folder's
+   `README.md`, or at the top of the draft file. A posted draft that says nothing about
+   being posted is the one that gets posted twice.
+
+If anything on the page differs from what the user approved — the composer cut the text,
+an image failed, the channel asks for something new — stop and show them; do not adjust
+and post.
 
 ## Boundaries
 
-- **Never posts.** No API calls, no browser automation, no account creation. A post in
-  someone's name is public and permanent; the owner sends it.
+- **Posts only when asked, one confirmed post at a time.** A post in someone's name is
+  public and permanent, so each one waits for the user's explicit yes on the exact text.
+  Only through a browser the user is already signed in to; no API calls.
+- **Never signs in or creates accounts.** No passwords, no sign-up, no accepting terms —
+  a login page means the user signs in themselves.
 - **Never invents.** No metric, user count or quote that is not in the source.
 - **Does not write the thing announced** — the article, the release notes, the store
   listing (`store-metadata-writer`) are written first, elsewhere.

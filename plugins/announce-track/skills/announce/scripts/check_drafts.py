@@ -11,6 +11,7 @@ A draft's channel is read from its file name — the convention the announce ski
     x-thread.txt        posts separated by a line holding only ---
     bluesky-thread.txt  same shape
     linkedin*.md        a post, with its first comment after a line holding only ---
+                        (no Markdown: LinkedIn shows it as typed)
     reddit*.md          a post: the first line is the title
     crosspost-*.md      a dev.to / Medium copy, front matter first
 
@@ -83,6 +84,11 @@ def check_linkedin(path):
     body = parts[0]
     if URL.search(body) and len(parts) == 1:
         warn(path, "the link is in the post body; the convention is the first comment, after a --- line")
+    if MD_MARKS.search(read(path)):
+        fail(path, "Markdown marks (backticks, >, #, **, [..](..)) — LinkedIn shows them as typed")
+    for p in parts[1:]:
+        if p.strip().startswith("@"):
+            warn(path, "a comment starts with an @mention — in a right-to-left LinkedIn UI it flips the comment; put it last")
 
 
 def check_reddit(path):
