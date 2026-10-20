@@ -14,6 +14,26 @@ skill does.
 
 ## Unreleased
 
+## 0.8.0
+
+A minor: `announce` behaves differently. It can now publish the drafts it writes — only
+when asked, one confirmed post at a time, in a browser the user is already signed in to.
+Handing the drafts over stays the default. 42 skills in nine tracks.
+
+- **Publishing, opt-in.** A new final step: after the checker passes, the user chooses
+  between pasting the drafts themselves and having Claude post them, in Claude in Chrome
+  or the desktop app's built-in browser pane. Each post is filled, shown with a
+  screenshot, and posted only after an explicit yes for that post; a yes does not carry
+  to the next post or to its first comment. Then the post and comment are checked on the
+  live page and the URL and date are recorded next to the draft. It never signs in, types
+  a password, creates an account or accepts terms — a login page is the user's.
+- **Lessons from posting by browser**, in `channels.md`: file inputs that open a native
+  picker (use the browser tool's upload, do not click), line breaks typed with the
+  channel's own key and counted afterwards, and an @mention at the start of an English
+  comment that flips it right-to-left in a Hebrew LinkedIn UI.
+- **`check_drafts.py`** fails Markdown in a LinkedIn draft — LinkedIn shows it as typed —
+  and warns on a comment that starts with an @mention.
+
 ## 0.7.0
 
 A minor: a new track. App Factory can now announce what it ships — the drafts, checked
