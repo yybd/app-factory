@@ -8,8 +8,8 @@ description: >-
   LinkedIn post, a tweet or thread, a Reddit post or a dev.to copy, or says "write a
   launch post", "draft a LinkedIn post", "write an X thread", "announce the release",
   "post this to LinkedIn", "where should I announce this", "תכתוב פוסט", "הכרזה על
-  הגרסה", "טיוטה ללינקדאין", "איפה לפרסם". It writes drafts into a git-excluded
-  folder and hands them over; it posts only when the user asks, one confirmed post at a
+  הגרסה", "טיוטה ללינקדאין", "איפה לפרסם". It writes drafts into the hub's campaigns
+  folder (a git-excluded one when there is no hub) and hands them over; it posts only when the user asks, one confirmed post at a
   time, through a browser they are already signed in to — and never signs in or creates
   accounts. It does not write store listings (store-metadata-writer) or the article itself.
 ---
@@ -28,7 +28,9 @@ checks the drafts mechanically before anyone pastes them.
   a browser where the user is already signed in to the channel.
 - **Browser (optional, step 6 only):** Claude in Chrome or the desktop app's built-in
   browser pane.
-- **Hub (`$APP_HUB`):** optional — an app's `profile.md` there is a good source of truth.
+- **Hub (`$APP_HUB`):** optional — where the drafts live, in `campaigns/` (see the hub
+  contract, `docs/contracts/hub.md`), and an app's `profile.md` there is a good source of
+  truth. Without a hub the drafts go to a git-excluded `launch/` in the repo.
 - **Other tracks:** none. `shared-track`'s `copy-edit` is worth running on long drafts.
 
 ## Workflow
@@ -50,11 +52,25 @@ the source, ask; do not supply it.
   no reach; say so rather than writing a thread nobody will see.
 - **The canonical URL** — the one page every draft points back to.
 
-### 3. Write the drafts into a folder git does not see
+### 3. Write the drafts where they will be kept
 
-Default `launch/` at the repo root. Exclude it in **`.git/info/exclude`**, not
-`.gitignore`: drafts are private working files, and `.gitignore` is committed — in a
-public repo it announces the folder's existence.
+**With a hub (`$APP_HUB` set),** a campaign folder in it — the hub contract's
+`campaigns/`. Pick the one that matches what is announced:
+
+| announcing | folder |
+|---|---|
+| an app | `$APP_HUB/<slug>/campaigns/<campaign>/` |
+| a project that is not an app (a tool, a library) | `$APP_HUB/<area>/<project>/campaigns/<campaign>/` |
+| several projects at once | `$APP_HUB/<area>/campaigns/<campaign>/` |
+
+`<campaign>` names what and when — `launch-2026-10`, `v0.7.0`. `<area>` is the owner's
+grouping for non-app projects (`3-oss`, say): if the hub has one, use it; if not, ask
+rather than invent one. Share images go in the project's `media/social/`. The hub is
+private and in git, so the drafts are committed there — **in the hub's own terms, from a
+session standing in the hub or as an exact-path commit**, never by sweeping it.
+
+**Without a hub,** `launch/` at the repo root, excluded in **`.git/info/exclude`** — not
+`.gitignore`, which is committed and in a public repo announces the folder's existence:
 
 ```bash
 mkdir -p launch && grep -qx 'launch/' .git/info/exclude || echo 'launch/' >> .git/info/exclude
@@ -78,7 +94,7 @@ link points nowhere once the text leaves its own site.
 ### 4. Check them
 
 ```bash
-python3 ${CLAUDE_PLUGIN_ROOT}/skills/announce/scripts/check_drafts.py launch --links
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/announce/scripts/check_drafts.py <drafts-folder> --links
 ```
 
 Fix every ✗. A ⚠ is a convention, not a rule — say which ones you are keeping and why.
@@ -113,8 +129,9 @@ Per post, one at a time:
    (LinkedIn), with its own yes as above.
 5. **Verify** that the post and the comment are visible on the live page, rendered as
    intended — paragraphs, direction, link.
-6. **Record** the live URL and the date next to the draft: in the drafts folder's
-   `README.md`, or at the top of the draft file. A posted draft that says nothing about
+6. **Record** the live URL and the date next to the draft: in the campaign folder's
+   `README.md`, or at the top of the draft file — and commit it, when the drafts are in
+   the hub. A posted draft that says nothing about
    being posted is the one that gets posted twice.
 
 If anything on the page differs from what the user approved — the composer cut the text,

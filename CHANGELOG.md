@@ -14,6 +14,17 @@ skill does.
 
 ## Unreleased
 
+- **`announce` writes into the hub.** With `$APP_HUB` set, a campaign's drafts go to the
+  hub's `campaigns/` — `<slug>/campaigns/<campaign>/` for an app,
+  `<area>/<project>/campaigns/<campaign>/` for a project that is not one, and
+  `<area>/campaigns/<campaign>/` for several — and are committed there with the live URL
+  once posted. Without a hub they stay in a git-excluded `launch/`. Drafts written to the
+  repo were moved into the hub by hand once already; this makes that the default.
+- **The hub contract names `campaigns/` and `media/social/`**, and `<area>/` for projects
+  that are not apps — they existed in practice and on no page. Its count of skills that
+  read `$APP_HUB` is recounted: 33 of 42, not 32 of 39. The Hebrew tree catches up with
+  the English one (`profile.<lang>.md`, `release-notes/`).
+
 ## 0.8.0
 
 A minor: `announce` behaves differently. It can now publish the drafts it writes — only
