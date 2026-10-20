@@ -14,6 +14,17 @@ skill does.
 
 ## Unreleased
 
+- **A draft owns its status, in a comment line.** `announce` records a post as
+  `<!-- Status: posted <date> · <url> -->` in the draft itself, not in the campaign
+  README — that line is what a hub's stats reader counts, and 0.8.1 said the README,
+  which would have dropped every post from the count. The hub contract says the same, in
+  both languages. Notes, headings and labels go to the README; the draft keeps only what
+  is pasted.
+- **`check_drafts.py` checks what is pasted**: `<!-- -->` comments are removed before the
+  channel checks, so a status line is not counted against X's 280 or read as Markdown,
+  and a draft with no status line gets a warning. Cross-posts are still checked raw —
+  their front matter must come first.
+
 ## 0.8.1
 
 A patch: where `announce` keeps its drafts, and the hub contract that says so. No

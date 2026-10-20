@@ -85,7 +85,20 @@ File names are how the checker knows the channel:
 | `linkedin*.md` | LinkedIn — the post, then `---`, then the first comment |
 | `reddit*.md` | Reddit — first line is the title |
 | `crosspost-<slug>.md` | dev.to / Medium — front matter first |
-| `README.md` | what each file is, where it goes, when |
+| `README.md` | what each file is, where it goes, when — the notes, never the status |
+
+**A draft holds only what is pasted**, plus one status line as an HTML comment, which the
+channel never sees and a hub's stats reader counts:
+
+```
+<!-- Status: draft -->
+<!-- Status: scheduled 2026-10-22 08:30 -->
+<!-- Status: posted 2026-10-20 · https://… -->
+```
+
+A file that goes to more than one channel names it: `<!-- Status (medium): posted … -->`.
+How-tos, headings and "first comment:" labels go in the folder's `README.md`, not in the
+draft — around the post they are Markdown the channel would print.
 
 Shape each one to its channel (references/channels.md): plain text where Markdown is not
 rendered, the link where the channel expects it, absolute URLs everywhere — a relative
@@ -129,10 +142,11 @@ Per post, one at a time:
    (LinkedIn), with its own yes as above.
 5. **Verify** that the post and the comment are visible on the live page, rendered as
    intended — paragraphs, direction, link.
-6. **Record** the live URL and the date next to the draft: in the campaign folder's
-   `README.md`, or at the top of the draft file — and commit it, when the drafts are in
-   the hub. A posted draft that says nothing about
-   being posted is the one that gets posted twice.
+6. **Record** it in the draft's own status line — `<!-- Status: posted <date> · <url> -->`
+   in place of `draft` or `scheduled` — and commit it, when the drafts are in the hub. The
+   line in the file is the record, not the README: it is what a hub's stats reader counts,
+   and a posted draft that says nothing about being posted is the one that gets posted
+   twice.
 
 If anything on the page differs from what the user approved — the composer cut the text,
 an image failed, the channel asks for something new — stop and show them; do not adjust

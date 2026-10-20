@@ -45,13 +45,29 @@ def read(path):
         return f.read()
 
 
+COMMENT = re.compile(r"<!--[\s\S]*?-->\n?")
+STATUS = re.compile(r"^(?:> |<!-- )Status(?: \([^)]+\))?: (posted|scheduled|draft)\b", re.M)
+
+
+def pasted(path):
+    """The text that is pasted: the file without its <!-- --> comments. A draft carries its
+    own status line as a comment (`<!-- Status: posted 2026-10-20 · <url> -->`, the form a
+    hub's stats reader counts); the channel never sees it, so no check should either."""
+    return COMMENT.sub("", read(path)).strip("\n")
+
+
+def check_status(path):
+    if path.endswith(".md") and not STATUS.search(read(path)):
+        warn(path, "no `<!-- Status: draft -->` line — a hub's stats reader lists it as untracked")
+
+
 def x_length(text):
     """What X counts: every URL is 23 characters, whatever its real length."""
     return len(URL.sub("x" * 23, text))
 
 
 def check_hn_title(path):
-    t = read(path).strip()
+    t = pasted(path).strip()
     if "\n" in t:
         fail(path, "a title is one line")
     if len(t) > HN_TITLE:
@@ -61,7 +77,7 @@ def check_hn_title(path):
 
 
 def check_hn_comment(path):
-    t = read(path)
+    t = pasted(path)
     if MD_MARKS.search(t):
         fail(path, "Markdown marks (backticks, >, #, **, [..](..)) — HN shows them as typed")
     if not URL.search(t):
@@ -69,7 +85,7 @@ def check_hn_comment(path):
 
 
 def check_thread(path, channel):
-    posts = [p.strip() for p in re.split(r"^---\s*$", read(path), flags=re.M) if p.strip()]
+    posts = [p.strip() for p in re.split(r"^---\s*$", pasted(path), flags=re.M) if p.strip()]
     if not posts:
         fail(path, "empty")
     limit = LIMITS[channel]
@@ -80,11 +96,11 @@ def check_thread(path, channel):
 
 
 def check_linkedin(path):
-    parts = re.split(r"^---\s*$", read(path), flags=re.M)
+    parts = re.split(r"^---\s*$", pasted(path), flags=re.M)
     body = parts[0]
     if URL.search(body) and len(parts) == 1:
         warn(path, "the link is in the post body; the convention is the first comment, after a --- line")
-    if MD_MARKS.search(read(path)):
+    if MD_MARKS.search(pasted(path)):
         fail(path, "Markdown marks (backticks, >, #, **, [..](..)) — LinkedIn shows them as typed")
     for p in parts[1:]:
         if p.strip().startswith("@"):
@@ -92,7 +108,7 @@ def check_linkedin(path):
 
 
 def check_reddit(path):
-    lines = read(path).strip().split("\n")
+    lines = pasted(path).strip().split("\n")
     if not lines or not lines[0].strip():
         fail(path, "the first line is the title, and it is empty")
     elif len(lines[0]) > 300:
@@ -161,6 +177,7 @@ def main():
     for pattern, fn in CHECKS:
         for path in sorted(glob.glob(os.path.join(a.dir, pattern))):
             fn(path)
+            check_status(path)
             checked.append(path)
     if a.links:
         check_links(checked)

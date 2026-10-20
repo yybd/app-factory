@@ -136,8 +136,14 @@ are simply seven independent opinions.
 Written by `announce`. **One folder per campaign**, named for what and when —
 `launch-2026-10`, `v0.7.0`. In it, one draft per channel, named so the checker knows the
 channel (`hn-title.txt`, `linkedin-he.md`, `crosspost-<slug>.md`…), and a `README.md` that
-says what each file is, where it goes, and — once posted — **the live URL and the date**.
-A posted draft that says nothing about being posted is the one that gets posted twice.
+says what each file is, where it goes, and when.
+
+**Each draft holds only what is pasted, and owns its state** in one line near its top —
+`<!-- Status: draft -->`, `<!-- Status: scheduled 2026-10-22 08:30 -->`,
+`<!-- Status: posted 2026-10-20 · <url> -->`, with the channel named in parentheses when
+one file goes to several. It is an HTML comment because the channel must not see it; it is
+in the file, not the README, because that is what a stats reader counts. A posted draft
+that says nothing about being posted is the one that gets posted twice.
 
 **The drafts are copies.** The text that is announced lives at its own canonical page —
 the article, the release notes, the profile — and a campaign is regenerated from it when
