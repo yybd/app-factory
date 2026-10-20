@@ -14,6 +14,10 @@ skill does.
 
 ## Unreleased
 
+## 0.8.2
+
+A patch: where a posted draft records that it was posted.
+
 - **A draft owns its status, in a comment line.** `announce` records a post as
   `<!-- Status: posted <date> · <url> -->` in the draft itself, not in the campaign
   README — that line is what a hub's stats reader counts, and 0.8.1 said the README,
