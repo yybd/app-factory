@@ -5,6 +5,9 @@
 **42 skills that build, describe, ship and announce apps** — to the App Store and
 Google Play, and outside them, on the Mac and on Windows. Each one loads only where it is wanted.
 
+*The story behind it — why one big instructions file stopped holding, and what replaced it:
+[the article](https://www.bdtech.app/blog/skills-and-tracks?utm_source=github).*
+
 ![Three of the skills' scripts, run for real: enable.py picks the tracks, check_name.py audits a name against the live App Store, measure_copy.py catches a translation that dropped a claim](docs/media/app-factory-demo.gif)
 
 They are Claude Code plugins. You enable the tracks a repo needs, and a session opened
