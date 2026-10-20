@@ -14,6 +14,11 @@ skill does.
 
 ## Unreleased
 
+## 0.8.1
+
+A patch: where `announce` keeps its drafts, and the hub contract that says so. No
+skill's behaviour changes beyond that.
+
 - **`announce` writes into the hub.** With `$APP_HUB` set, a campaign's drafts go to the
   hub's `campaigns/` — `<slug>/campaigns/<campaign>/` for an app,
   `<area>/<project>/campaigns/<campaign>/` for a project that is not one, and
