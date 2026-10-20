@@ -43,7 +43,7 @@ descriptions — and only in a repo where you turned them on.
 
 ## The shape
 
-Seven tracks of skills, plus one that does setup:
+Eight tracks of skills, plus one that does setup:
 
 | Track | Skills | |
 |---|---|---|

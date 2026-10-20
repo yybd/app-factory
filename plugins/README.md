@@ -1,6 +1,6 @@
 *English · [עברית](README.he.md)*
 
-# The plugins — seven tracks of skills, and one that does setup
+# The plugins — eight tracks of skills, and one that does setup
 
 **What this folder is.** The app skills, distributed as plugins from this repo's
 marketplace (`app-factory`). One directory per track.
