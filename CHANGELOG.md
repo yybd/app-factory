@@ -33,6 +33,8 @@ Handing the drafts over stays the default. 42 skills in nine tracks.
   comment that flips it right-to-left in a Hebrew LinkedIn UI.
 - **`check_drafts.py`** fails Markdown in a LinkedIn draft — LinkedIn shows it as typed —
   and warns on a comment that starts with an @mention.
+- **English trigger phrases** in the skill's description beside the Hebrew ones — "write
+  a launch post", "draft a LinkedIn post", "announce the release" and others.
 
 ## 0.7.0
 

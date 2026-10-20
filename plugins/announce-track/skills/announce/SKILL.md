@@ -5,8 +5,10 @@ description: >-
   LinkedIn, X, Bluesky and dev.to/Medium cross-posts — from one source of truth, each
   shaped to its channel and checked against that channel's mechanical rules. Use when
   the user wants to announce or promote something they shipped, asks for a Show HN, a
-  LinkedIn post, a tweet or thread, a Reddit post or a dev.to copy, or says "תכתוב פוסט",
-  "הכרזה על הגרסה", "טיוטה ללינקדאין", "איפה לפרסם". It writes drafts into a git-excluded
+  LinkedIn post, a tweet or thread, a Reddit post or a dev.to copy, or says "write a
+  launch post", "draft a LinkedIn post", "write an X thread", "announce the release",
+  "post this to LinkedIn", "where should I announce this", "תכתוב פוסט", "הכרזה על
+  הגרסה", "טיוטה ללינקדאין", "איפה לפרסם". It writes drafts into a git-excluded
   folder and hands them over; it posts only when the user asks, one confirmed post at a
   time, through a browser they are already signed in to — and never signs in or creates
   accounts. It does not write store listings (store-metadata-writer) or the article itself.

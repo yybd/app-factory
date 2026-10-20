@@ -15,7 +15,7 @@ edit a skill, not this table.*
 |---|---|---|---|
 | `announce` | Write the posts that announce a release, a launch or an article — Hacker News, Reddit, LinkedIn, X, Bluesky and dev.to/Medium cross-posts — from on… | 1 | 1 |
 
-**What it costs.** 776 characters of description ≈ 194 tokens, in every session
+**What it costs.** 926 characters of description ≈ 231 tokens, in every session
 that enables this track. A skill's body is read only when the skill fires; its description
 is in context always.
 <!-- /generated:track -->
