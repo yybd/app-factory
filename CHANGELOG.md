@@ -14,6 +14,25 @@ skill does.
 
 ## Unreleased
 
+## 0.9.1
+
+A patch: the licence-key reference fits whichever provider issues the keys.
+
+- **A provider contract** in `plugins/apple-track/skills/macos-direct-distribution/references/licensing.md`:
+  the five things the app needs from a licence provider — check without spending a
+  seat, activate with a per-Mac handle, deactivate with the key alone, name the product,
+  say why a key is no good — all with the licence key as the only credential, or else a
+  server the owner runs holds the secret.
+- **Lemon Squeezy, Keygen, Gumroad and Paddle Billing compared against it**, checked
+  against each one's API documentation on 2026-10-21: Gumroad counts uses and cannot
+  decrement them without the seller's token; Paddle Billing issues no licence keys at
+  all (Classic did); Keygen's licence-key auth depends on the policy.
+- **The Swift sketch is provider-neutral**: a `LicenceProvider` protocol, the app's
+  side (`Licence`: order, Keychain, policy) written once against it, and Lemon Squeezy
+  as the one implementation, with what Keygen, Gumroad and a self-issued key change.
+  Typechecked. The rules speak of the product id rather than Lemon Squeezy's
+  `variant_id`, and the checklist adds that re-validation spends no seat.
+
 ## 0.9.0
 
 A minor: `macos-direct-distribution` covers selling the direct build, and
