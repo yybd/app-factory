@@ -24,11 +24,11 @@ edit a skill, not this table.*
 | `aso-keywords` | App Store Optimization (ASO) for APPLE discoverability — research and optimize the search-indexed fields of an App Store listing: the app name, sub… | 1 | 1 |
 | `code-signing-provisioning` | Understand, diagnose, and fix Apple code signing and provisioning for macOS and iOS Xcode projects — certificates, identifiers, provisioning profil… | 1 | 2 |
 | `localization-i18n` | Audit and manage IN-APP localization for a macOS or iOS Xcode project — the user-facing strings inside the app (Localizable.strings / .xcstrings St… | 1 | 1 |
-| `macos-direct-distribution` | Set up direct (outside the Mac App Store) distribution for a macOS Xcode app: a dedicated "Direct" target — sandbox off, hardened runtime on, a DIR… | 3 | 3 |
+| `macos-direct-distribution` | Set up direct (outside the Mac App Store) distribution for a macOS Xcode app: a dedicated "Direct" target — sandbox off, hardened runtime on, a DIR… | 3 | 4 |
 | `notarize-and-distribute` | Take a built macOS app from an Xcode archive, package it into a signed DMG, notarize it with Apple, staple the ticket, and verify that everything —… | 1 | 1 |
 | `ship-apple-app` | Verify an Apple app is submission-ready and ship it — the FINAL App Store / Mac App Store step: confirm the content is already in place (signing, c… |  | 1 |
 
-**What it costs.** 13,145 characters of description ≈ 3,286 tokens, in every session
+**What it costs.** 13,332 characters of description ≈ 3,333 tokens, in every session
 that enables this track. A skill's body is read only when the skill fires; its description
 is in context always.
 

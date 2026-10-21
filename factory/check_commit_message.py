@@ -53,12 +53,16 @@ FINGERPRINTS = [
     (r"https?://[^\s`)\]]*\.(?:io|com|app|dev|net)/(?!\s)[^\s`)\]]*", "a live URL"),
 ]
 
-# URLs that are legitimately named: a vendor's own documentation and endpoints.
+# URLs that are legitimately named: a vendor's own documentation and endpoints, and a
+# host whose name is a <placeholder>. A merchant's API host is listed by its full name
+# — its bare domain also carries every seller's own store subdomain, which is exactly
+# the fingerprint this exists to catch.
 ALLOWED = re.compile(
     r"(apple|google|developer|play|github|githubusercontent|sparkle-project|fastlane|"
     r"anthropic|claude|vercel|w3|schema|mozilla|npmjs|python|ruby|indexnow|bing|"
     r"yandex|seznam|example|your-site|your-domain|localhost|jsdelivr|cdnjs|unpkg|"
-    r"fonts\.googleapis|gstatic|creativecommons|opensource\.org|semver)", re.I)
+    r"fonts\.googleapis|gstatic|creativecommons|opensource\.org|semver|"
+    r"api\.lemonsqueezy\.com|//<[^>/]+>\.)", re.I)
 
 NAMES_FILE = os.path.expanduser(
     os.environ.get("APP_FACTORY_FINGERPRINTS") or "~/.claude/.app-factory/fingerprints.txt")

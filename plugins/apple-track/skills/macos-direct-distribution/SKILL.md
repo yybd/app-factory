@@ -5,10 +5,12 @@ description: >-
   dedicated "Direct" target — sandbox off, hardened runtime on, a DIRECT flag,
   direct-only frameworks linked to it alone — wired to Sparkle auto-updates with EdDSA
   signing keys, a SUFeedURL, a "Check for Updates" menu item and an appcast signing
-  script. Use whenever the user wants automatic updates for a Mac app sold outside
-  the App Store ("הפצה ישירה", "עדכונים אוטומטיים"), add Sparkle, create a second
-  non-MAS target alongside an App Store build, set up an appcast, or ask how to keep
-  Sparkle out of the App Store build. Pairs with `notarize-and-distribute`, which builds
+  script — and, for selling that build, a licence key from a hosted checkout, kept out
+  of the App Store build. Use whenever the user wants automatic updates for a Mac app
+  sold outside the App Store ("הפצה ישירה", "עדכונים אוטומטיים"), add Sparkle, create
+  a second non-MAS target alongside an App Store build, set up an appcast, sell the
+  direct build with a licence key ("מפתח רישיון", Lemon Squeezy), or ask how to keep
+  Sparkle or licensing out of the App Store build. Pairs with `notarize-and-distribute`, which builds
   the signed DMG this skill's appcast points at.
 ---
 
@@ -169,7 +171,19 @@ wrong — re-check that Sparkle is linked only to the Direct target.
    Info.plist shipped with each install, so changing it orphans every existing
    copy.
 
-### 7. Document it
+### 7. Selling it: a licence key (if the direct build is paid)
+
+The App Store build is paid through StoreKit; the direct build cannot be. If it is
+sold, it is unlocked with a licence key: a merchant-of-record hosted checkout, the key
+by email, pasted into the paywall, activated against the merchant's **public** licence
+API, stored in the Keychain. Two things are the owner's to decide or do — whether the
+app re-validates on launch or activates once and never calls home again, and the
+dashboard step that yields the variant id and checkout URL. All of it compiles into
+the Direct target only: Guideline 3.1.1 names licence keys explicitly. The flow, both
+policies, the rules, a Swift sketch and the test checklist are in
+[references/licensing.md](references/licensing.md).
+
+### 8. Document it
 
 Add a "Distribution builds" section to the project's README (or hub docs) covering
 both channels and the release flow. Use the template in
@@ -197,9 +211,15 @@ names, URLs, and target names. Keeping this current is what lets the next releas
   the non-synced-folder fallback.
 - [references/sparkle.md](references/sparkle.md) — EdDSA keys, Info.plist, the
   appcast, `sign_update` vs `generate_appcast`, hosting, sandbox & signing notes.
+- [references/licensing.md](references/licensing.md) — selling the direct build with a
+  licence key: checkout, activation, the two re-validation policies, the strict
+  variant check, keeping it out of the App Store build, a Swift sketch, tests.
 
 ## Boundaries
 This skill creates the **target** and the **update mechanism** and documents them.
 It does **not** build/sign/notarize the DMG (that's **notarize-and-distribute**) and
-does not prescribe a payment system — though the `DIRECT` flag it adds is also the
-right seam for a direct-channel licensing backend kept out of the App Store build.
+does not choose or set a price — the price lives on the merchant's checkout page, and
+where else it is written is **price-sync**'s job. The licence-key unlock is covered
+here ([references/licensing.md](references/licensing.md)) because it rides the same
+`DIRECT` flag and target split; StoreKit IAP for the App Store build is
+**app-store-deliver**'s.

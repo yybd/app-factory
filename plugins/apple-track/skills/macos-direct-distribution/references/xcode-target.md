@@ -77,6 +77,7 @@ file refs into the new target.
 ## The DIRECT flag is the seam for more than Sparkle
 
 `#if DIRECT` is also the natural place for a direct-channel **payment/licensing**
-backend (e.g. a license-key system) that replaces StoreKit IAP, kept out of the
-App Store build for Guideline 3.1.1. That's a separate concern from this skill, but
-it rides the same flag and the same target split.
+backend (a licence-key system) that replaces StoreKit IAP, kept out of the App Store
+build for Guideline 3.1.1 — which names licence keys explicitly. It rides the same
+flag and the same target split; the flow, the policies and the checks are in
+[licensing.md](licensing.md).
