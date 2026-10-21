@@ -180,8 +180,9 @@ API, stored in the Keychain. Two things are the owner's to decide or do — whet
 app re-validates on launch or activates once and never calls home again, and the
 dashboard step that yields the variant id and checkout URL. All of it compiles into
 the Direct target only: Guideline 3.1.1 names licence keys explicitly. The flow, both
-policies, the rules, a Swift sketch and the test checklist are in
-[references/licensing.md](references/licensing.md).
+policies, the rules, the five things a provider must offer (with Lemon Squeezy, Keygen,
+Gumroad and Paddle Billing compared against them), a provider-neutral Swift sketch and
+the test checklist are in [references/licensing.md](references/licensing.md).
 
 ### 8. Document it
 
@@ -212,8 +213,9 @@ names, URLs, and target names. Keeping this current is what lets the next releas
 - [references/sparkle.md](references/sparkle.md) — EdDSA keys, Info.plist, the
   appcast, `sign_update` vs `generate_appcast`, hosting, sandbox & signing notes.
 - [references/licensing.md](references/licensing.md) — selling the direct build with a
-  licence key: checkout, activation, the two re-validation policies, the strict
-  variant check, keeping it out of the App Store build, a Swift sketch, tests.
+  licence key: checkout, activation, the provider contract and a comparison of
+  providers, the two re-validation policies, the strict product check, keeping it out
+  of the App Store build, a provider-neutral Swift sketch, tests.
 
 ## Boundaries
 This skill creates the **target** and the **update mechanism** and documents them.
