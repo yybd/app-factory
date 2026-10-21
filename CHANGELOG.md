@@ -14,6 +14,26 @@ skill does.
 
 ## Unreleased
 
+## 0.9.2
+
+A patch: the licence-key reference carries code for Keygen and Gumroad, not only a
+description of what would change.
+
+- **`Keygen` and `Gumroad` conform to `LicenceProvider`** beside `LemonSqueezy`. Keygen:
+  `validate-key` scoped to the product (a node-locked key with no machine yet is a good
+  key), a machine created under `Authorization: License <key>` with a SHA-256 of the
+  Mac's hardware UUID as its fingerprint, deleted by id, and `FINGERPRINT_TAKEN` read
+  as "already active here". Gumroad: the counter off on every call but activation, the
+  app's own activation limit, refunds, chargebacks and ended subscriptions refused, and
+  deactivation through the owner's server or, without one, on this Mac only.
+- **One `LicenceHTTP` helper for all three**: a 4xx with a JSON body is an answer; no
+  network, a 5xx, or a body that is not JSON is "offline" — so a captive portal or an
+  outage never locks a paying user under the re-validate policy.
+- Each provider's code was run against a mocked HTTP layer — 42 scenarios, including
+  wrong product, revoked key, limit reached, offline and the seat given back — and
+  typechecked; none of it has been run against the live services, and the reference
+  says so.
+
 ## 0.9.1
 
 A patch: the licence-key reference fits whichever provider issues the keys.
