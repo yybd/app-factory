@@ -193,7 +193,7 @@ StoreKit code give the type + price. Write each product into the hub:
 
 ```
 <slug>/store/apple/iap/<product-id>/
-  product.txt            # reference name · type (non-consumable / auto-renewable …)
+  product.txt            # key: value lines — product_id, reference_name, type, cleared_for_sale
   price.txt              # price point / tier
   <locale>/display_name.txt   # ≤30, per locale
   <locale>/description.txt    # ≤45, per locale  ← short. The .storekit / StoreKit
@@ -201,6 +201,17 @@ StoreKit code give the type + price. Write each product into the hub:
                               #   rewrite it to fit, don't copy it through.
   review/notes.txt            # notes for App Review
   review/screenshot.png       # required reviewer screenshot — copied from media (see below)
+```
+
+`product.txt` is one `key: value` per line — `provision_iap.rb` reads
+`reference_name:` (the internal name in App Store Connect, ≤64) and `type:` when it
+creates the product:
+
+```
+product_id: <product-id>
+reference_name: Pro Unlock
+type: non-consumable          # or consumable / non-renewing-subscription
+cleared_for_sale: true
 ```
 
 Lift the per-locale copy from the profile/README like all other store copy — never

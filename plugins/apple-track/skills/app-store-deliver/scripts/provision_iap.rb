@@ -15,7 +15,8 @@
 #   ruby provision_iap.rb <slug> <product-id> <bundle-id> [options]
 #
 #   --locales a,b,c     restrict to these (default: every locale dir in the hub)
-#   --type TYPE         NON_CONSUMABLE (default) | CONSUMABLE | NON_RENEWING_SUBSCRIPTION
+#   --type TYPE         NON_CONSUMABLE | CONSUMABLE | NON_RENEWING_SUBSCRIPTION
+#                       (default: product.txt's `type:`, else NON_CONSUMABLE)
 #   --territory T       base territory for pricing (default USA)
 #   --mirror-from PID   copy the territory availability from an existing product
 #                       (its 175-territory set), instead of every territory Apple lists
@@ -25,7 +26,9 @@
 #
 # Hub layout it reads (authored by app-store-metadata):
 #   <hub>/<slug>/store/apple/iap/<product-id>/
-#     product.txt              # reference name · type   (first line; "·" separated)
+#     product.txt              # key: value lines — reference_name:, type: (also
+#                              #   product_id:, cleared_for_sale:, not read here).
+#                              #   An older "reference name · type" first line still works.
 #     price.txt                # customer price, e.g. "19.99 USD (tier 10177 …)"
 #     <locale>/display_name.txt   ≤30
 #     <locale>/description.txt    ≤45
@@ -40,6 +43,7 @@ if (ARGV & %w[-h --help]).any?  # the usage needs no gems and no credentials
 end
 
 require_relative "asc_common"
+require "uri"
 
 pos, _ = ASC.parse_args(ARGV)
 slug, pid, bundle = pos
@@ -49,7 +53,6 @@ def flag(n, d = nil)
   i = ARGV.index(n); i && ARGV[i + 1] && !ARGV[i + 1].start_with?("--") ? ARGV[i + 1] : d
 end
 dry       = ARGV.include?("--dry-run")
-type      = flag("--type", "NON_CONSUMABLE")
 territory = flag("--territory", "USA")
 mirror    = flag("--mirror-from")
 no_price  = ARGV.include?("--no-price")
@@ -60,6 +63,17 @@ abort "no IAP tree in the #{tree[:name]} at: #{root}" unless Dir.exist?(root)
 $stdout.sync = true
 
 rd = ->(p) { File.exist?(p) ? File.read(p, encoding: "UTF-8").strip : nil }
+
+# product.txt is `key: value` lines, as app-store-metadata and store-metadata-writer
+# write it. A hub written before that has "reference name · type" on the first line —
+# read that too, rather than creating a product named after the whole line.
+product = rd.(File.join(root, "product.txt")).to_s
+kv      = /\A\s*([a-z_]+)\s*:\s*(.*?)\s*\z/
+fields  = product.lines.filter_map { |l| (m = l.match(kv)) && [m[1], m[2]] }.to_h
+first   = product.lines.first.to_s
+legacy  = first.match?(kv) ? [] : first.split("·").map(&:strip)
+TYPES   = %w[NON_CONSUMABLE CONSUMABLE NON_RENEWING_SUBSCRIPTION].freeze
+as_type = ->(t) { t.to_s.strip.upcase.gsub(/[\s-]+/, "_") }
 locales = (flag("--locales")&.split(",") ||
            Dir.children(root).select { |d| File.directory?(File.join(root, d)) && d != "review" }).sort
 
@@ -74,9 +88,16 @@ if rec
   iid = rec["id"]
   puts "IAP #{pid} id=#{iid} state=#{rec.dig('attributes', 'state')}"
 else
-  ref = (rd.(File.join(root, "product.txt")) || pid).split("·").first.to_s.strip
+  ref = (fields["reference_name"] || legacy[0]).to_s
   ref = pid if ref.empty?
   abort "reference name is #{ref.length} chars (max 64)" if ref.length > 64
+  # The type cannot be changed after creation, so an unreadable `type:` stops here
+  # rather than defaulting. The old first-line format never drove the type; it does
+  # now only when it names one this script can create.
+  type = flag("--type") || fields["type"] || (TYPES.include?(as_type.(legacy[1])) ? legacy[1] : "NON_CONSUMABLE")
+  type = as_type.(type)
+  abort "type #{type.inspect} is not one this script creates (#{TYPES.join(' | ')}) — " \
+        "auto-renewable subscriptions use the subscription API" unless TYPES.include?(type)
   puts "IAP #{pid} does not exist — creating as #{ref.inspect} (#{type})"
   if dry
     puts "  [dry-run] stopping: everything below needs the created product"
@@ -149,10 +170,25 @@ unless no_price
     elsif dry
       puts "  [dry-run] would set #{want} (#{territory})"
     else
-      pts = ASC.body(rc.get("v2/inAppPurchases/#{iid}/pricePoints",
-                            { "filter[territory]" => territory, limit: 200 }))["data"] || []
-      pp = pts.find { |p| p.dig("attributes", "customerPrice") == want }
-      abort "  no #{territory} price point at #{want}" unless pp
+      # Price points come 200 a page, cheapest first, so a USA price above about $24.49
+      # is on page two or later. links.next cannot be followed as a path: the tunes
+      # client drops its query string, and page two comes back unfiltered and repeats
+      # forever. Take the cursor out of it and send it with the filter and limit again.
+      pp = nil
+      cursor = nil
+      pages = 0
+      loop do
+        q = { "filter[territory]" => territory, limit: 200 }
+        q[:cursor] = cursor if cursor
+        page = ASC.body(rc.get("v2/inAppPurchases/#{iid}/pricePoints", q))
+        pages += 1
+        pp = (page["data"] || []).find { |p| p.dig("attributes", "customerPrice") == want }
+        nxt = page.dig("links", "next")
+        break if pp || nxt.nil? || pages >= 25
+        prev, cursor = cursor, URI.decode_www_form(URI(nxt).query.to_s).to_h["cursor"]
+        break if cursor.nil? || cursor == prev
+      end
+      abort "  no #{territory} price point at #{want} (#{pages} page(s) read)" unless pp
       rc.post("v1/inAppPurchasePriceSchedules",
         { data: { type: "inAppPurchasePriceSchedules",
                   relationships: {

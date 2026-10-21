@@ -402,7 +402,10 @@ after a partial failure. `--mirror-from <other-product-id>` copies a sibling
 product's territory set rather than every territory Apple lists; `--territory`,
 `--type`, `--no-price`, `--no-screenshot`, `--locales` narrow it. Price comes from
 the hub `price.txt` (first `NN.NN` found), matched against the product's own price
-points — price-point ids are per-product, so a sibling's id is not reusable.
+points, every page of them — price-point ids are per-product, so a sibling's id is not
+reusable. The reference name and type of a product it creates come from `product.txt`'s
+`reference_name:` and `type:` lines (`--type` overrides; an older
+"name · type" first line still works).
 
 Setting localizations + review note + price + screenshot flips the state to
 `READY_TO_SUBMIT`.

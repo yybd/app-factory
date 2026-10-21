@@ -18,7 +18,7 @@ the hub; this skill only **syncs + uploads** it — it never writes this:
 
 ```
 $APP_HUB/<slug>/store/apple/iap/<product-id>/
-  product.txt            # reference name · type · cleared_for_sale · price_usd
+  product.txt            # key: value lines — product_id, reference_name, type, cleared_for_sale
   price.txt              # price point / tier (optional; may be set already in ASC)
   <locale>/display_name.txt    # the per-locale Display Name users see (≤30)
   <locale>/description.txt     # the per-locale Description (≤45)
@@ -107,3 +107,9 @@ sets the price and attaches the reviewer screenshot.
   in `store-metadata-writer` / `app-store-metadata`, then re-run.
 - **Read before you write** — price schedule and reviewer screenshot are often
   already set in ASC; GET the IAP's relationships first and skip what's done.
+- **Price points are paged, 200 at a time, cheapest first** — a USA price above about
+  $24.49 is not on the first page. Page through, but not by following `links.next` as
+  a path: the tunes client drops the query string, so page two comes back without
+  `filter[territory]` and the same cursor repeats forever. Take `cursor` out of the
+  next link and send it as a param together with `filter[territory]` and `limit`, and
+  cap the number of pages. `provision_iap.rb` does this.
