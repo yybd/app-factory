@@ -14,6 +14,38 @@ skill does.
 
 ## Unreleased
 
+## 0.9.0
+
+A minor: `macos-direct-distribution` covers selling the direct build, and
+`app-store-deliver`'s IAP script reads prices and `product.txt` it used to miss.
+
+- **Selling the direct Mac build with a licence key** — a new
+  `plugins/apple-track/skills/macos-direct-distribution/references/licensing.md`, pointed to from the skill and
+  from the `DIRECT`-flag seam in `xcode-target.md`. A merchant-of-record hosted checkout
+  (Lemon Squeezy worked through; Paddle and Gumroad in a line), the key by email,
+  activation through the public licence API with no secret in the app, the Keychain
+  rather than `UserDefaults`, and deactivation to move Macs. Two policies for the owner
+  to choose — re-validate on launch (lock only on an explicit rejection, never on a
+  network failure) or activate-only (offline, at the cost of a refunded key that keeps
+  working). A strict `meta.variant_id` match, so a key for another product in the same
+  store does not unlock; no activation until the variant id is configured; the price
+  on the checkout page, not in the binary; and none of it in the App Store build,
+  which Guideline 3.1.1 forbids by name — `#if DIRECT`, or a Cargo feature checked in
+  `build.rs`. A Swift sketch and a test checklist. The description says so, in both
+  languages.
+- **`provision_iap.rb` pages through price points.** It read the first 200, so any USA
+  price above about $24.49 aborted with "no USA price point". It now follows the next
+  link's `cursor` as a param beside `filter[territory]` and `limit` — following the link
+  as a path through the tunes client drops the query, and page two came back unfiltered
+  and repeating — and stops after 25 pages or a repeated cursor.
+- **`provision_iap.rb` reads `product.txt` as it is documented**: `key: value` lines,
+  `reference_name:` and `type:`. It read the first line as "name · type", so a product
+  authored the documented way was created with `product_id: …` as its reference name.
+  The old first-line format still works; `type:` now sets the type of a product being
+  created (`--type` overrides), and a type the script cannot create stops it before
+  anything is written. `app-store-metadata` and the `app-store-deliver` reference now
+  describe the same layout `store-metadata-writer` did, with an example.
+
 ## 0.8.2
 
 A patch: where a posted draft records that it was posted.
