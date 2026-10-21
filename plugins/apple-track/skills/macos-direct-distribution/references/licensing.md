@@ -164,11 +164,18 @@ before the release build.
 
 ## A compact Swift sketch
 
-Direct target only. Two halves: `LicenceProvider` is the [contract](#the-provider-contract)
-as a protocol, and `Licence` is the app's side — the ordering, the Keychain and the
-policy — written once against it. Lemon Squeezy is the one implementation shown; another
-provider is another type conforming to the protocol (in Rust, a trait of the same
-shape), and nothing in `Licence` changes.
+Direct target only. Three parts: `LicenceProvider` is the [contract](#the-provider-contract)
+as a protocol; `Licence` is the app's side — the ordering, the Keychain and the policy —
+written once against it; and one type per provider. Lemon Squeezy, Keygen and Gumroad
+are below — pick one, delete the others. Another provider is another conforming type
+(in Rust, a trait of the same shape), and nothing in `Licence` changes.
+
+The three implementations follow the request and response shapes in each provider's
+documentation (checked on 2026-10-21) and are typechecked; they have not been run
+against the live services. Run the [test checklist](#test-checklist) on the one you
+keep.
+
+### The contract and the app's side
 
 ```swift
 #if DIRECT
@@ -215,6 +222,68 @@ struct Licence {
     }
 }
 
+/// One request, one answer. A 4xx with a JSON body is an answer — the server said
+/// something; no network, a 5xx, or a body that is not JSON is `.offline`, which is
+/// what keeps policy (a) from locking a paying user out during an outage.
+enum LicenceHTTP {
+    static func form(_ url: URL, _ fields: [String: String]) -> URLRequest {
+        var req = URLRequest(url: url)
+        req.httpMethod = "POST"
+        req.setValue("application/json", forHTTPHeaderField: "Accept")
+        req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
+        var body = URLComponents()
+        body.queryItems = fields.map { URLQueryItem(name: $0.key, value: $0.value) }
+        req.httpBody = body.percentEncodedQuery?.data(using: .utf8)   // keys are letters, digits, dashes
+        return req
+    }
+
+    static func send(_ req: URLRequest) async throws -> (status: Int, json: [String: Any]) {
+        guard let (data, response) = try? await URLSession.shared.data(for: req),
+              let status = (response as? HTTPURLResponse)?.statusCode, status < 500
+        else { throw LicenceFailure.offline }
+        if data.isEmpty, (200..<300).contains(status) { return (status, [:]) }   // 204 No Content
+        guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
+            throw LicenceFailure.offline                    // a captive portal's HTML page
+        }
+        return (status, json)
+    }
+}
+
+enum Keychain {
+    private static let base: [String: Any] = [
+        kSecClass as String: kSecClassGenericPassword,
+        kSecAttrService as String: (Bundle.main.bundleIdentifier ?? "app") + ".licence",
+        kSecAttrAccount as String: "licence",
+    ]
+    static func save(_ s: Licence.Stored) throws {
+        SecItemDelete(base as CFDictionary)
+        var add = base
+        add[kSecValueData as String] = try JSONEncoder().encode(s)
+        let status = SecItemAdd(add as CFDictionary, nil)
+        guard status == errSecSuccess else { throw NSError(domain: NSOSStatusErrorDomain, code: Int(status)) }
+    }
+    static func load() -> Licence.Stored? {
+        var q = base
+        q[kSecReturnData as String] = true
+        q[kSecMatchLimit as String] = kSecMatchLimitOne
+        var out: CFTypeRef?
+        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let data = out as? Data else { return nil }
+        return try? JSONDecoder().decode(Licence.Stored.self, from: data)
+    }
+    static func clear() { SecItemDelete(base as CFDictionary) }
+}
+#endif
+```
+
+On launch, with `let licence = Licence(provider: <one of the types below>)`:
+`if let s = Keychain.load() { unlock(); Task { if await !licence.stillValid(s) { Keychain.clear(); lock() } } }`
+for policy (a); for policy (b), `Keychain.load() != nil` is the whole check and
+`stillValid` is not called.
+
+### Lemon Squeezy
+
+```swift
+#if DIRECT
 /// Lemon Squeezy's public licence API — the key is the only credential.
 struct LemonSqueezy: LicenceProvider {
     /// From the dashboard, e.g. [<VARIANT_ID>]. Empty means not configured.
@@ -267,68 +336,185 @@ struct LemonSqueezy: LicenceProvider {
         }
     }
 
-    /// Form-encoded POST. Errors come back as a 4xx with a JSON body, so the body is read
-    /// whatever the status; no network, or a body that is not JSON, is `.offline`.
+    /// Errors come back as a 4xx with a JSON body carrying `error`: read whatever the status.
     private func post(_ path: String, _ form: [String: String]) async throws -> [String: Any] {
-        var req = URLRequest(url: api.appendingPathComponent(path))
-        req.httpMethod = "POST"
-        req.setValue("application/json", forHTTPHeaderField: "Accept")
-        req.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-        var body = URLComponents()
-        body.queryItems = form.map { URLQueryItem(name: $0.key, value: $0.value) }
-        req.httpBody = body.percentEncodedQuery?.data(using: .utf8)   // keys are letters, digits, dashes
-        guard let reply = try? await URLSession.shared.data(for: req),
-              let json = try? JSONSerialization.jsonObject(with: reply.0) as? [String: Any]
-        else { throw LicenceFailure.offline }
-        return json
+        try await LicenceHTTP.send(LicenceHTTP.form(api.appendingPathComponent(path), form)).json
     }
-}
-
-enum Keychain {
-    private static let base: [String: Any] = [
-        kSecClass as String: kSecClassGenericPassword,
-        kSecAttrService as String: (Bundle.main.bundleIdentifier ?? "app") + ".licence",
-        kSecAttrAccount as String: "licence",
-    ]
-    static func save(_ s: Licence.Stored) throws {
-        SecItemDelete(base as CFDictionary)
-        var add = base
-        add[kSecValueData as String] = try JSONEncoder().encode(s)
-        let status = SecItemAdd(add as CFDictionary, nil)
-        guard status == errSecSuccess else { throw NSError(domain: NSOSStatusErrorDomain, code: Int(status)) }
-    }
-    static func load() -> Licence.Stored? {
-        var q = base
-        q[kSecReturnData as String] = true
-        q[kSecMatchLimit as String] = kSecMatchLimitOne
-        var out: CFTypeRef?
-        guard SecItemCopyMatching(q as CFDictionary, &out) == errSecSuccess, let data = out as? Data else { return nil }
-        return try? JSONDecoder().decode(Licence.Stored.self, from: data)
-    }
-    static func clear() { SecItemDelete(base as CFDictionary) }
 }
 #endif
 ```
 
-On launch, with `let licence = Licence(provider: LemonSqueezy(variantIDs: [<VARIANT_ID>]))`:
-`if let s = Keychain.load() { unlock(); Task { if await !licence.stillValid(s) { Keychain.clear(); lock() } } }`
-for policy (a); for policy (b), `Keychain.load() != nil` is the whole check and
-`stillValid` is not called.
+### Keygen
 
-**Another provider** is another type conforming to `LicenceProvider`:
+The policy's authentication strategy must be `LICENSE` or `MIXED`, or the machine calls
+are refused. The handle is the machine id; the fingerprint is a SHA-256 of the Mac's
+hardware UUID, so the raw identifier never leaves the Mac.
 
-- **Keygen** — `check` posts `validate-key` with `meta.key` and `meta.scope.product`;
-  `activate` posts a machine with this Mac's fingerprint under
-  `Authorization: License <key>` and returns the machine id; `deactivate` deletes it;
-  `verdict` reads `meta.valid` / `meta.code` with the fingerprint in scope.
-- **Gumroad** — `check` calls `verify` with `product_id` and
-  `increment_uses_count=false`, and rejects `refunded` / `chargebacked` itself;
-  `activate` calls it with the counter on, compares `uses` to the app's limit, and
-  returns `""`; `deactivate` either calls the owner's server, which holds the token, or
-  only clears the Keychain and says that support resets the count; `verdict` calls
-  `verify` with the counter **off** — every counted call is a seat.
-- **Paddle Billing, or keys you issue yourself** — the provider is your server (or
-  Keygen behind the webhook); the protocol is the API that server has to offer.
+```swift
+#if DIRECT
+import CryptoKit
+import IOKit
+
+/// Keygen — validate-key needs no auth; machines are created and deleted under the key itself.
+struct Keygen: LicenceProvider {
+    let account: String                                     // <ACCOUNT_ID>, public
+    let product: String                                     // <PRODUCT_ID>; empty means not configured
+    var isConfigured: Bool { !product.isEmpty && !account.isEmpty }
+    private var api: URL { URL(string: "https://api.keygen.sh/v1/accounts/\(account)/")! }
+
+    /// Before activation a node-locked licence answers NO_MACHINE: that is a good key.
+    private static let unactivated: Set<String> = ["VALID", "NO_MACHINE", "NO_MACHINES"]
+
+    func check(_ key: String) async throws { _ = try await licenceID(key) }
+
+    func activate(_ key: String) async throws -> String {
+        let body: [String: Any] = ["data": [
+            "type": "machines",
+            "attributes": ["fingerprint": Self.fingerprint, "platform": "macOS",
+                           "name": Host.current().localizedName ?? "Mac"],
+            "relationships": ["license": ["data": ["type": "licenses", "id": try await licenceID(key)]]],
+        ]]
+        var req = request("machines", method: "POST", key: key)
+        req.httpBody = try JSONSerialization.data(withJSONObject: body)
+        let (status, json) = try await LicenceHTTP.send(req)
+        if status == 201, let id = (json["data"] as? [String: Any])?["id"] as? String { return id }
+        if errorCode(json) == "FINGERPRINT_TAKEN" { return Self.fingerprint }   // already active on this Mac
+        throw LicenceFailure.rejected(errorDetail(json) ?? "not activated")
+    }
+
+    func deactivate(_ key: String, handle: String) async throws {
+        let (status, json) = try await LicenceHTTP.send(request("machines/\(handle)", method: "DELETE", key: key))
+        guard status == 204 else { throw LicenceFailure.rejected(errorDetail(json) ?? "not deactivated") }
+    }
+
+    func verdict(_ key: String, handle: String) async -> Bool? {
+        guard let json = try? await validate(key, fingerprint: true),
+              let valid = (json["meta"] as? [String: Any])?["valid"] as? Bool else { return nil }
+        return valid
+    }
+
+    /// Contract 1, 4, 5 in one call: the licence id, or why not.
+    private func licenceID(_ key: String) async throws -> String {
+        let json = try await validate(key, fingerprint: false)
+        let code = (json["meta"] as? [String: Any])?["code"] as? String ?? errorCode(json) ?? "no answer"
+        if code == "PRODUCT_SCOPE_MISMATCH" { throw LicenceFailure.wrongProduct }
+        guard Self.unactivated.contains(code), let id = (json["data"] as? [String: Any])?["id"] as? String else {
+            throw LicenceFailure.rejected(code)              // NOT_FOUND, SUSPENDED, EXPIRED, TOO_MANY_MACHINES…
+        }
+        return id
+    }
+
+    private func validate(_ key: String, fingerprint: Bool) async throws -> [String: Any] {
+        var scope = ["product": product]
+        if fingerprint { scope["fingerprint"] = Self.fingerprint }
+        var req = request("licenses/actions/validate-key", method: "POST", key: nil)
+        req.httpBody = try JSONSerialization.data(withJSONObject: ["meta": ["key": key, "scope": scope]])
+        return try await LicenceHTTP.send(req).json
+    }
+
+    private func request(_ path: String, method: String, key: String?) -> URLRequest {
+        var req = URLRequest(url: api.appendingPathComponent(path))
+        req.httpMethod = method
+        req.setValue("application/vnd.api+json", forHTTPHeaderField: "Accept")
+        req.setValue("application/vnd.api+json", forHTTPHeaderField: "Content-Type")
+        if let key { req.setValue("License \(key)", forHTTPHeaderField: "Authorization") }
+        return req
+    }
+
+    private func firstError(_ json: [String: Any]) -> [String: Any]? { (json["errors"] as? [[String: Any]])?.first }
+    private func errorCode(_ json: [String: Any]) -> String? { firstError(json)?["code"] as? String }
+    private func errorDetail(_ json: [String: Any]) -> String? { firstError(json)?["detail"] as? String }
+
+    /// SHA-256 of IOPlatformUUID, hex: stable per Mac, URL-safe, and not the raw hardware id.
+    static let fingerprint: String = {
+        let service = IOServiceGetMatchingService(kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice"))
+        defer { IOObjectRelease(service) }
+        let uuid = IORegistryEntryCreateCFProperty(service, "IOPlatformUUID" as CFString, kCFAllocatorDefault, 0)?
+            .takeRetainedValue() as? String ?? Host.current().localizedName ?? "unknown"
+        return SHA256.hash(data: Data(uuid.utf8)).map { String(format: "%02x", $0) }.joined()
+    }()
+}
+#endif
+```
+
+### Gumroad
+
+Gumroad keeps a **count** of verifications, not a list of Macs, and lowering the count
+needs the seller's token. So the activation limit is the app's own (`maxActivations`),
+every call except `activate` turns the counter **off**, and deactivation goes through a
+server the owner runs (`deactivationServer`, which calls `decrement_uses_count` with the
+token) — or, without one, only clears this Mac and leaves the count for support to
+reset. Say which in the UI.
+
+```swift
+#if DIRECT
+/// Gumroad — licences/verify needs no auth; the key and the product id are the whole request.
+struct Gumroad: LicenceProvider {
+    let productID: String                                   // <PRODUCT_ID>; empty means not configured
+    let maxActivations: Int                                 // the app's own limit
+    /// The owner's server that decrements the count, e.g. https://<your-server>/licence/deactivate.
+    /// nil: deactivating clears this Mac only, and the count stays until support resets it.
+    let deactivationServer: URL?
+    private let verify = URL(string: "https://api.gumroad.com/v2/licenses/verify")!
+
+    var isConfigured: Bool { !productID.isEmpty && maxActivations > 0 }
+
+    func check(_ key: String) async throws {
+        let json = try accept(try await call(key, count: false))
+        guard (json["uses"] as? Int ?? 0) < maxActivations else {
+            throw LicenceFailure.rejected("activation limit reached — deactivate another Mac first")
+        }
+    }
+
+    func activate(_ key: String) async throws -> String {
+        let json = try accept(try await call(key, count: true))   // the one counted call
+        guard (json["uses"] as? Int ?? 0) <= maxActivations else {
+            throw LicenceFailure.rejected("activation limit reached")
+        }
+        return ""                                           // Gumroad has no per-Mac handle
+    }
+
+    func deactivate(_ key: String, handle: String) async throws {
+        guard let server = deactivationServer else { return }  // local only — see above
+        let (status, _) = try await LicenceHTTP.send(LicenceHTTP.form(server, ["license_key": key,
+                                                                                 "product_id": productID]))
+        guard (200..<300).contains(status) else { throw LicenceFailure.rejected("not deactivated") }
+    }
+
+    func verdict(_ key: String, handle: String) async -> Bool? {
+        guard let reply = try? await call(key, count: false), reply.json["success"] is Bool else { return nil }
+        return (try? accept(reply)) != nil
+    }
+
+    private func call(_ key: String, count: Bool) async throws -> (status: Int, json: [String: Any]) {
+        try await LicenceHTTP.send(LicenceHTTP.form(verify, ["product_id": productID, "license_key": key,
+                                                             "increment_uses_count": count ? "true" : "false"]))
+    }
+
+    /// The product is matched by the request: another product's key, or a disabled one, is a
+    /// 404 with success:false. success:true
+    /// alone does not say the purchase still stands — refunds and chargebacks are separate fields.
+    @discardableResult
+    private func accept(_ reply: (status: Int, json: [String: Any])) throws -> [String: Any] {
+        let json = reply.json
+        guard json["success"] as? Bool == true, let purchase = json["purchase"] as? [String: Any] else {
+            throw LicenceFailure.rejected(json["message"] as? String ?? "not valid for this product")
+        }
+        if purchase["refunded"] as? Bool == true || purchase["chargebacked"] as? Bool == true {
+            throw LicenceFailure.rejected("the purchase was refunded")
+        }
+        if let ended = purchase["subscription_ended_at"], !(ended is NSNull) {
+            throw LicenceFailure.rejected("the subscription has ended")
+        }
+        return json
+    }
+}
+#endif
+```
+
+**Paddle Billing, or keys you issue yourself** — the provider is your server (or Keygen
+behind the `transaction.completed` webhook), and `LicenceProvider` is the API that
+server has to offer: write its type against your own endpoints, the same way.
 
 ## Test checklist
 

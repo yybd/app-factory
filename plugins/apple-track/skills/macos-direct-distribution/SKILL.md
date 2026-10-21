@@ -181,7 +181,8 @@ app re-validates on launch or activates once and never calls home again, and the
 dashboard step that yields the variant id and checkout URL. All of it compiles into
 the Direct target only: Guideline 3.1.1 names licence keys explicitly. The flow, both
 policies, the rules, the five things a provider must offer (with Lemon Squeezy, Keygen,
-Gumroad and Paddle Billing compared against them), a provider-neutral Swift sketch and
+Gumroad and Paddle Billing compared against them), Swift code for the app's side and
+for Lemon Squeezy, Keygen and Gumroad, and
 the test checklist are in [references/licensing.md](references/licensing.md).
 
 ### 8. Document it
@@ -215,7 +216,8 @@ names, URLs, and target names. Keeping this current is what lets the next releas
 - [references/licensing.md](references/licensing.md) — selling the direct build with a
   licence key: checkout, activation, the provider contract and a comparison of
   providers, the two re-validation policies, the strict product check, keeping it out
-  of the App Store build, a provider-neutral Swift sketch, tests.
+  of the App Store build, Swift for Lemon Squeezy, Keygen and Gumroad behind one
+  protocol, tests.
 
 ## Boundaries
 This skill creates the **target** and the **update mechanism** and documents them.

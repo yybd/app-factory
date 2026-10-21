@@ -62,7 +62,7 @@ ALLOWED = re.compile(
     r"anthropic|claude|vercel|w3|schema|mozilla|npmjs|python|ruby|indexnow|bing|"
     r"yandex|seznam|example|your-site|your-domain|localhost|jsdelivr|cdnjs|unpkg|"
     r"fonts\.googleapis|gstatic|creativecommons|opensource\.org|semver|"
-    r"api\.lemonsqueezy\.com|//<[^>/]+>\.)", re.I)
+    r"api\.lemonsqueezy\.com|api\.gumroad\.com|//<[^>/]+>\.)", re.I)
 
 NAMES_FILE = os.path.expanduser(
     os.environ.get("APP_FACTORY_FINGERPRINTS") or "~/.claude/.app-factory/fingerprints.txt")
