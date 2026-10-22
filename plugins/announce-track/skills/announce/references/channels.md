@@ -19,6 +19,9 @@ not documented by the channel, and said as such.
   sentence; then why it exists, how it works, where it stops. No cost or investment line
   — here it reads as marketing. Close by asking where it gets in the way, and that pull
   requests improving it are welcome.
+- **Voice:** plain, technical, modest. No adjectives about the work, no "big
+  investment", no call to action beyond *"I'd like to hear where it gets in your way"*.
+  Known limits stated up front, not discovered in the replies.
 
 ## Reddit
 
@@ -31,6 +34,10 @@ not documented by the channel, and said as such.
   the end-to-end line, and may say what it cost to build and that it is open source. A
   technical one (r/ClaudeCode and the like) takes lessons, not a pitch — no cost line.
   Both end inviting the reader to try it, fork it, improve it.
+- **Voice:** a member of the community telling what they learned — the lesson or the
+  problem first, the product after. Follow the subreddit's showcase rule where it has one
+  (r/ClaudeAI: what was built, how Claude or Claude Code helped, what was learned, that it
+  is free to try). Minimal promotion.
 
 ## LinkedIn
 
@@ -48,6 +55,8 @@ not documented by the channel, and said as such.
   the feed shows before *see more*), then what it is end to end, then the investment and
   the open-source release in the owner's words, the details, the why, and a closing
   invitation — try it, fork the repo, improve it — before "Link in the first comment".
+- **Voice:** professional but personal — what I built and why, in full sentences. No
+  hashtag walls: five at most, at the end.
 
 ## X and Bluesky
 
@@ -61,6 +70,10 @@ not documented by the channel, and said as such.
   carries the pain and the end-to-end line (and, for something given away, the
   investment and that it is open source); the last carries the invitation to try, fork
   and improve, with the link.
+- **Voice (X):** conversational, a little informal, a hook in the first line —
+  *"Shipping an app is weird. You finish the code and you're halfway there."* Fragments
+  are fine ("Signing. Compliance. Store copy."). Bullets are fine, but `•` counts 2. One
+  link, in the last post.
 
 ## dev.to and Medium — cross-posts
 
@@ -70,6 +83,8 @@ not documented by the channel, and said as such.
 - **Medium:** prefer *Import a story* with the canonical URL — Medium sets the canonical
   link itself. Pasted by hand, set *Customize canonical link* in the story's settings.
 - **Both:** absolute links only. Add an "Originally published at" line.
+- **Voice:** the article's own. A cross-post is a copy of the canonical, never
+  rewritten for the channel.
 - **When:** after the launch channel, not before — the launch is where it should be seen
   first.
 

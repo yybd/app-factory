@@ -136,6 +136,35 @@ LinkedIn post, each of which moved the draft toward it:
 A post written as a lesson (a technical subreddit's "three things I learned") keeps its
 lesson first, as references/channels.md says; the invitation still closes it.
 
+**Voice — how a post sounds, on every channel.** The order above can be right and the
+post still read like a press release; on the App Factory launch the first X thread did,
+and the owner asked for it "more human, fitting X".
+
+- **Say it the way the author would say it to a colleague:** first person, short
+  sentences, plain words, one idea per sentence.
+- **Concrete over abstract:** the actual step, file or failure (*"the agent offered me an
+  Android deploy while I was editing a website"*), never the category ("context issues").
+- **No marketing words** — revolutionary, seamless, powerful, game-changer, unlock,
+  leverage — no exclamation marks, no rhetorical questions stacked for effect.
+- **Honest about limits and cost.** One sentence of the author's own investment where the
+  channel allows it (references/channels.md says where).
+- **Read it aloud.** A sentence nobody would say out loud is rewritten.
+
+Before and after, the opening of that X thread:
+
+> *Before:* Finishing an app's code is half the way to the stores. Then: signing,
+> compliance, screenshots in every language, store copy, two listings, the release.
+> Every version again. I turned all of it into Claude Code skills. A big investment to
+> build, now open source: App Factory.
+>
+> *After:* Shipping an app is weird. You finish the code and you're halfway there.
+> Signing. Compliance. Screenshots in every language. Store copy. Two store listings.
+> The release. Then again next version. So I turned the whole thing into Claude Code
+> skills. Now open source 👇
+
+Same facts, same order; the second is how a person talks. Each channel's own register is
+in [references/channels.md](references/channels.md).
+
 Shape each one to its channel (references/channels.md): plain text where Markdown is not
 rendered, the link where the channel expects it, absolute URLs everywhere — a relative
 link points nowhere once the text leaves its own site.

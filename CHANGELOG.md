@@ -14,6 +14,20 @@ skill does.
 
 ## Unreleased
 
+## 0.9.5
+
+A patch: `announce` says how a post should sound, not only how it is laid out.
+
+- **A Voice section** in `plugins/announce-track/skills/announce/SKILL.md`: said the way
+  the author would say it to a colleague, concrete over abstract, no marketing words or
+  exclamation marks, honest about limits and cost, read aloud before it ships — with the
+  App Factory launch thread's opening before and after, the one the owner asked to make
+  "more human, fitting X".
+- **Each channel's register** in `plugins/announce-track/skills/announce/references/channels.md`: X conversational
+  with a hook, LinkedIn professional but personal with five hashtags at most, Hacker News
+  plain and modest with limits up front, Reddit the lesson first under the subreddit's
+  showcase rule, cross-posts in the article's own voice.
+
 ## 0.9.4
 
 A patch: `announce`'s draft checker counts an X post the way X does.
