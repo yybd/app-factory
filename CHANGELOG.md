@@ -14,6 +14,16 @@ skill does.
 
 ## Unreleased
 
+## 0.9.4
+
+A patch: `announce`'s draft checker counts an X post the way X does.
+
+- **X's weighted count** in `plugins/announce-track/skills/announce/scripts/check_drafts.py`:
+  a character outside the light ranges (Latin, Hebrew and most scripts below U+1100,
+  spaces, dashes, quotes) counts 2, an emoji counts 2 however many code points build it,
+  and the text is NFC first. The launch thread's second post, three `•` bullets, passed
+  the checker at 278 and was refused by X at 281; the checker now says 281.
+
 ## 0.9.3
 
 A patch: `announce` teaches the shape of an announcement post, learned from the owner's

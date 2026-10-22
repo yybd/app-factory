@@ -21,7 +21,7 @@ comment came first. Whether the words are any good is not mechanical and is not 
 
 Exit 1 when any draft breaks a rule; warnings alone exit 0.
 """
-import argparse, glob, os, re, sys, urllib.request
+import argparse, glob, os, re, sys, unicodedata, urllib.request
 
 LIMITS = {"x": 280, "bluesky": 300}
 HN_TITLE = 80
@@ -61,9 +61,36 @@ def check_status(path):
         warn(path, "no `<!-- Status: draft -->` line — a hub's stats reader lists it as untracked")
 
 
+# X's weighted count (twitter-text v3): a character in these ranges counts 1, any other 2.
+# Latin, Hebrew, Arabic and most scripts are under 4352; of general punctuation only the
+# spaces, dashes and quotes are light — "•", "…" and "→" count 2, as do CJK and emoji.
+X_LIGHT = ((0x0000, 0x10FF), (0x2000, 0x200D), (0x2010, 0x201F), (0x2032, 0x2037))
+# What joins a code point to the emoji before it: variation selectors, skin tones, the
+# keycap, tag characters, and the zero-width joiner with the code point after it.
+EMOJI_TAIL = re.compile("[︎️⃣\U0001F3FB-\U0001F3FF\U000E0020-\U000E007F]|‍.")
+REGIONAL = re.compile("[\U0001F1E6-\U0001F1FF]{2}")
+
+
+def x_weight(ch):
+    o = ord(ch)
+    return 1 if any(a <= o <= b for a, b in X_LIGHT) else 2
+
+
 def x_length(text):
-    """What X counts: every URL is 23 characters, whatever its real length."""
-    return len(URL.sub("x" * 23, text))
+    """What X counts, not what len() counts: every URL is 23 characters whatever its real
+    length, a character outside the light ranges counts 2, and an emoji counts 2 however
+    many code points build it (a flag, a skin tone, a ZWJ family). Text is NFC first, as
+    X normalises it."""
+    text = unicodedata.normalize("NFC", URL.sub("x" * 23, text))
+    text = REGIONAL.sub("\U0001F1E6", text)
+    n, i = 0, 0
+    while i < len(text):
+        j = i + 1
+        while (m := EMOJI_TAIL.match(text, j)):
+            j = m.end()
+        n += 2 if j - i > 1 else x_weight(text[i])
+        i = j
+    return n
 
 
 def check_hn_title(path):

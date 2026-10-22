@@ -53,7 +53,10 @@ not documented by the channel, and said as such.
 
 - **For:** an existing following. A new account with no followers reaches almost no one;
   replies in existing conversations reach more than posts.
-- **Mechanical:** X — 280 characters per post, every URL counted as 23. Bluesky — 300.
+- **Mechanical:** X — 280 characters per post, every URL counted as 23, and **weighted**:
+  Latin, Hebrew and most scripts, spaces, dashes and quotes count 1; anything else counts
+  2 — `•`, `…`, `→`, CJK, and every emoji however it is built. A bulleted list can pass a
+  plain count and still be refused; the checker counts the way X does. Bluesky — 300.
 - A thread: the problem, what did not work, what does, the link last. The first post
   carries the pain and the end-to-end line (and, for something given away, the
   investment and that it is open source); the last carries the invitation to try, fork
