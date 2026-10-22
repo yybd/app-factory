@@ -43,6 +43,16 @@ never copied from an earlier post — a count that moved since (skills, tracks, 
 is the commonest wrong fact in an announcement. If something the post needs is not in
 the source, ask; do not supply it.
 
+**A feature list is made from the thing itself, not from the article.** An article
+covers what it was about; the post lists what ships. Walk the repo's skill or feature
+index (and, for a capability that sells, the skills behind it) and check the list in the
+draft against it. On the App Factory launch the licence-key paywall — Lemon Squeezy,
+Keygen or Gumroad, in `macos-direct-distribution` — was missing from every draft
+because the article predated it, and the owner had to point it out.
+
+**What the owner says about themselves comes from the owner.** What it cost them to
+build, why they give it away, how long it took — ask; never write it on their behalf.
+
 ### 2. Agree the plan with the owner
 
 - **Which channels, and in what order.** See [references/channels.md](references/channels.md)
@@ -99,6 +109,32 @@ channel never sees and a hub's stats reader counts:
 A file that goes to more than one channel names it: `<!-- Status (medium): posted … -->`.
 How-tos, headings and "first comment:" labels go in the folder's `README.md`, not in the
 draft — around the post they are Markdown the channel would print.
+
+**The order a post is built in** — learned from the owner's edits to the App Factory
+LinkedIn post, each of which moved the draft toward it:
+
+1. **The reader's pain, in concrete steps.** Not "shipping is hard" but the steps
+   themselves: *"Finishing an app's code is only half the way to the stores. Then come
+   signing, compliance, screenshots in every language, store copy, two listings, the
+   release — and again for every version."*
+2. **What the thing is, end to end — as the main point.** One sentence that says it does
+   the whole of what the pain listed (*"from the code to a live app, start to finish"*),
+   right after the pain, before any backstory.
+3. **The details** — the complete feature list (step 1), the limits, where it stops on
+   purpose.
+4. **The author's why, later.** The motivation (*"one big instructions file stopped
+   holding at my third app"*) explains the thing; placed first, it buries what the thing
+   is under the author's story.
+5. **What it cost, and that it is given away** — *"building it was a big investment on
+   my part, and I've released it as open source"*, in the owner's words. On LinkedIn, X
+   and general subreddits only; on Hacker News and in technical communities
+   (r/ClaudeCode and the like) it reads as marketing — leave it out there.
+6. **An explicit invitation to take part**, last: try it, fork the repo, improve it. On
+   Hacker News, *"pull requests that improve a skill are welcome"*, beside asking where
+   it gets in the way.
+
+A post written as a lesson (a technical subreddit's "three things I learned") keeps its
+lesson first, as references/channels.md says; the invitation still closes it.
 
 Shape each one to its channel (references/channels.md): plain text where Markdown is not
 rendered, the link where the channel expects it, absolute URLs everywhere — a relative

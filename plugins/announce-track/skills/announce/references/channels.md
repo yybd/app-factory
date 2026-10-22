@@ -15,6 +15,10 @@ not documented by the channel, and said as such.
   its known limits, a link to the write-up. Be there for hours and answer everything.
   Most Show HN posts stay on /newest; that is the normal outcome, not a failure. Never
   ask for votes.
+- **Convention, the first comment's shape:** what it is, end to end, in the first
+  sentence; then why it exists, how it works, where it stops. No cost or investment line
+  — here it reads as marketing. Close by asking where it gets in the way, and that pull
+  requests improving it are welcome.
 
 ## Reddit
 
@@ -23,6 +27,10 @@ not documented by the channel, and said as such.
 - **Convention:** read the subreddit's rules first — many forbid self-promotion outright.
   Lead with the lesson or the problem, not the product. New accounts with no karma are
   filtered in most communities.
+- **Convention, by kind of subreddit:** a general one (r/ClaudeAI) takes the pain, then
+  the end-to-end line, and may say what it cost to build and that it is open source. A
+  technical one (r/ClaudeCode and the like) takes lessons, not a pitch — no cost line.
+  Both end inviting the reader to try it, fork it, improve it.
 
 ## LinkedIn
 
@@ -36,13 +44,20 @@ not documented by the channel, and said as such.
 - **Convention:** the link goes in the first comment rather than the post body — posts
   with external links are commonly believed to be shown less. A belief, not a documented
   rule; say so if asked.
+- **Convention, the post's shape:** the pain in concrete steps in the opening lines (all
+  the feed shows before *see more*), then what it is end to end, then the investment and
+  the open-source release in the owner's words, the details, the why, and a closing
+  invitation — try it, fork the repo, improve it — before "Link in the first comment".
 
 ## X and Bluesky
 
 - **For:** an existing following. A new account with no followers reaches almost no one;
   replies in existing conversations reach more than posts.
 - **Mechanical:** X — 280 characters per post, every URL counted as 23. Bluesky — 300.
-- A thread: the problem, what did not work, what does, the link last.
+- A thread: the problem, what did not work, what does, the link last. The first post
+  carries the pain and the end-to-end line (and, for something given away, the
+  investment and that it is open source); the last carries the invitation to try, fork
+  and improve, with the link.
 
 ## dev.to and Medium — cross-posts
 

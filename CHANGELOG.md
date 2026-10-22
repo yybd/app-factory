@@ -14,6 +14,21 @@ skill does.
 
 ## Unreleased
 
+## 0.9.3
+
+A patch: `announce` teaches the shape of an announcement post, learned from the owner's
+edits to the App Factory launch post on LinkedIn.
+
+- **The order a post is built in** (`plugins/announce-track/skills/announce/SKILL.md`):
+  the reader's pain in concrete steps; what the thing is, end to end, as the main point;
+  the details; the author's why later, not first; what it cost and that it is given
+  away, in the owner's words; and a closing invitation to try it, fork it, improve it.
+- **The cost line by channel** (`plugins/announce-track/skills/announce/references/channels.md`): on LinkedIn, X and general
+  subreddits; left out on Hacker News and technical subreddits, where it reads as
+  marketing. HN closes with "pull requests that improve a skill are welcome".
+- **A feature list is made from the repo, not the article** — the launch drafts missed
+  the licence-key paywall because the article predated it.
+
 ## 0.9.2
 
 A patch: the licence-key reference carries code for Keygen and Gumroad, not only a
