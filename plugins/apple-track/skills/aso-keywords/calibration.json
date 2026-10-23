@@ -1,0 +1,49 @@
+{
+  "_comment": "The numbers score.py and allocate.py run on. Change them from reviews across the portfolio, not from one app, and add a dated line to LESSONS.md saying what moved and why. Every field's meaning is in SKILL.md, 'Scoring'.",
+  "version": 1,
+  "updated": "2026-10-23",
+
+  "keyword_limit": 100,
+  "keyword_limit_unit": "bytes",
+  "_keyword_limit_unit_note": "UNVERIFIED for Hebrew. Apple's reference says 100 bytes; UTF-8 Hebrew is 2 bytes a letter. Counting bytes is the safe side until someone types a 51+ letter Hebrew field into App Store Connect and sees whether it is accepted. Then set this to 'characters' if it is, and record the date in LESSONS.md.",
+  "name_limit": 30,
+  "subtitle_limit": 30,
+
+  "relevance_gate": 6,
+
+  "proxy": {
+    "_note": "Autocomplete popularity proxy. Per observation (typed, position): completion = share of the term the store filled in; position = (11 - pos) / 10. The best observation wins; the proxy is 1 + 9 * (completion_weight * completion + position_weight * position).",
+    "completion_weight": 0.6,
+    "position_weight": 0.4,
+    "contained_completion": 0.3,
+    "unsuggested": 1.5,
+    "no_signal": 2.0
+  },
+
+  "apple": {
+    "_note": "Apple Ads searchPopularity1to100 → 1–10 by dividing by 10. Apple lists head terms only (the floor measured 2026-10-23 was about 54), so when Apple's list for a storefront was read and a term is NOT in it, its proxy is capped just under that floor.",
+    "absent_cap": 5.3
+  },
+
+  "difficulty": {
+    "_note": "From the store's own results for the term: the median rating count of the top ten (log scale, 100,000 ratings = 10) and the share of them with every word of the term in their name.",
+    "ratings_weight": 0.6,
+    "title_weight": 0.4,
+    "ratings_ceiling": 100000
+  },
+
+  "review": {
+    "_note": "How a review's verdict (review.py --apply) feeds the next study. A 'replace' is discarded outright (score.py), a 'keep' has its priority multiplied by this.",
+    "keep_boost": 1.25
+  },
+
+  "bands": {
+    "stretch": 2,
+    "core": 20,
+    "long_tail": 15,
+    "_note": "Stretch: the most popular relevant terms our chance is low on. Long tail: relevance >= long_tail_relevance and popularity <= long_tail_popularity. Core: the rest, by priority.",
+    "long_tail_relevance": 8,
+    "long_tail_popularity": 4,
+    "stretch_chance_below": 4
+  }
+}
