@@ -2,8 +2,9 @@
 
 # 4 — turning `aso-keywords` into an ASO analyst
 
-**Type:** a plan, with the live measurements that shaped it. **Status:** steps 1–4 being
-built 2026-10-23; the live trial (step 5) waits on the owner.
+**Type:** a plan, with the live measurements that shaped it. **Status:** steps 1–4 built
+and shipped in 0.10.0 on 2026-10-23; the live trial (step 5) waits on the owner.
+**Placement decided** the same day: the hub gets `apple-track`; the skill stays where it is.
 
 **Dated.** Researched 2026-10-23 from a hub session, then tested against Apple's live
 endpoints the same day. Where this disagrees with the skill as it ships, the skill is right.
