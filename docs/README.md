@@ -35,6 +35,7 @@ contradicts today's code is not a bug in the record.
 | [1 — when a repo is not private](decisions/1-shared-context-repos.md) | why a shared data repo and a website are not "one project", and what that means for where a skill lives |
 | [2 — what shipping this as a product required](decisions/2-product-readiness.md) | the readiness assessment, and what it found blocking |
 | [3 — the studio flow, as it was actually run](decisions/3-studio-flow.md) | one studio's full launch sequence, hub and site repo included — the record the product lifecycle was distilled from |
+| [4 — turning `aso-keywords` into an ASO analyst](decisions/4-aso-analyst.md) | a plan, with Apple's live endpoints measured: what is free, what Apple Ads adds (head terms only), and the feedback loop |
 
 ## [`maintenance/`](maintenance) — keeping it true
 
