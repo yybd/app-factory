@@ -28,7 +28,7 @@ edit a skill, not this table.*
 | `notarize-and-distribute` | Take a built macOS app from an Xcode archive, package it into a signed DMG, notarize it with Apple, staple the ticket, and verify that everything —… | 1 | 1 |
 | `ship-apple-app` | Verify an Apple app is submission-ready and ship it — the FINAL App Store / Mac App Store step: confirm the content is already in place (signing, c… |  | 1 |
 
-**What it costs.** 13,298 characters of description ≈ 3,324 tokens, in every session
+**What it costs.** 13,308 characters of description ≈ 3,327 tokens, in every session
 that enables this track. A skill's body is read only when the skill fires; its description
 is in context always.
 

@@ -4,13 +4,13 @@ description: >-
   App Store Optimization for APPLE search, done the way an ASO analyst does it: research
   real search terms per storefront with data (App Store autocomplete, the store's own
   results, rating counts; Apple Ads popularity when a key is present), score them for
-  relevance, popularity and difficulty, pack the name, subtitle and 100-byte keywords
+  relevance, popularity and difficulty, pack the name, subtitle and 100-character keywords
   field per locale, record the change as an experiment, and review the ranks four weeks
   later. Use when the user wants better App Store search ranking or discoverability,
   keyword research, to audit or rewrite the keywords field, to choose between name,
   subtitle and keywords, to track ranks, or to review a past keyword change ("מילות
   מפתח", "דירוג בחיפוש", "ASO", "למה לא מוצאים את האפליקציה"). Works fully with no Apple
-  Ads account. It owns the keyword strategy and the 100-byte field; app-store-metadata
+  Ads account. It owns the keyword strategy and the 100-character field; app-store-metadata
   owns the files. Not for Google Play, which has no keywords field — play-store-metadata
   writes Play's visible copy.
 ---
@@ -77,7 +77,7 @@ the report: *"popularity: Apple Ads for 6 terms (week of …), autocomplete for 
 python3 $D/allocate.py --check --metadata M --cc us
 ```
 
-Lengths (the keyword field in **bytes** — see the ⚠ below), spaces around commas, words
+Lengths (the keyword field in **characters** — see below), spaces around commas, words
 repeated across name/subtitle/keywords, singular+plural pairs, stop and category words.
 The older `analyze_keywords.py <repo>` still runs the same audit over a whole fastlane
 tree.
@@ -147,11 +147,10 @@ Rules it enforces, and you keep when writing:
   en-GB; UK and Germany share en-GB). A locale the listing lacks is another free keyword
   field — the script lists them.
 
-⚠ **Bytes or characters.** Apple's reference says the keyword field is **100 bytes**;
-Hebrew is 2 bytes a letter. Whether App Store Connect counts bytes or characters is
-**unverified**, so the scripts count bytes (`calibration.json`). The first time a Hebrew
-field over 50 letters is typed into App Store Connect, record what it accepted in
-LESSONS.md and set the unit.
+**The limit is 100 characters, in Hebrew too.** Apple's reference says "bytes", but App
+Store Connect counts characters: a Hebrew field of 84 characters (155 bytes) was accepted,
+approved and is live (verified 2026-10-23, LESSONS.md). A Hebrew field packed to 50
+letters wastes half of it.
 
 ### 6. Write the visible copy, hand it over
 
@@ -201,7 +200,7 @@ Admin key). Ask before running it; until then the reviews run on ranks alone and
 
 ## Boundaries
 
-- **It owns the keyword strategy and the 100-byte field, not the files.**
+- **It owns the keyword strategy and the 100-character field, not the files.**
   `app-store-metadata` writes what this skill decides; `store-metadata-writer` writes the
   listing copy from the profile.
 - **It does not rename the app.** The name is `app-identity`'s; this skill optimises

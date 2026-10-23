@@ -21,7 +21,7 @@ The rules it packs by (see the guide for which are Apple's and which are practic
     form is wasted bytes;
   * no stop words, no category or developer words (Apple indexes those already), no term
     the study marks as a trademark or the owner rejected;
-  * the limit is counted in the unit calibration.json names (bytes, until verified).
+  * the limit is counted in the unit calibration.json names (characters, verified).
 
 Prints the proposal; with --out also writes it as JSON. Never writes a metadata file —
 `app-store-metadata` owns those.
@@ -75,8 +75,6 @@ def check(locale, listing, cal, excluded=frozenset()):
         issues.append(("warn", "keywords field is empty — a wasted ranking surface"))
     elif used < limit * 0.85:
         issues.append(("info", f"keywords use {used}/{limit} {unit} — room for more"))
-    if is_hebrew(kw) and unit == "bytes" and len(kw) <= limit < used:
-        issues.append(("warn", f"fits in {len(kw)} characters but not in bytes — the unit is unverified for Hebrew"))
     if ", " in kw or " ," in kw:
         issues.append(("warn", "spaces around commas waste the field — 'a,b,c'"))
     terms = [t.strip() for t in kw.split(",") if t.strip()]

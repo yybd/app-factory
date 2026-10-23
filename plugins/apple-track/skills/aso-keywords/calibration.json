@@ -4,8 +4,8 @@
   "updated": "2026-10-23",
 
   "keyword_limit": 100,
-  "keyword_limit_unit": "bytes",
-  "_keyword_limit_unit_note": "UNVERIFIED for Hebrew. Apple's reference says 100 bytes; UTF-8 Hebrew is 2 bytes a letter. Counting bytes is the safe side until someone types a 51+ letter Hebrew field into App Store Connect and sees whether it is accepted. Then set this to 'characters' if it is, and record the date in LESSONS.md.",
+  "keyword_limit_unit": "characters",
+  "_keyword_limit_unit_note": "Verified 2026-10-23: App Store Connect counts CHARACTERS. A Hebrew keywords field of 84 characters (155 UTF-8 bytes) was accepted and approved, and is live — impossible under a 100-byte limit. Apple's reference says 'bytes'; the store does not. See LESSONS.md.",
   "name_limit": 30,
   "subtitle_limit": 30,
 

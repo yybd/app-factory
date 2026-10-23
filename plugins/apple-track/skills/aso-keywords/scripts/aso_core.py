@@ -119,10 +119,10 @@ def stem(word):
     return w
 
 
-def units(text, unit="bytes"):
-    """How much of a keyword field `text` uses. Apple's reference says 100 BYTES; whether
-    App Store Connect counts bytes or characters for Hebrew is unverified, so the caller
-    says which — and calibration.json carries the answer once someone has checked."""
+def units(text, unit="characters"):
+    """How much of a keyword field `text` uses. App Store Connect counts characters —
+    verified 2026-10-23 with a Hebrew field of 84 characters and 155 bytes, accepted and
+    approved — although Apple's reference says bytes. calibration.json names the unit."""
     return len(text.encode("utf-8")) if unit == "bytes" else len(text)
 
 

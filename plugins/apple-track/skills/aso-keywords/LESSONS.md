@@ -60,8 +60,12 @@ words, which spends bytes when they match and loses the term when they do not. S
 with a rank check on one app: a term present only with a prefix, before and after adding
 the bare form.
 
-## Open: bytes or characters for Hebrew
+## 2026-10-23 — the keyword limit is 100 characters, not bytes
 
-Unverified. The scripts count bytes. The first time a Hebrew keyword field of more than
-50 letters (and at most 100) is typed into App Store Connect, record here whether it was
-accepted, and set `keyword_limit_unit` in `calibration.json`.
+*Expected*, from Apple's reference: 100 **bytes**, so a Hebrew field (2 UTF-8 bytes a
+letter) holds about 50 letters; the scripts counted bytes to be safe. *Happened*, read
+through the App Store Connect API: a studio app's `he` keywords field is 84 characters and
+155 bytes, accepted by App Store Connect and live after App Review on three versions (and
+78 characters / 144 bytes on the first). A byte limit could not have accepted it.
+`keyword_limit_unit` is now `characters`. *Cost of forgetting:* every Hebrew field packed
+to half its room — fifty letters of ranking surface thrown away per locale.

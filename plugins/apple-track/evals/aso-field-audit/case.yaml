@@ -1,10 +1,11 @@
 schema_version: "1.1"
 name: aso-field-audit
 description: >-
-  A listing with three classic keyword-field faults planted: the English field repeats a
-  subtitle word and names a competitor (Notion), and the Hebrew field is 65 characters —
-  under 100 characters, 120 BYTES. A bare model tends to count characters
-  and pass the Hebrew field; the skill counts bytes and says the unit is unverified.
+  A listing with classic keyword-field faults planted: the English field repeats a
+  subtitle word and names a competitor (Notion), and the Hebrew field spends room on a
+  singular and its plural (תזכורת, תזכורות) — one stem, matched once by the store. The
+  Hebrew field is 74 characters and 137 bytes: within the limit, which App Store Connect
+  counts in characters, so a run that calls it over the limit is wrong.
   Needs --scaffold for the fixture.
 tags: [behaviour, apple, aso]
 context:
@@ -17,9 +18,9 @@ execution:
   max_turns: 15
   allowed_tools: [Read, Glob, Grep, Bash, Skill]
 graders:
-  - name: hebrew-bytes
+  - name: hebrew-plural
     type: regex
-    pattern: '(?i)byte|בתים'
+    pattern: '(?i)תזכורות[^\n]{0,160}(plural|singular|stem|רבים|יחיד|כפול|twice|duplicate)|(plural|singular|stem|רבים|יחיד|כפול|twice|duplicate)[^\n]{0,160}תזכורות'
   - name: trademark
     type: regex
     pattern: '(?i)(notion[^\n]{0,120}(trademark|competitor|2\.3\.7))|((trademark|competitor|2\.3\.7)[^\n]{0,120}notion)'

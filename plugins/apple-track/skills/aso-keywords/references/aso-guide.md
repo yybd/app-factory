@@ -10,7 +10,7 @@ when the evidence disagrees.
 
 ## What is indexed
 
-- **[Apple]** App name (30 characters), subtitle (30), keywords field (100 — see the ⚠),
+- **[Apple]** App name (30 characters), subtitle (30), keywords field (100 characters — see below),
   primary **and secondary** category, developer name. In-app purchase names can appear
   in search too.
 - **[Apple]** Ranking uses text relevance **and user behaviour** — downloads, ratings.
@@ -37,9 +37,9 @@ when the evidence disagrees.
   matters, test the other form in a later cycle rather than packing both.)
 - **[practice]** Single words beat phrases in the field: the store combines words across
   name + subtitle + keywords **within one locale**, never across locales.
-- ⚠ **[Apple]** The reference says **100 bytes**. UTF-8 Hebrew is 2 bytes a letter, so a
-  Hebrew field may hold only 50 letters. **Unverified** whether App Store Connect counts
-  bytes or characters; the scripts count bytes until LESSONS.md records the answer.
+- **[measured]** The limit is **100 characters**, Hebrew included. Apple's reference says
+  "100 bytes", but App Store Connect accepted — and App Review approved — a Hebrew field of
+  84 characters, 155 UTF-8 bytes (2026-10-23). Count characters.
 - **[practice]** Name, subtitle and keywords change only with a new version. Ranks settle
   about **four weeks** after a change — review then, not before.
 

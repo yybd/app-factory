@@ -2,7 +2,8 @@
 
     python3 factory/tests/test_aso_keywords.py
 
-What is pinned: the units the keyword field is counted in (Hebrew is two bytes a letter),
+What is pinned: the units the keyword field is counted in (characters, though Hebrew is two
+bytes a letter),
 the stems that keep note/notes from both spending bytes, the popularity proxy's ordering
 and its cap under Apple's head-term floor, the relevance gate, the packing rules (no word
 the name or subtitle carries, a phrase's words in one locale, the limit respected), the
@@ -112,9 +113,11 @@ def main():
     text = " ".join(m for _, m in issues)
     check("spaces" in text and "twice" in text and "name or subtitle" in text and "ignored" in text,
           "the hygiene check finds spaces, repeats, name overlap and stop words", text)
-    heb = "א" * 60
-    issues = allocate.check("he", {"name": "", "subtitle": "", "keywords": heb}, cal)
-    check(any(s == "error" for s, _ in issues), "60 Hebrew letters overflow 100 bytes", issues)
+    check(cal["keyword_limit_unit"] == "characters", "the limit is counted in characters (verified 2026-10-23)")
+    issues = allocate.check("he", {"name": "", "subtitle": "", "keywords": "א" * 84}, cal)
+    check(not any(s == "error" for s, _ in issues), "84 Hebrew letters fit — App Store Connect accepted 155 bytes", issues)
+    issues = allocate.check("he", {"name": "", "subtitle": "", "keywords": "א" * 101}, cal)
+    check(any(s == "error" for s, _ in issues), "101 characters overflow", issues)
 
     # review verdicts
     check(review.verdict(40, 8) == "keep", "into the top 10 is keep")

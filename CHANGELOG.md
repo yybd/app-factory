@@ -14,6 +14,12 @@ skill does.
 
 ## Unreleased
 
+- **`aso-keywords` counts the keyword limit in characters**, Hebrew included. Apple's
+  reference says 100 bytes; App Store Connect accepted and App Review approved a Hebrew
+  field of 84 characters (155 bytes), verified 2026-10-23. Counting bytes had packed every
+  Hebrew field to half its room. `calibration.json`, the allocator, SKILL.md, the guide and
+  the plan say so; the field-audit eval now plants a Hebrew plural pair instead.
+
 ## 0.10.0
 
 A minor: `aso-keywords` becomes an ASO analyst — research with data, scoring, field

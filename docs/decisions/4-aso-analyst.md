@@ -68,9 +68,9 @@ Apple-confirmed unless marked.
 - Keywords field: comma-separated; no repeats of name/subtitle/category/developer words;
   plural = duplicate (practitioners: singular and plural SERPs overlap only ~44%, so test
   both where it matters); no "app"/"game"; no competitor or trademark names (Guideline
-  2.3.7). ⚠ Apple's reference says **100 bytes** — Hebrew is 2 bytes per letter in UTF-8.
-  **Still unverified** whether App Store Connect counts bytes or characters; the optimizer
-  counts bytes until it is.
+  2.3.7). The limit is **100 characters**, Hebrew included: Apple's reference says bytes,
+  but App Store Connect accepted and App Review approved a Hebrew field of 84 characters
+  (155 bytes) — verified 2026-10-23, after this plan was first written.
 - Word combinations form across name + subtitle + keywords **within one locale**, never
   across locales (practitioner consensus).
 - Cross-localization (practitioners): **US** indexes en-US + ar, zh-Hans, zh-Hant, fr, ko,
@@ -126,7 +126,7 @@ is scored is a lesson.
 
 ## 5. Build order
 
-0. ~~Verify live~~ — done 2026-10-23 (above), except bytes-vs-characters and the
+0. ~~Verify live~~ — done 2026-10-23 (above), bytes-vs-characters included; except the
    Analytics request.
 1. Placement decision + autocomplete, SERP, scoring, allocation scripts — a full research
    → proposal run with no paid data and no Ads account.
