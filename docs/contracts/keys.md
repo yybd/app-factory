@@ -25,6 +25,8 @@ $KEYS_ROOT/
 ├── appstoreconnect/
 │   ├── AuthKey_<KEYID>.p8  the App Store Connect API key
 │   └── notarytool/         the notarisation profile, when one is kept as a file
+├── appleads/               OPTIONAL — Apple Ads API: api_key.json + private-key.pem
+│                           (aso-keywords reads search popularity; nothing needs it)
 └── android/
     ├── api-fastlane-supply/<service-account>.json    Google Play
     └── <app>-keystore/keystore.properties           one upload key per app

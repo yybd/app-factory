@@ -24,6 +24,8 @@ $KEYS_ROOT/
 ├── appstoreconnect/
 │   ├── AuthKey_<KEYID>.p8  מפתח ה-API של App Store Connect
 │   └── notarytool/         פרופיל הנוטריזציה, כשהוא נשמר כקובץ
+├── appleads/               אופציונלי — Apple Ads API: api_key.json + private-key.pem
+│                           (aso-keywords קורא ממנו פופולריות חיפוש; שום דבר לא תלוי בו)
 └── android/
     ├── api-fastlane-supply/<service-account>.json    Google Play
     └── <app>-keystore/keystore.properties           מפתח העלאה אחד לכל אפליקציה

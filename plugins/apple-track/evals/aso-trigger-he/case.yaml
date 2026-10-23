@@ -1,0 +1,15 @@
+schema_version: "1.1"
+name: aso-trigger-he
+description: The Hebrew trigger the description quotes ("מילות מפתח", "דירוג בחיפוש") loads aso-keywords — the skill is bilingual only if both halves fire.
+tags: [trigger, apple, he, aso]
+execution:
+  prompt: |
+    האפליקציה שלי ב-App Store כמעט לא מופיעה בחיפוש. איך אני בוחר מילות מפתח טובות יותר
+    ומשפר את הדירוג בחיפוש?
+  max_turns: 4
+  allowed_tools: [Read, Glob, Grep, Skill]
+graders:
+  - name: aso-skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?aso-keywords"'

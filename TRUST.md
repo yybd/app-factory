@@ -57,7 +57,8 @@ already uploaded, or a git object.
 | `ship-apple-app` | the archive | a build in App Store Connect |
 | `notarize-and-distribute` | your app, to Apple's notary service | nothing but the notarisation ticket |
 | both reviews responders | a reply you approved | a public reply under a review |
-| `aso-keywords`, `app-identity` | a search query to the public store search API | nothing |
+| `app-identity` | a search query to the public store search API | nothing |
+| `aso-keywords` | search queries to Apple's public autocomplete, store search page and iTunes Search/lookup; with an Apple Ads key, read-only popularity queries; with an App Store Connect key, reads of the analytics reports | nothing — except `asc_analytics.py request`, which starts an analytics report on your account and is run only after you say so |
 | `web-seo` | requests to your own pages | nothing |
 | `web-design-guidelines` | a request for a public rules document | nothing |
 

@@ -1,0 +1,28 @@
+schema_version: "1.1"
+name: aso-field-audit
+description: >-
+  A listing with three classic keyword-field faults planted: the English field repeats a
+  subtitle word and names a competitor (Notion), and the Hebrew field is 65 characters —
+  under 100 characters, 120 BYTES. A bare model tends to count characters
+  and pass the Hebrew field; the skill counts bytes and says the unit is unverified.
+  Needs --scaffold for the fixture.
+tags: [behaviour, apple, aso]
+context:
+  scaffold_script: fixture.sh
+execution:
+  prompt: |
+    This directory has my App Store listing in fastlane/metadata. Audit the keyword
+    fields for ASO problems before I submit the next version, and tell me exactly what to
+    change in each locale.
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Bash, Skill]
+graders:
+  - name: hebrew-bytes
+    type: regex
+    pattern: '(?i)byte|בתים'
+  - name: trademark
+    type: regex
+    pattern: '(?i)(notion[^\n]{0,120}(trademark|competitor|2\.3\.7))|((trademark|competitor|2\.3\.7)[^\n]{0,120}notion)'
+  - name: subtitle-repeat
+    type: regex
+    pattern: '(?i)markdown[^\n]{0,120}(subtitle|already|repeat|redundant)|(subtitle|already|repeat|redundant)[^\n]{0,120}markdown'

@@ -1,0 +1,33 @@
+{
+  "_comment": "Where one run of aso-keywords lands, and how each place closes. Read by $REPO_GUARDS/tools/close.py. A study is research, not listing text: it writes only the app's aso/ folder. The listing files it proposes are written by app-store-metadata / store-metadata-writer, which declare their own places.",
+  "operation": "aso-keywords",
+  "operates_from": "the hub, or the app's repo — wherever the listing is",
+  "places": [
+    {
+      "id": "app-hub",
+      "root": "$APP_HUB",
+      "paths": [
+        "<slug>/aso/keywords.json",
+        "<slug>/aso/experiments.jsonl",
+        "<slug>/aso/ranks/**"
+      ],
+      "close": "commit",
+      "note": "The study, the experiments and the rank snapshots are the history a review compares against. Uncommitted, a snapshot is one `git clean` from gone, and a review four weeks later has no baseline."
+    },
+    {
+      "id": "app-repo",
+      "root": "the app's own repo, when there is no hub",
+      "paths": [
+        "aso/keywords.json",
+        "aso/experiments.jsonl",
+        "aso/ranks/**"
+      ],
+      "close": "commit",
+      "note": "The same files, for a developer without a hub."
+    }
+  ],
+  "commits": "per-place",
+  "commit_scope": "declared-only",
+  "push": "never",
+  "_push_note": "Nothing here is published by a commit. The listing reaches the store only through app-store-deliver."
+}

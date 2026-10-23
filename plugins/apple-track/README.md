@@ -21,16 +21,18 @@ edit a skill, not this table.*
 | `apple-credentials` | The single owner of Apple developer credentials and certificates — checking what you have, explaining the types and why each is needed, creating th… | 1 | 2 |
 | `apple-hig-design-review` | Review a macOS or iOS app's UI against Apple's Human Interface Guidelines (HIG) and produce prioritized, actionable design/UX/accessibility recomme… | 1 | 2 |
 | `appstore-media` | Produce App Store screenshots and App Preview videos for iOS and macOS, from a scripted XCUITest demo flow that can be re-run every release. | 7 | 5 |
-| `aso-keywords` | App Store Optimization (ASO) for APPLE discoverability — research and optimize the search-indexed fields of an App Store listing: the app name, sub… | 1 | 1 |
+| `aso-keywords` | App Store Optimization for APPLE search, done the way an ASO analyst does it: research real search terms per storefront with data (App Store autoco… | 10 | 1 |
 | `code-signing-provisioning` | Understand, diagnose, and fix Apple code signing and provisioning for macOS and iOS Xcode projects — certificates, identifiers, provisioning profil… | 1 | 2 |
 | `localization-i18n` | Audit and manage IN-APP localization for a macOS or iOS Xcode project — the user-facing strings inside the app (Localizable.strings / .xcstrings St… | 1 | 1 |
 | `macos-direct-distribution` | Set up direct (outside the Mac App Store) distribution for a macOS Xcode app: a dedicated "Direct" target — sandbox off, hardened runtime on, a DIR… | 3 | 4 |
 | `notarize-and-distribute` | Take a built macOS app from an Xcode archive, package it into a signed DMG, notarize it with Apple, staple the ticket, and verify that everything —… | 1 | 1 |
 | `ship-apple-app` | Verify an Apple app is submission-ready and ship it — the FINAL App Store / Mac App Store step: confirm the content is already in place (signing, c… |  | 1 |
 
-**What it costs.** 13,332 characters of description ≈ 3,333 tokens, in every session
+**What it costs.** 13,298 characters of description ≈ 3,324 tokens, in every session
 that enables this track. A skill's body is read only when the skill fires; its description
 is in context always.
 
-**What it needs on the machine**, from the scripts that call it: `fastlane`, `xcodebuild`, `xcrun`, `ffmpeg`, `ImageMagick`, `ruby`, `Pillow`, `sips`, `swift`.
+**What it needs on the machine**, from the scripts that call it: `fastlane`, `xcodebuild`, `xcrun`, `ffmpeg`, `ImageMagick`, `ruby`, `Pillow`, `openssl`, `sips`, `swift`.
+
+**Operations that declare where their work lands** (`close.py --op`): `aso-keywords`.
 <!-- /generated:track -->
