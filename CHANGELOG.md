@@ -14,6 +14,27 @@ skill does.
 
 ## Unreleased
 
+## 0.10.0
+
+A minor: `aso-keywords` becomes an ASO analyst — research with data, scoring, field
+packing and a feedback loop — and it works fully with **no Apple Ads account**.
+
+- **Research from free data** in `plugins/apple-track/skills/aso-keywords/scripts/`:
+  `hints.py` (App Store autocomplete — seeds expanded, and a popularity proxy from how
+  early each term is suggested), `serp.py` (the store's own results for iPhone and Mac:
+  rating counts, title matches, our rank).
+- **Deterministic scoring and packing**: `score.py` (relevance gate, popularity,
+  difficulty, chance, priority, bands) and `allocate.py` (the keyword field of every
+  locale a storefront indexes, counted in bytes — Hebrew is two a letter), from
+  `calibration.json`.
+- **The feedback loop**: `track.py` rank snapshots, `review.py` experiments recorded
+  before a version ships and reviewed 28 days on, with verdicts that feed the next study;
+  `LESSONS.md` for what the method learns.
+- **Optional enrichments, detected**: `apple_ads.py` (Apple's own popularity — head terms
+  only, measured 2026-10-23) and `asc_analytics.py` (App Store search impressions per
+  app). Stdlib only; signing through the `openssl` binary.
+- The plan and the live measurements: `docs/decisions/4-aso-analyst.md`.
+
 ## 0.9.5
 
 A patch: `announce` says how a post should sound, not only how it is laid out.
