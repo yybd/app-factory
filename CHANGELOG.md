@@ -14,6 +14,10 @@ skill does.
 
 ## Unreleased
 
+## 0.10.1
+
+A patch: the keyword limit is counted the way App Store Connect counts it.
+
 - **`aso-keywords` counts the keyword limit in characters**, Hebrew included. Apple's
   reference says 100 bytes; App Store Connect accepted and App Review approved a Hebrew
   field of 84 characters (155 bytes), verified 2026-10-23. Counting bytes had packed every
