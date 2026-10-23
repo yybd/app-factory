@@ -180,6 +180,33 @@ place", "recursive", "content signature", "security-scoped" are invisible to the
 person who wrote them and opaque to everyone else. A project's standard may list
 the terms its own copy keeps reaching for — read that list.
 
+### 3d. The ordinary reader, one glance
+
+A store page, a caption and a release note are read in a glance by someone who has never
+used the product. **Every line must be understood by that person on the first read, with no
+effort** — not decoded, not guessed at. This is the half-2 test applied to whole pages, and
+the defects it catches are ones the owner has had to point out by hand:
+
+- **Telegraphic fragments.** "End the day. See what moved." is two fragments and an image.
+  A full sentence with an action and a result reads at once: "In the evening, see what you
+  finished."
+- **An image standing in for the fact.** "Empty your head in one go" makes the reader
+  translate the metaphor. Say the thing: "Type a list, get a reminder for each." An image
+  may stay only when the plain fact follows in the same sentence.
+- **An inside reference.** "Never '2 of 3'" assumes the reader has seen the screen it
+  argues with. Cut it, or say the point: "you see what you finished, not what you missed."
+- **The product's own words, unexplained.** "Give a big task a small first step" uses the
+  feature's name as if it were plain language. On first use, say it in words the reader
+  already has: "write down the first small thing to do."
+- **A mechanism the reader can't place.** "The estimates follow how long things really take
+  you" — whose estimates? Name who does what: "the app learns how long things really take
+  you."
+- **Captions too.** A screenshot caption is a sentence, and the place this fails most,
+  because it is the shortest. Five to eight plain words with a verb beat three clever ones.
+
+The test: read the line aloud to someone outside the project. If they ask "meaning what?",
+rewrite it. Long is fine; a plain 30-word sentence passes where a punchy five-word one fails.
+
 ### 4. Every language: write the sentence, keep the text aligned
 
 Each sentence in a target language is written from the **meaning**, in that
