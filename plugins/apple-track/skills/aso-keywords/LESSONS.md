@@ -46,7 +46,7 @@ as easy. `serp._count` reads the suffix.
 
 ## 2026-10-23 — a Hebrew listing indexes Latin words too
 
-The first allocator kept Latin terms out of the `he` locale. On PureWrite's Israeli
+The first allocator kept Latin terms out of the `he` locale. On a studio app's Israeli
 listing — whose Hebrew subtitle reads "Markdown Writer — …" — that left "markdown editor"
 with nowhere to go, though Israelis search it in Latin. Now a Hebrew term goes only to
 `he`, and a Latin term goes anywhere, preferring a Latin locale (en-GB in Israel) when the

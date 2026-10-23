@@ -88,8 +88,8 @@ def main():
         "markdown editor": {"band": "core", "priority": 7},
         "writing app": {"band": "long tail", "priority": 5},
     }}}}
-    listings = {"he": {"name": "PureWrite", "subtitle": "עורך מרקדאון", "keywords": ""},
-                "en-GB": {"name": "PureWrite", "subtitle": "Markdown notes", "keywords": ""}}
+    listings = {"he": {"name": "Inkwell", "subtitle": "עורך מרקדאון", "keywords": ""},
+                "en-GB": {"name": "Inkwell", "subtitle": "Markdown notes", "keywords": ""}}
     res = allocate.allocate(study, "il", listings, cal, set())
     he, en = res["locales"]["he"]["keywords"].split(","), res["locales"]["en-GB"]["keywords"].split(",")
     check("עורך" not in he and "טקסט" in he, "a word the subtitle has is not repeated", he)
