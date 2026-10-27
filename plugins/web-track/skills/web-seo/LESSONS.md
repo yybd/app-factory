@@ -140,6 +140,11 @@ or the Search Console UI. What the skill needs is the numbers, however they arri
 **Cost of forgetting:** a client gets added, breaks on the next auth change, and the
 monthly reading stops because the tool stopped rather than because the site did.
 
+**Google's `analytics-mcp` is not an exception to this** (added 2026-10-28). It is
+Google's own server, installed on the machine and maintained upstream, so its auth
+and upgrades are not this skill's to carry; the skill only says when to call it.
+Where it is missing, the reading falls back to an export or the UI exactly as before.
+
 ## Five of seven Vercel projects were failing on `fatal: bad object`
 
 *Found while checking what breaks silently.* The ignored-build step diffed against a

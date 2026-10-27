@@ -26,8 +26,9 @@ site keeps its own notes.
 
 Work in two passes and in this order: **audit the pages** (`audit.py` — offline,
 seconds, everything actionable now), then **read Google's response** — a snapshot
-of Search Console and analytics. **No client for those APIs ships here**; the
-snapshot is whatever export or dashboard the site already has, and it can only
+of Search Console and analytics. **No client for those APIs ships here**; GA4 is
+read through Google's `analytics-mcp` server when the machine has it (§3), and the
+rest of the snapshot is whatever export or dashboard the site already has. It can only
 report what the pages already earned. Diagnosing from the response alone is how a markup problem gets
 mistaken for a demand problem.
 
@@ -43,6 +44,7 @@ This file is the method. What running it taught — the runs behind each rule �
 
 - **Tools:** Python 3 for `scripts/audit.py` (standard library only, nothing to install); the site repo's own `npm run seo` and `npm run verify:deploys`; `curl` for the live checks.
 - **Credentials:** Search Console and analytics credentials, only for the live reading (§3) — named by the descriptor's `search_console` / `analytics` entries (e.g. `$KEYS_ROOT/google/search-console.json`). No API client ships here; the audit needs none.
+- **MCP:** optional — Google's [`analytics-mcp`](https://github.com/googleanalytics/google-analytics-mcp) server, for reading GA4 in the live half (§3). It is installed on the machine, not shipped here; with no `mcp__analytics-mcp__*` tools in the session, take GA4's numbers from an export or the UI and say so.
 - **Hub (`$APP_HUB`):** optional — `<slug>/profile.md` is read to compare a page's title and first paragraph against the product's own words (§4); without it, compare against the page alone.
 - **Other tracks:** none — `copy-edit` (shared-track) owns the wording it points at, and `add-app-to-site` is the site repo's own skill, not a factory track.
 
@@ -169,6 +171,36 @@ What to collect, per property, against the baseline:
 | pages that **lost** indexing since the last reading | the only finding here that is urgent |
 | the conversion step this site exists for | §6 |
 | for a blog with its own counter: opened / read / tool per article, and sources | the subsection below — analytics alone cannot be trusted for it |
+
+### GA4 through `analytics-mcp`
+
+When the session has the `mcp__analytics-mcp__*` tools, GA4 is read with them, not
+from screenshots or exports — they answer the exact question, over the exact range,
+the same way every month. The property comes from the descriptor's
+`analytics.ga4_property`; when the descriptor has none, `get_account_summaries` lists
+what the credentials can see — pick the property by name and say which one was read.
+
+| question | tool |
+|---|---|
+| which accounts and properties are there | `get_account_summaries` |
+| sessions / users / views per host, page, source, country, against the baseline's range | `run_report` — `dimensions` such as `hostName`, `pagePath`, `sessionSource`; `metrics` such as `sessions`, `activeUsers`, `screenPageViews` |
+| the conversion step (§6), or an event such as `cross_property_click` | `run_report` with `eventName`, or `run_funnel_report` for the steps in order |
+| a custom dimension or event parameter by its API name | `get_custom_dimensions_and_metrics` first |
+| "is the tag firing at all?" right after a deploy | `run_realtime_report` — minutes, not days |
+
+Read with the same date range as the baseline, and end it **yesterday** — today is
+still being processed and reads low. The server is read-only; it never changes the
+property (writes are an explicit `--allow-write` it is not installed with).
+
+**Setting it up on a machine** (once, outside any repo): `pipx install analytics-mcp`,
+then `claude mcp add analytics-mcp --scope user -e GOOGLE_APPLICATION_CREDENTIALS=<the
+descriptor's analytics credentials> -e GOOGLE_CLOUD_PROJECT=<its project id> --
+<pipx's analytics-mcp binary>`. A service-account JSON works as those credentials
+when the account was added as a user inside GA4 and the Cloud project has the
+Analytics Admin and Data APIs enabled; otherwise run `gcloud auth application-default
+login` with the `analytics.readonly` scope and point at the file it prints. An empty
+`get_account_summaries` means the credentials work but were never added to any GA4
+property — the same mistake as a Search Console 403.
 
 A 403 from Search Console has two causes that look identical and have different fixes:
 the API is switched off in the Cloud project, or nobody shared the property with the
@@ -322,7 +354,8 @@ Each of these has happened or can happen, and none of them raises an error:
   leaves every entry a commit stale.
 - **GA4 gone quiet.** Sessions at zero across all hosts usually means the tag or
   the measurement id moved, not that nobody visited. `analytics.js` holds the id
-  in one place.
+  in one place. `run_realtime_report` while you load a page yourself settles it in
+  a minute.
 - **Cross-domain measurement switched off.** A UI setting, unreachable by API,
   and nothing reports its absence — the free → paid journey just stops appearing.
 - **A property's consent state.** Where consent mode is used it must stay

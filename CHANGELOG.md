@@ -14,6 +14,11 @@ skill does.
 
 ## Unreleased
 
+- **`web-seo` reads GA4 through Google's `analytics-mcp` server** when the session has
+  it: which tool answers which question, the property from the descriptor, the range
+  ending yesterday, and how to install it once per machine. Without it, the reading
+  falls back to an export or the UI as before. No client ships in the plugin.
+
 ## 0.10.1
 
 A patch: the keyword limit is counted the way App Store Connect counts it.
