@@ -28,7 +28,7 @@ work across several repos. Without it, `factory/enable.py` enables tracks per re
 | `web-track` | 4 | the website |
 | `capacitor-track` | 2 | app repos |
 | `design-track` | 1 | apps and the site alike |
-| `windows-track` | 1 | desktop app repos that ship on Windows |
+| `windows-track` | 2 | desktop app repos that ship on Windows |
 | `announce-track` | 1 | any repo you announce from — an app's, a tool's, a site's |
 | `factory-setup` | 1 | **everywhere** — see below |
 
@@ -69,13 +69,20 @@ why they must be shared rather than living in either place.
 `frontend-design`. Entirely generic, and needed anywhere a user interface is built —
 HTML/CSS inside a Capacitor app or on the site.
 
-### Windows track — 1
+### Windows track — 2
 
-`windows-direct-distribution`. A Windows installer, downloaded from your own server,
-that updates itself through WinSparkle — signed with the same EdDSA key as Sparkle on
-the Mac, with a feed of its own. The Windows half of `macos-direct-distribution`, and
-a track of its own because a repo that ships only on Windows has no use for the
-sixteen Apple skills. No Authenticode signing, by design for now.
+`windows-direct-distribution` · `windows-local-build`
+
+* **`windows-direct-distribution`** — a Windows installer, downloaded from your own
+  server, that updates itself through WinSparkle, signed with the same EdDSA key as
+  Sparkle on the Mac, with a feed of its own. The Windows half of
+  `macos-direct-distribution`. No Authenticode signing, by design for now.
+* **`windows-local-build`** — the same installer built on a Mac with no GitHub
+  Actions: cross-compiled with cargo-xwin and NSIS, then installed and self-tested in a
+  local Parallels VM, x64 and arm64 side by side.
+
+A track of its own because a repo that ships only on Windows has no use for the
+sixteen Apple skills.
 
 ### Announce track — 1
 

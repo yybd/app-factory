@@ -13,12 +13,12 @@ marketplace (`app-factory`). One directory per track.
 | `web-track` | 4 | websites |
 | `capacitor-track` | 2 | Capacitor apps |
 | `design-track` | 1 | design and frontend |
-| `windows-track` | 1 | Windows direct distribution |
+| `windows-track` | 2 | Windows direct distribution, and building it on a Mac |
 | `announce-track` | 1 | announcement drafts, per channel |
 | `factory-setup` | 1 | setup, and the one that is on everywhere |
-| **total** | **42** | |
+| **total** | **43** | |
 
-*Counted from disk 2026-10-14.*
+*Counted from disk 2026-10-28.*
 
 ---
 

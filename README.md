@@ -2,7 +2,7 @@
 
 # App Factory
 
-**42 skills that build, describe, ship and announce apps** — to the App Store and
+**43 skills that build, describe, ship and announce apps** — to the App Store and
 Google Play, and outside them, on the Mac and on Windows. Each one loads only where it is wanted.
 
 *The story behind it — why one big instructions file stopped holding, and what replaced it:
@@ -41,7 +41,7 @@ once, whether or not it applied**.
 
 So: nothing is global. A skill is a document the agent loads *when its description
 matches what you asked for*, and the descriptions are the only part that is always in
-context. What it costs to have 42 of them available is about 8,400 tokens of
+context. What it costs to have 43 of them available is about 8,700 tokens of
 descriptions — and only in a repo where you turned them on.
 
 ## The shape
@@ -56,7 +56,7 @@ Eight tracks of skills, plus one that does setup:
 | `web-track` | 4 | a site's structure, an audit of it, and whether search finds it |
 | `capacitor-track` | 2 | web-in-a-shell apps, where the bugs live in the seam |
 | `design-track` | 1 | visual craft for any HTML interface |
-| `windows-track` | 1 | a Windows installer that updates itself, outside any store |
+| `windows-track` | 2 | a Windows installer that updates itself, built and tested on a Mac without CI |
 | `announce-track` | 1 | the posts that announce a release or an article, checked per channel, posted only on a yes per post |
 | `factory-setup` | 1 | on everywhere; says when a repo looks like an app and no track is on |
 

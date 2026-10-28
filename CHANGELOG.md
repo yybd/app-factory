@@ -14,6 +14,21 @@ skill does.
 
 ## Unreleased
 
+- **`windows-local-build`, a second skill in `windows-track`.** A Tauri app's Windows
+  installer built on a Mac with no GitHub Actions: cross-compiled with cargo-xwin and
+  NSIS, then installed, self-tested without a window (`--selftest`), screenshotted and
+  rolled back to a clean snapshot in a local Parallels VM through `prlctl exec`. One
+  script, `win_local.sh`, with every app-specific name read from the project or a
+  variable. It records what is hard to find: `makensis` dies with `std::bad_alloc`
+  without a UTF-8 locale; `prlctl exec` sometimes fails before running anything and a
+  retry clears it; `snapshot-list` prints ids, not names; the VM may see only some of
+  the Mac's folders; `ring` (via rustls) does not build for arm64 under cargo-xwin, and
+  native-tls fixes it — and suits filtering networks that re-sign HTTPS. It says what UTM cannot do, and what a VM cannot show (speed on
+  real x64, WebView2 on an offline Windows 10, Windows 7 and 8). It came from a working
+  setup in one app, where x64 and arm64 builds gave identical self-tests.
+- **`windows-direct-distribution` points at it** for building without Windows CI and
+  for the one test on Windows.
+
 ## 0.11.0
 
 A minor: `web-seo` reads GA4 through an MCP server, and `copy-edit` tests every line

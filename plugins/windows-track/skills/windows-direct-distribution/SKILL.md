@@ -30,8 +30,9 @@ Three things carry the weight, and each has a reason in
 
 ## Prerequisites
 
-- **Tools:** a Tauri 2 app with an NSIS Windows build (CI on `windows-latest` is
-  enough; no Windows machine is needed to build). On the Mac: Sparkle's
+- **Tools:** a Tauri 2 app with an NSIS Windows build (CI on `windows-latest`, or
+  cross-compiled on the Mac with `windows-local-build`; no Windows machine is needed
+  to build). On the Mac: Sparkle's
   `sign_update` (in the `bin/` of a Sparkle release, or under DerivedData after an
   Xcode project resolved the package), `curl`, `unzip`, `shasum`.
 - **Credentials:** the Sparkle EdDSA key pair. An app with a Mac Sparkle build
@@ -40,7 +41,8 @@ Three things carry the weight, and each has a reason in
   `macos-direct-distribution`'s Sparkle reference for generating and backing it up).
 - **Hub (`$APP_HUB`):** not used — everything is in the app's own repo.
 - **Other tracks:** none required. `apple-track`'s `macos-direct-distribution` is
-  the Mac half, if the app has one.
+  the Mac half, if the app has one. In this track, `windows-local-build` builds and
+  tests the installer on a Mac without CI.
 
 **A Windows machine is needed once**, for step 6. Building and signing do not
 need one; proving that an installed app updates itself does.
@@ -105,11 +107,12 @@ runtime safe.
    draws its own dialog — the front end only invokes it.
 
 Check it compiles for Windows before going further. `cargo check` on the Mac does
-not build the `cfg(windows)` code; run the Windows CI job.
+not build the `cfg(windows)` code; run the Windows CI job, or build it locally with
+`windows-local-build` (cargo-xwin) — no Actions minutes spent.
 
 ### 5. Sign the installer and write the feed
 
-After the CI build produced `<Product>_<version>_x64-setup.exe`:
+After the build (CI or `windows-local-build`) produced `<Product>_<version>_x64-setup.exe`:
 
 ```bash
 DOWNLOAD_URL='https://<host>/<app>/releases/windows/<version>/<App>-Setup-<version>.exe' \
@@ -128,7 +131,8 @@ integration is to call this script from it — not to grow a second uploader.
 
 ### 6. Prove it on a Windows machine — once, before calling it done
 
-A build that compiles has not shown that it updates. On Windows:
+A build that compiles has not shown that it updates. On Windows (a Parallels VM
+driven by `windows-local-build` is enough):
 
 1. Install version N from the stable link. Confirm `WinSparkle.dll` sits beside
    the exe in the install folder.
@@ -171,4 +175,5 @@ This skill wires the **updater** and writes the **feed**. It does not build the
 CI workflow around it (it adds one step to the one the app has), does not
 Authenticode-sign the installer, does not upload or choose hosting, and does not
 touch the macOS feed — that is `macos-direct-distribution`, and the two feeds stay
-separate files.
+separate files. Building and testing the installer without CI, on a Mac and a local
+VM, is `windows-local-build`.

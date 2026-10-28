@@ -12,7 +12,7 @@ each of those lives in a different repo with a different release rhythm. Keeping
 in any one of them makes the other two copies. Keeping them in the hub makes all three
 derived.
 
-**Why this document exists.** **33 of the 42 skills can read `$APP_HUB`, and every one of them works
+**Why this document exists.** **33 of the 43 skills can read `$APP_HUB`, and every one of them works
 without it.** A hub is what makes several apps share one source of truth; with one app
 it is overhead, and the skills detect its absence rather than assuming it.
 

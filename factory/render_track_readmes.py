@@ -134,7 +134,7 @@ BLURB = {
  "capacitor-track": "Capacitor apps specifically — a web app in a native shell, where the strings live\nin JavaScript and the bugs live in the seam between the two. Enable it alongside\nthe Apple and Android tracks, not instead of them.",
  "factory-setup": "On everywhere, and one job: say when a repo looks like an app and no\ntrack is enabled in it. That failure is silent otherwise — a repo nobody set up\nlooks exactly like one where the skills decided they were not relevant.",
  "announce-track": "Announcing what you shipped: the Show HN, the Reddit and LinkedIn posts, a thread,\nthe dev.to and Medium copies, written from one source of truth and checked against\neach channel's rules — then handed over, or posted in a browser you are signed in to,\none post at a time and only on your yes. Enable it in any repo you announce from, an app's or not.",
- "windows-track": "Windows, outside any store: an installer downloaded from your own server that\nupdates itself. The Windows half of macOS direct distribution — enable it in a\ndesktop app repo that ships on Windows, alone or beside apple-track.",
+ "windows-track": "Windows, outside any store: an installer downloaded from your own server that\nupdates itself, built and tested on a Mac without Windows CI. The Windows half of\nmacOS direct distribution — enable it in a desktop app repo that ships on Windows,\nalone or beside apple-track.",
  "design-track": "Visual craft for any HTML interface. Deliberately generic: a Capacitor app's UI is\nHTML and CSS as much as a marketing page is, so this is not part of web-track.",
 }
 

@@ -29,7 +29,8 @@ fastlane already brings.
 | **web-track** | the project's own toolchain | the audit is pure Python; publishing runs whatever the site uses |
 | **capacitor-track** | `adb`, Node | inspecting the WebView on a device |
 | **announce-track** | Python 3 | checking drafts; `--links` needs network |
-| **windows-track** | `curl`, `unzip`, `shasum`; Sparkle's `sign_update` | fetching WinSparkle, signing the installer — the build itself runs in Windows CI |
+| **windows-track** | `curl`, `unzip`, `shasum`; Sparkle's `sign_update` | fetching WinSparkle, signing the installer |
+| | `cargo-xwin`, Homebrew `nsis` and `llvm`, Rust's Windows targets; Parallels Desktop (`prlctl`) for testing | building the installer on a Mac without Windows CI, and checking it in a VM |
 | **shared-track** | `fastlane` (some paths), Node or Gradle to read a version | the copy measurer and the profile work need nothing |
 | **android-track** | JDK (the version the project declares), Gradle wrapper, `adb`, `keytool`, `apksigner` / `jarsigner` | building, signing and verifying an AAB |
 | | `fastlane` (`supply`) | uploading a listing |
