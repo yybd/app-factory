@@ -354,6 +354,9 @@ def frame(src: Path, out: Path, preset: str, caption: str, rtl: bool,
     leading = int(font_size * 1.22)
     block = leading * len(lines)
     y = max(int(H * 0.055), (band - block) // 2)
+    # A caption taller than the band (two lines on the wide Mac canvas) pushed its last
+    # line under the device. The band grows to hold it; the device shrinks to fit.
+    band = max(band, y + block + int(H * 0.02))
     for line in lines:
         draw.text((W // 2, y), line, font=font, fill=fg,
                   anchor="ma", direction="rtl" if rtl else "ltr")
