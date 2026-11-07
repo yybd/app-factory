@@ -14,6 +14,12 @@ skill does.
 
 ## Unreleased
 
+- **`page-builder`: say what it does before showing how well.** A product, and every
+  part of one sold on its own, opens with a plain description of what it does (a concrete
+  heading, one sentence, a short list of its tools in ordinary words) before screenshots,
+  capability cards and advantages. From a writing app's paid-studio section, which opened on
+  an abstract line and went straight to cards. **`copy-edit` §3d** now applies its
+  one-glance test to whole sections and points to the rule.
 - **`windows-local-build`, a second skill in `windows-track`.** A Tauri app's Windows
   installer built on a Mac with no GitHub Actions: cross-compiled with cargo-xwin and
   NSIS, then installed, self-tested without a window (`--selftest`), screenshotted and

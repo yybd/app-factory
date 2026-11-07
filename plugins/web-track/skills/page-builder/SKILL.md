@@ -73,6 +73,7 @@ Confirm the blueprint with the user (or proceed if they asked you to just build)
 
 - **One page, one job.** Clarity of a single goal beats a buffet of options.
 - **Earn the scroll.** Each section must give a reason to reach the next. Front-load value.
+- **Say what it does before showing how well.** A product, and every part of a product sold on its own (a paid tier, an add-on, a studio), opens with a plain description of what it does: a concrete heading, one sentence on what it is and for whom, and a short list of its tools in words an ordinary reader already has ("write screenplays in the industry format", "start from a writing template"). Screenshots, capability cards and advantages come after it. A heading or opening line that describes a mechanism instead of a use ("turns X into a place to make a work") fails, however true. Learned on a writing app's paid studio, 2026-11-08: its section opened on an abstract line and went straight to cards, and the owner could not tell from it what the studio does. The sentence-level test is `copy-edit` §3d.
 - **Proof near claims.** Place trust signals adjacent to the claim they support, not all dumped in one band.
 - **Decision points get CTAs.** Repeat the primary CTA wherever the reader has just been given a reason to act.
 - **Structure is language-agnostic, copy is not.** Design sections to survive 30–40% text expansion and full RTL mirroring.

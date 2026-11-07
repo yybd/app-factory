@@ -207,6 +207,12 @@ the defects it catches are ones the owner has had to point out by hand:
 The test: read the line aloud to someone outside the project. If they ask "meaning what?",
 rewrite it. Long is fine; a plain 30-word sentence passes where a punchy five-word one fails.
 
+**Whole sections, too.** On a product page, a section about a product or a paid part of
+one must open by saying what it does, in plain words, before its cards and screenshots.
+A section that opens on an abstract line and then lists features fails the one-glance
+test even when every card passes it. The rule for the page's structure is in
+`page-builder` (web-track), "Say what it does before showing how well".
+
 ### 4. Every language: write the sentence, keep the text aligned
 
 Each sentence in a target language is written from the **meaning**, in that
