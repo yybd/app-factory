@@ -1,0 +1,147 @@
+# Apple — identity, certificates and keys
+
+> A map of this Apple developer account: what exists, where it is, and how to work with it.
+> **No secrets here.** IDs, dates and locations only — never a password, a private key,
+> or the content of a `.p8` / `.p12`.
+> This file lives in `$KEYS_ROOT` (`{{KEYS_ROOT}}`), outside every repo. Never move or copy it into one.
+>
+> **Last updated:** {{TODAY}}. Update it after every certificate renewal, new key, new
+> profile or capability change — the `apple-credentials` skill does this when it makes
+> the change.
+
+---
+
+## 1. Identity
+
+| What | Value | Note |
+|---|---|---|
+| **Team ID** | {{TEAM_ID}} | The team every signature, profile and app belongs to. |
+| **Personal ID** | {{PERSONAL_ID}} | The person's ID inside the team. Appears **only** in the Apple Development certificate's name. **It is not a team** — choosing it as the Team fails with `No Accounts`. |
+| **Apple ID** | {{ASK: the Apple ID signed in to Xcode → Settings → Accounts, and its role in the team}} | |
+| **Issuer ID (App Store Connect)** | {{ISSUER_ID}} | Shared by every API key of the team. |
+
+**Checking that a build is signed by the right team:** `codesign -dv <app> 2>&1 | grep TeamIdentifier`
+must print {{TEAM_ID}}.
+
+---
+
+## 2. Signing certificates
+
+**Where:** the login keychain; each certificate's private key sits beside it.
+**Check:** `security find-identity -v`
+
+{{CERT_TABLE}}
+
+**Missing:** {{CERT_MISSING}}
+
+**Renew before the date:** {{CERT_RENEW}}
+
+---
+
+## 3. App Store Connect API keys
+
+**Where:** `$KEYS_ROOT/appstoreconnect/<name>/`, one folder per purpose, each holding
+`api_key.json` (key_id, issuer_id, key_filepath) and `private_keys/AuthKey_<KEYID>.p8`.
+A key gives tools access to the account with no password and no 2FA.
+
+{{KEY_TABLE}}
+
+**From the command line (headless `xcodebuild` sees no Xcode account):**
+
+```bash
+K="$KEYS_ROOT/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8"
+xcodebuild … -allowProvisioningUpdates \
+  -authenticationKeyPath "$K" -authenticationKeyID <KEYID> \
+  -authenticationKeyIssuerID <ISSUER_ID>
+```
+
+**REST API** (`api.appstoreconnect.apple.com`): an ES256 JWT with `kid` = Key ID,
+`iss` = Issuer ID, `aud` = `appstoreconnect-v1`. The API can create bundle IDs and
+enable capabilities, but **cannot create an App Group** — that happens through Xcode
+(automatic signing) or on the developer website.
+
+---
+
+## 4. Other Apple-related keys
+
+| What | Where | Note |
+|---|---|---|
+| **Apple Ads API** | {{APPLEADS}} | Keyword research (`aso-keywords`). |
+| **Sparkle (EdDSA)** | {{SPARKLE}} | Signs the updates of every directly-distributed Mac app. **Never generate a new one** — existing users would stop receiving updates. The public key is each app's `SUPublicEDKey`. |
+| **Notary keychain profile** | {{NOTARY}} | |
+
+---
+
+## 5. Provisioning profiles
+
+| Where | What is there |
+|---|---|
+| `~/Library/Developer/Xcode/UserData/Provisioning Profiles` | Profiles Xcode manages (automatic signing). |
+| `~/Library/MobileDevice/Provisioning Profiles` | Manually created store profiles. |
+
+No profile is kept in `$KEYS_ROOT` — a profile is not a secret.
+
+**Manual profiles found:**
+
+{{PROFILE_TABLE}}
+
+**Listing with expiry:**
+
+```bash
+for d in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles" "$HOME/Library/MobileDevice/Provisioning Profiles"; do
+  for f in "$d"/*; do p=$(security cms -D -i "$f" 2>/dev/null) || continue
+    echo "$(/usr/libexec/PlistBuddy -c 'Print :Name' /dev/stdin <<<"$p") | $(/usr/libexec/PlistBuddy -c 'Print :ExpirationDate' /dev/stdin <<<"$p")"
+  done; done
+```
+
+### Per-app notes
+
+{{ASK: for each app with extensions or capabilities — bundle IDs, App Groups, which profiles it uses, and anything pending before its next upload}}
+
+---
+
+## 6. Policy: how profiles are managed
+
+{{INCLUDE:POLICY}}
+
+---
+
+## 6a. Key backup
+
+**State on this machine:**
+
+{{BACKUP_STATE}}
+
+{{INCLUDE:BACKUP}}
+
+---
+
+## 7. Known traps
+
+- **The personal ID in the development certificate's name is not a team** (section 1).
+- **Headless `xcodebuild` reports `No Accounts`** even when Xcode is signed in, so
+  automatic signing from the command line can only use existing profiles — unless the
+  API key is passed (section 3).
+- **The wildcard profile (`*`) strips capabilities.** If the build log shows
+  `Provisioning Profile: "…: *"`, every App Group and other capability was removed from
+  the signature silently. Check with `codesign -d --entitlements - <app>`.
+- **XcodeGen empties entitlements files** when `project.yml` has no
+  `entitlements.properties` — the signature then has no App Group.
+- **Capabilities added in Xcode's GUI to an XcodeGen project** are lost or empty the
+  tracked entitlements file. Declare them in code (section 6).
+- **A build signed with Apple Distribution does not open on the Mac** (error 163). Sign
+  an ad-hoc copy for local testing.
+{{ASK: any trap met on this account that is not above}}
+
+---
+
+## 8. Quick status
+
+```bash
+security find-identity -v                                          # certificates
+ls "$KEYS_ROOT"/appstoreconnect/*/private_keys/*.p8                # API keys
+defaults read com.apple.dt.Xcode IDEProvisioningTeamByIdentifier   # teams Xcode knows
+```
+
+The `apple-credentials` skill (apple-track) runs the full check:
+`python3 ${CLAUDE_PLUGIN_ROOT}/skills/apple-credentials/scripts/apple_creds.py check`.

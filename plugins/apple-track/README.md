@@ -18,7 +18,7 @@ edit a skill, not this table.*
 | `app-store-reviews-responder` | Monitor App Store / Mac App Store customer reviews and draft developer responses to them. | 1 | 1 |
 | `apple-app-store-screenshots` | Conform an image that already exists to one of Apple's exact App Store screenshot sizes — resize, pad or crop, flatten alpha, write a validated PNG. | 1 | 1 |
 | `apple-bug-flow-review` | Find real bugs in an Apple app and audit its user journeys end to end — static scan, build-time diagnostics, runtime sanitizers, then a flow-by-flo… | 2 | 4 |
-| `apple-credentials` | The single owner of Apple developer credentials and certificates — checking what you have, explaining the types and why each is needed, creating th… | 1 | 3 |
+| `apple-credentials` | The single owner of Apple developer credentials and certificates — checking what you have, explaining the types and why each is needed, creating th… | 1 | 4 |
 | `apple-hig-design-review` | Review a macOS or iOS app's UI against Apple's Human Interface Guidelines (HIG) and produce prioritized, actionable design/UX/accessibility recomme… | 1 | 2 |
 | `appstore-media` | Produce App Store screenshots and App Preview videos for iOS and macOS, from a scripted XCUITest demo flow that can be re-run every release. | 7 | 5 |
 | `aso-keywords` | App Store Optimization for APPLE search, done the way an ASO analyst does it: research real search terms per storefront with data (App Store autoco… | 10 | 1 |

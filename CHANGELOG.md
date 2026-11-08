@@ -14,6 +14,17 @@ skill does.
 
 ## Unreleased
 
+- **`$KEYS_ROOT/APPLE.md` has a fixed structure, and `apple_creds.py init` writes it.**
+  `apple-credentials/references/APPLE.md.template` is the map every installation shares
+  (identity, certificates, API keys, other keys, profiles, profile policy, key backup,
+  known traps, quick status). `init` fills what the machine shows — team from the
+  certificates' OU, certificates with SHA-1 and expiry, keys and Issuer ID, manual
+  profiles, backups matched by SHA-1, the off-machine copy — embeds the policy and
+  backup text so the file stands alone, leaves `{{ASK: …}}` for what only the user
+  knows, writes with umask 077, and refuses to overwrite an existing file (it lists
+  what the file does not mention instead). The skill then resolves every marker and
+  writes the prose in the user's language, keeping the template's section order.
+
 - **`apple-credentials` carries the studio's provisioning-profile policy and key
   backup** (`plugins/apple-track/skills/apple-credentials/references/profiles-and-backup.md`): a manual profile only for a Tauri Mac
   App Store build (found by name, one per app, regenerated when a capability is added);

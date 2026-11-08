@@ -156,16 +156,34 @@ the change. **Never a secret:** no password, no `.p8`/`.p12` content, no private
 key — IDs, dates and locations only. A record that is not updated at the moment
 of change is wrong from that moment on, and nothing else will notice.
 
-If the file does not exist and `$KEYS_ROOT` is set, **offer** to create it from
-the check's output (team ID, certificates with SHA-1 and expiry, each API key's
-folder, Key ID and purpose — ask the user what each key is for, the folder name is
-only a hint). `$KEYS_ROOT` is outside every repo; the file never moves into one.
+**Creating it** (the file does not exist and `$KEYS_ROOT` is set) — **offer**, then:
+1. `apple_creds.py init` writes it from
+   [references/APPLE.md.template](references/APPLE.md.template), the fixed structure
+   every installation shares (identity → certificates → API keys → other keys →
+   profiles → profile policy → key backup → known traps → quick status). It fills what
+   the machine shows — team ID from the certificates' `OU`, the personal ID, the
+   certificates with SHA-1 and expiry, the keys under `$KEYS_ROOT/appstoreconnect/*/`
+   with the Issuer ID, the manual profiles, the backups matched by SHA-1, whether
+   `$KEYS_ROOT` has an off-machine copy — and embeds the policy and backup text from
+   `references/profiles-and-backup.md`, so the file stands on its own. It writes with
+   `umask 077`, never a secret, and **refuses to overwrite** an existing file (it lists
+   what the machine shows that the file does not mention instead).
+2. Resolve **every `{{ASK: …}}`** with the user — each key's purpose, the Apple ID, which
+   missing certificate matters, per-app notes. Leave none behind.
+3. Rewrite the prose in **the user's conversational language**. The section order and
+   numbering stay the template's; headings are translated, not renamed or reordered.
+
+**Updating it** — edit in place, in the file's own language, keeping the template's
+section order; put a new fact in the section the template gives it, not at the end.
+`init` on an existing file is the cheap way to see what it is missing.
+
 If `$KEYS_ROOT` is not set, do not invent a location — say so and go on.
+`$KEYS_ROOT` is outside every repo; the file never moves into one.
 
 ## What's safe vs ask-first
 Safe: `check`, reading `APPLE.md`, explaining, guiding creation, drafting
 commands, updating `APPLE.md` after a change this skill made. Ask first:
-creating `APPLE.md`, exporting private keys to the backup `.p12` files,
+creating `APPLE.md` (`init`), exporting private keys to the backup `.p12` files,
 running `store-creds` (writes to the keychain), exporting a `.p12` (handles the
 private key), and anything touching the Apple account.
 
@@ -196,5 +214,7 @@ single source of truth.
 - [references/profiles-and-backup.md](references/profiles-and-backup.md) — which
   builds get a manual profile, iOS automatic export, where capabilities are declared
   (Capacitor vs Tauri) and how to verify them, the key backup and restore, the don'ts.
-- [scripts/apple_creds.py](scripts/apple_creds.py) — `check`, `store-creds`,
+- [references/APPLE.md.template](references/APPLE.md.template) — the fixed
+  structure of `$KEYS_ROOT/APPLE.md`, filled by `init`.
+- [scripts/apple_creds.py](scripts/apple_creds.py) — `check`, `init`, `store-creds`,
   `setup`.
