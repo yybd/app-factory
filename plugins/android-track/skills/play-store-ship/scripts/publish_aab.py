@@ -34,7 +34,7 @@ _SHARED = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__
 sys.path.insert(0, _SHARED)
 import credentials as _creds                                  # noqa: E402
 
-DEFAULT_KEY_DIR = os.path.join(_creds.keys_root(), "android", "api-fastlane-supply")
+DEFAULT_KEY_DIR = _creds.folder("googleplay")[0]
 
 
 def default_key():

@@ -5,7 +5,7 @@
     apple_ads.py popularity STUDY.json --cc il  mark the study's terms Apple lists
     apple_ads.py head --cc us [--genre PRODUCTIVITY_UTILITIES] [--match WORD]
 
-**Nothing in the method needs this.** It is used when `$KEYS_ROOT/appleads/api_key.json`
+**Nothing in the method needs this.** It is used when `$KEYS_ROOT/store-api/appleads/api_key.json`
 exists (an Apple Ads API key: client id, team id, key id, private key file), and the skill
 says, for every number, whether it came from here or from autocomplete.
 
@@ -41,8 +41,12 @@ GENRES = ("BUSINESS", "EDUCATION", "ENTERTAINMENT", "FINANCE", "FOOD_DRINK", "GA
 
 
 def key_dir():
-    root = os.environ.get("KEYS_ROOT") or os.path.expanduser("~/keys")
-    return os.path.join(os.path.expanduser(root), "appleads")
+    """$KEYS_ROOT/store-api/appleads/ — or the legacy layout's folder, by the track's
+    resolver (shared/credentials.py), when only that one exists."""
+    sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                     "..", "..", "..", "shared")))
+    import credentials
+    return credentials.folder("appleads")[0]
 
 
 def config():

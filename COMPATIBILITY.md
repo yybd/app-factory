@@ -63,7 +63,9 @@ None is needed to install, and none is needed by the skills that only read and r
 | Play service account | uploading anything to Google | Play Console → Setup → API access |
 | Android upload keystore | signing an AAB | you create it once, and losing it is unrecoverable |
 
-All of them are named — never held — in `$KEYS_ROOT/credentials.json`. See
+All of them are named — never held — in `$KEYS_ROOT/credentials.json`; the files sit
+under `$KEYS_ROOT/signing/` and `$KEYS_ROOT/store-api/` ([`docs/contracts/keys.md`](docs/contracts/keys.md),
+which also lists the legacy layout the resolvers still read). See
 [TRUST.md](TRUST.md) for what the skills do and do not do with them.
 
 ---

@@ -92,7 +92,10 @@ python3 $AF/factory/enable.py --none                 # כולם כבויים כ�
 **לאן המפתחות שלי הולכים?**
 ל-`$KEYS_ROOT`, ש-`factory/init_keys.py --create` מקים מחוץ לכל ריפו ומוסיף ל-gitignore
 מהבייט הראשון. אתם ממלאים אותו ביד. כל מסלול פותר אישור בסדר מתועד אחד: הסביבה, ואז
-`$KEYS_ROOT/credentials.json`, ואז מוסכמת התיקיות.
+`$KEYS_ROOT/credentials.json`, ואז מוסכמת התיקיות — `signing/` למה שחותם
+(`android/<app>/`, `apple/`, `sparkle/`), `store-api/` למה שמדבר עם חנות
+(`appstoreconnect/<name>/`, `googleplay/`, `appleads/`). המבנה השטוח שלפני 2026-11 עדיין
+נקרא, אחרון, ומדווח כ-legacy. המפה ב-[`docs/contracts/keys.he.md`](docs/contracts/keys.he.md).
 
 **משהו כאן רואה את המפתחות שלי?**
 הפותרים מחזירים **נתיב**; הקובץ עצמו נקרא על ידי `fastlane`, `notarytool` או ה-API של

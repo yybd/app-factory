@@ -30,11 +30,11 @@ seven hostnames, which is what kept it in a private repo instead of in the skill
   "search_console": {
     "_comment": "Only needed for the live half — impressions, queries, index coverage. The audit is entirely offline and needs none of it.",
     "properties": ["sc-domain:example.com"],
-    "credentials": "$KEYS_ROOT/google/search-console.json"
+    "credentials": "$KEYS_ROOT/services/google/search-console.json"
   },
   "analytics": {
     "ga4_property": "properties/000000000",
-    "credentials": "$KEYS_ROOT/google/analytics.json"
+    "credentials": "$KEYS_ROOT/services/google/analytics.json"
   },
   "blog_counter": {
     "_comment": "Only for a site that counts its own blog reads first-party. What it counts and how to read it; the token stays in the site's git-ignored env file.",

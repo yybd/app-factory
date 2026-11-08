@@ -85,8 +85,8 @@ public certificates can be downloaded again.
 
 | What | Where it lives | Its backup |
 |---|---|---|
-| Private keys of the signing identities | the login keychain | `$KEYS_ROOT/apple-certificates/` — **one `.p12` per certificate**, named `<type>-<YYYY-MM-DD>.p12` (`apple-development-…`, `apple-distribution-…`, `developer-id-application-…`, `3rd-party-mac-developer-installer-…`): one certificate and its private key each. One password for all, in `p12-password.txt` beside them (`chmod 600`, folder `700`) |
-| App Store Connect API keys (`.p8`) | `$KEYS_ROOT/appstoreconnect/<name>/private_keys/` | **none** — Apple lets you download a `.p8` once. This copy is the only one. |
+| Private keys of the signing identities | the login keychain | `$KEYS_ROOT/signing/apple/` — **one `.p12` per certificate**, named `<type>-<YYYY-MM-DD>.p12` (`apple-development-…`, `apple-distribution-…`, `developer-id-application-…`, `3rd-party-mac-developer-installer-…`): one certificate and its private key each. One password for all, in `p12-password.txt` beside them (`chmod 600`, folder `700`) |
+| App Store Connect API keys (`.p8`) | `$KEYS_ROOT/store-api/appstoreconnect/<name>/private_keys/` | **none** — Apple lets you download a `.p8` once. This copy is the only one. |
 | Sparkle EdDSA key, other signing keys | under `$KEYS_ROOT` | **none** — the file is the original. A lost Sparkle key means existing users never get another update. |
 
 One file per certificate, so that renewing one certificate replaces one file and a
@@ -99,7 +99,7 @@ certificate expires** (it is the only copy of the old key). `security export` wr
 every identity into one file, so export to a temporary folder and split:
 
 ```bash
-D="$KEYS_ROOT/apple-certificates"; umask 077; T="$D/.tmp"; mkdir -p "$T"
+D="$KEYS_ROOT/signing/apple"; umask 077; T="$D/.tmp"; mkdir -p "$T"
 security export -k ~/Library/Keychains/login.keychain-db -t identities -f pkcs12 \
   -P "$(cat "$D/p12-password.txt")" -o "$T/all.p12"
 openssl pkcs12 -legacy -in "$T/all.p12" -passin "file:$D/p12-password.txt" -nodes -out "$T/all.pem"
@@ -132,9 +132,9 @@ date and what was verified — never the password).
 Double-click the `.p12` and enter the password from the file, or:
 
 ```bash
-security import "$KEYS_ROOT/apple-certificates/<type>-<date>.p12" \
+security import "$KEYS_ROOT/signing/apple/<type>-<date>.p12" \
   -k ~/Library/Keychains/login.keychain-db \
-  -P "$(cat "$KEYS_ROOT/apple-certificates/p12-password.txt")" -T /usr/bin/codesign
+  -P "$(cat "$KEYS_ROOT/signing/apple/p12-password.txt")" -T /usr/bin/codesign
 ```
 
 ### An off-machine copy

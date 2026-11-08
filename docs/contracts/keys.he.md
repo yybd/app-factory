@@ -21,14 +21,20 @@ python3 factory/init_keys.py --point ~/vault/studio-keys   # להשתמש באח
 $KEYS_ROOT/
 ├── .gitignore              מסרב להכול, נכתב ראשון
 ├── credentials.json        איפה כל אישור — מזהים ונתיבים בלבד
-├── appstoreconnect/
-│   ├── AuthKey_<KEYID>.p8  מפתח ה-API של App Store Connect
-│   └── notarytool/         פרופיל הנוטריזציה, כשהוא נשמר כקובץ
-├── appleads/               אופציונלי — Apple Ads API: api_key.json + private-key.pem
+├── APPLE.md                אופציונלי — המפה של חשבון אפל, apple-credentials כותב אותה
+├── signing/                מה שחותם
+│   ├── android/<app>/      keystore.properties וה-.jks שלו — מפתח העלאה אחד לכל אפליקציה
+│   ├── apple/              גיבויי <type>-<YYYY-MM-DD>.p12 ו-p12-password.txt
+│   └── sparkle/            sparkle_private_key.txt — המפתח של עדכוני Mac
+├── store-api/              מה שמדבר עם חנות
+│   ├── appstoreconnect/<name>/   api_key.json ו-private_keys/AuthKey_<KEYID>.p8,
+│   │                             תיקייה לכל שימוש (העלאות, notarytool, …)
+│   ├── googleplay/<service-account>.json   Google Play
+│   └── appleads/           אופציונלי — Apple Ads API: api_key.json + private-key.pem
 │                           (aso-keywords קורא ממנו פופולריות חיפוש; שום דבר לא תלוי בו)
-└── android/
-    ├── api-fastlane-supply/<service-account>.json    Google Play
-    └── <app>-keystore/keystore.properties           מפתח העלאה אחד לכל אפליקציה
+├── services/               שירותים אחרים: google/, ai/<provider>/, <name>/
+├── projects/<name>/        סודות של פרויקט אחד
+└── accounts/               קודי שחזור, הערות חשבון
 ```
 
 ה-`.gitignore` נכתב **לפני** שאפשר לשים משהו בתיקייה, ומסרב להכול חוץ מעצמו ומה-README.
@@ -42,10 +48,11 @@ $KEYS_ROOT/
 ```json
 {
   "appstoreconnect": { "issuer_id": "<uuid>", "key_id": "<10 תווים>",
-                       "p8": "appstoreconnect/AuthKey_<KEYID>.p8" },
+                       "p8": "store-api/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8" },
   "notary":          { "keychain_profile": "<שם שבחרת>" },
-  "googleplay":      { "service_account": "android/api-fastlane-supply/<file>.json",
-                       "keystores": { "<app>": "android/<app>-keystore/keystore.properties" } }
+                  /* או: { "key_id": "<10 תווים>", "p8": "store-api/appstoreconnect/notarytool/…/AuthKey_<KEYID>.p8" } */
+  "googleplay":      { "service_account": "store-api/googleplay/<file>.json",
+                       "keystores": { "<app>": "signing/android/<app>/keystore.properties" } }
 }
 ```
 
@@ -62,11 +69,31 @@ $KEYS_ROOT/
 1. **הסביבה.** `ASC_KEY_ID` / `ASC_ISSUER_ID` / `ASC_KEY_PATH`, `PLAY_SERVICE_ACCOUNT`,
    `NOTARY_PROFILE`. CI מגדיר משתנים; הוא לא מחזיק קובץ.
 2. **`$KEYS_ROOT/credentials.json`.** התשובה המתועדת.
-3. **מוסכמת התיקייה**, כשהיא חד-משמעית. קובץ JSON אחד בדיוק ב-`android/api-fastlane-supply/`
+3. **מוסכמת התיקייה**, כשהיא חד-משמעית. קובץ JSON אחד בדיוק ב-`store-api/googleplay/`
    הוא תשובה; אפס או כמה אינם, כי שם הקובץ מונפק על ידי ה-Play Console, וניחוש תחת
    איזה חשבון יוצא שחרור הוא הטעות היחידה שאי אפשר לבטל.
-4. **`DATA.md` של ריפו נתונים**, להתקנה שקדמה לקובץ הזה. עדיין נקרא, כדי ששום דבר לא
+   את מפתח ההעלאה של אפליקציה מחפשים ב-`signing/android/<app>/`.
+4. **התיקיות של המבנה הישן**, אחרונות — ראו למטה.
+5. **`DATA.md` של ריפו נתונים**, להתקנה שקדמה לקובץ הזה. עדיין נקרא, כדי ששום דבר לא
    יישבר — ומדווח כ-legacy, כי fallback שאיש לא סופר עליו הופך למנגנון האמיתי.
+
+## המבנה הישן (legacy)
+
+עד 2026-11 התיקיות ישבו ברמה העליונה. ה-resolvers
+(`plugins/*/shared/credentials.py`, ‏`LAYOUT`) עדיין קוראים אותן, **כ-fallback האחרון**,
+ואומרים כשהתשובה הגיעה משם; `init_keys.py` מדווח עליהן ולא יוצר אותן.
+
+| ישן | נוכחי |
+|---|---|
+| `android/<app>-keystore/` | `signing/android/<app>/` |
+| `android/api-fastlane-supply/` | `store-api/googleplay/` |
+| `appstoreconnect/` | `store-api/appstoreconnect/` |
+| `appleads/` | `store-api/appleads/` |
+| `apple-certificates/` | `signing/apple/` |
+| `Sparkle/` | `signing/sparkle/` |
+
+`credentials.json` שנוקב בנתיב ישן ממשיך לעבוד כל עוד הקובץ שם — זה נתיב כמו כל נתיב.
+מעבירים את הקבצים, ואז מעדכנים בו את הנתיבים.
 
 ## מה הסקילים עושים, ומה לא
 

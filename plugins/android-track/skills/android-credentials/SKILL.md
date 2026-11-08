@@ -26,7 +26,7 @@ rest. Almost every confusion comes from **there being two keys, not one.**
 
 - **Tools:** a JDK matching the project's toolchain (`keytool`, `jarsigner`) and
   `apksigner` from the Android SDK build-tools; nothing to `pip`/`gem` install.
-- **Credentials:** owned here — the upload keystore under `$KEYS_ROOT/android/` and the
+- **Credentials:** owned here — the upload keystore under `$KEYS_ROOT/signing/android/` and the
   Play service-account JSON, both recorded by path in `$KEYS_ROOT/credentials.json`.
 - **Hub (`$APP_HUB`):** optional — `DATA.md` records identifiers and paths and sets the
   conversational language; the secrets themselves never live there.
@@ -36,7 +36,7 @@ rest. Almost every confusion comes from **there being two keys, not one.**
 
 | | **Upload key** | **App signing key** |
 |---|---|---|
-| Who holds it | you (`$KEYS_ROOT/android/<app>-keystore/`) | **Google**, under Play App Signing |
+| Who holds it | you (`$KEYS_ROOT/signing/android/<app>/`) | **Google**, under Play App Signing |
 | What it does | proves *you* uploaded the AAB | signs the APKs that reach devices |
 | If lost | recoverable — ask Google to reset it | fatal if you are **not** enrolled in Play App Signing |
 
@@ -60,8 +60,8 @@ installation that predates it); the secrets themselves sit in `$KEYS_ROOT/`, whi
 deliberately not a git repository.
 
 ```
-$KEYS_ROOT/android/<app>-keystore/keystore.properties   # storeFile/…/keyAlias
-$KEYS_ROOT/android/api-fastlane-supply/*.json           # Play API service account
+$KEYS_ROOT/signing/android/<app>/keystore.properties   # storeFile/…/keyAlias
+$KEYS_ROOT/store-api/googleplay/*.json           # Play API service account
 ```
 
 `build.gradle` reads the properties file **only if it is present**, and the guard

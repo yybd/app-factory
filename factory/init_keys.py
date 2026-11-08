@@ -60,15 +60,24 @@ fr = _Guards()
 # What the shipping skills look for, and the skill that needs each one. Kept here rather
 # than in prose so `--create` and the report can never describe different folders.
 SLOTS = [
-    ("android/<app>-keystore/keystore.properties",
-     "play-store-ship", "the upload key for one app: storeFile, storePassword, keyAlias, keyPassword"),
-    ("android/api-fastlane-supply/<service-account>.json",
+    ("signing/android/<app>/keystore.properties",
+     "play-store-ship", "the upload key for one app: keystore.properties (storeFile, storePassword, keyAlias, keyPassword) beside its .jks"),
+    ("signing/apple/<type>-<YYYY-MM-DD>.p12",
+     "apple-credentials", "backup of each Apple signing certificate's private key, one .p12 per certificate; the password in p12-password.txt"),
+    ("signing/sparkle/sparkle_private_key.txt",
+     "macos-direct-distribution", "the Sparkle EdDSA key that signs Mac updates — never regenerate it"),
+    ("store-api/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8",
+     "app-store-deliver · ship-apple-app · notarize-and-distribute", "App Store Connect API keys, one folder per purpose, each with its api_key.json (key id, issuer id)"),
+    ("store-api/googleplay/<service-account>.json",
      "play-store-ship · play-store-deliver", "Google Play service account, JSON, from the Play Console"),
-    ("appstoreconnect/AuthKey_<KEYID>.p8",
-     "app-store-deliver · ship-apple-app", "App Store Connect API key — with its key id and issuer id"),
-    ("appstoreconnect/notarytool/",
-     "notarize-and-distribute", "the notarisation profile or app-specific password"),
+    ("store-api/appleads/api_key.json",
+     "aso-keywords", "optional — Apple Ads API key, for keyword popularity"),
 ]
+
+# The layout before 2026-11 — still read, as the LAST fallback, by the track resolvers
+# (plugins/*/shared/credentials.py: LAYOUT). Listed so `report` can say an installation
+# is on it; never created.
+LEGACY = ["android", "appstoreconnect", "appleads", "apple-certificates", "Sparkle"]
 
 GITIGNORE = """# Everything here is a secret. Nothing here belongs in any repository.
 *
@@ -90,20 +99,22 @@ CREDENTIALS = """{
     "_where": "App Store Connect -> Users and Access -> Integrations -> App Store Connect API",
     "issuer_id": "<uuid>",
     "key_id": "<10 characters>",
-    "p8": "appstoreconnect/AuthKey_<KEYID>.p8"
+    "p8": "store-api/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8"
   },
 
   "notary": {
-    "_where": "created by `apple_creds.py store-creds --profile <name> ...`; this is the NAME, and the credential itself lives in the login keychain",
-    "keychain_profile": "<profile name>"
+    "_where": "EITHER a keychain profile created by `apple_creds.py store-creds --profile <name> ...` (this is its NAME; the credential lives in the login keychain), OR an API key (key_id + p8; the issuer defaults to appstoreconnect's)",
+    "keychain_profile": "<profile name>",
+    "key_id": "<10 characters>",
+    "p8": "store-api/appstoreconnect/notarytool/private_keys/AuthKey_<KEYID>.p8"
   },
 
   "googleplay": {
     "_where": "Play Console -> Setup -> API access -> service accounts",
-    "service_account": "android/api-fastlane-supply/<service-account>.json",
+    "service_account": "store-api/googleplay/<service-account>.json",
     "keystores": {
       "_comment": "One upload key per app, by the app's name. Play refuses an AAB signed with the wrong one, and says so in terms of the certificate rather than the key you meant.",
-      "<app>": "android/<app>-keystore/keystore.properties"
+      "<app>": "signing/android/<app>/keystore.properties"
     }
   }
 }
@@ -118,6 +129,18 @@ Where the factory looks, in order: the `KEYS_ROOT` environment variable, then
 `keys_root` in RepoGuards' registry (relative to the tree's base), then `keys`
 beside the other repos.
 
+## Layout
+
+```
+signing/       what signs: android/<app>/, apple/ (.p12 backups), sparkle/, …
+store-api/     what talks to a store: appstoreconnect/<name>/, googleplay/, appleads/, …
+services/      other services' keys: google/, ai/<provider>/, <name>/
+projects/      secrets that belong to one project: <name>/
+accounts/      recovery codes and account notes
+APPLE.md       the Apple account's map (apple-credentials writes it) — no secrets
+credentials.json   which file is which, for the skills — paths only
+```
+
 ## What goes where
 
 {slots}
@@ -129,6 +152,12 @@ number, which bundle id — belong in the hub's `DATA.md`. This folder holds the
 """
 
 
+def _literal(slot):
+    """The part of a slot's folder before the first <placeholder>: what can be made."""
+    parts = os.path.dirname(slot).split("/")
+    return "/".join(parts[:next((i for i, x in enumerate(parts) if "<" in x), len(parts))])
+
+
 def report(root):
     print(f"Credentials folder: {short(root)}")
     if not os.path.isdir(root):
@@ -138,9 +167,14 @@ def report(root):
         return 1
     missing = []
     for slot, who, _what in SLOTS:
-        head = slot.split("/")[0]
+        head = _literal(slot)
         if not os.path.isdir(os.path.join(root, head)):
             missing.append((head, who))
+    legacy = [d for d in LEGACY if os.path.isdir(os.path.join(root, d))
+              and not os.path.islink(os.path.join(root, d))]
+    if legacy:
+        print("  Legacy layout: " + ", ".join(f"{d}/" for d in legacy) + " — still read, as the last")
+        print("      fallback. Move them (docs/contracts/keys.md has the map) and update credentials.json.")
     has_creds = os.path.isfile(os.path.join(root, "credentials.json"))
     if not missing and has_creds:
         print("  ✓ it is there, with every folder the skills look for, and a credentials.json.")
@@ -168,11 +202,9 @@ def create(root):
         open(gi, "w", encoding="utf-8").write(GITIGNORE)
         made.append(".gitignore")
     for slot, _who, _what in SLOTS:
-        # Only the literal part of a slot is made. `android/<app>-keystore/` is a name
-        # for the reader to fill in, and made as-is it is a folder called `<app>-keystore`.
-        parts = os.path.dirname(slot).split("/")
-        parts = parts[:next((i for i, x in enumerate(parts) if "<" in x), len(parts))]
-        d = os.path.join(root, *parts)
+        # Only the literal part of a slot is made. `signing/android/<app>/` is a name
+        # for the reader to fill in, and made as-is it is a folder called `<app>`.
+        d = os.path.join(root, _literal(slot))
         if not os.path.isdir(d):
             os.makedirs(d, exist_ok=True)
             made.append(os.path.relpath(d, root) + "/")

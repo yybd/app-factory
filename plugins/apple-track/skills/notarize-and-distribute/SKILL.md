@@ -44,7 +44,7 @@ is one-time credential setup.
   Both are `apple-credentials`' to create — see A and B below.
 - **Which key or certificate:** if `$KEYS_ROOT/APPLE.md` exists, look there first —
   the owner's map of the team, each certificate and its expiry, and which App Store
-  Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
+  Connect key under `$KEYS_ROOT/store-api/appstoreconnect/<name>/` serves what (no secrets).
   `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
 - **Hub (`$APP_HUB`):** not used.
 - **Other tracks:** none; `apple-credentials` and `macos-direct-distribution` are in

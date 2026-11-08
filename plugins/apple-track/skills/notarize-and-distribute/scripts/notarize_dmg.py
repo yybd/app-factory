@@ -260,6 +260,20 @@ def resolve_notary_cred(args):
         return ["--keychain-profile", args.keychain_profile]
     if getattr(args, "api_key", None) and getattr(args, "api_key_id", None) and getattr(args, "api_issuer", None):
         return ["--key", args.api_key, "--key-id", args.api_key_id, "--issuer", args.api_issuer]
+    # Nothing passed: what this machine recorded — a profile, else the notary API key
+    # (shared/credentials.py: $NOTARY_PROFILE, then "notary" in credentials.json).
+    try:
+        sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                                         "..", "..", "..", "shared")))
+        import credentials as _creds
+        prof = _creds.notary_profile(required=False)
+        if prof:
+            return ["--keychain-profile", prof]
+        k = _creds.notary_key()
+        if k and os.path.isfile(k["p8"]):
+            return ["--key", k["p8"], "--key-id", k["key_id"], "--issuer", k["issuer_id"]]
+    except Exception:
+        pass
     bad("provide --keychain-profile NAME (set up via `setup`) or the API key trio "
         "(--api-key AuthKey.p8 --api-key-id KEYID --api-issuer ISSUER-UUID)")
     sys.exit(1)

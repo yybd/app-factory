@@ -114,11 +114,11 @@ key files live under `$KEYS_ROOT`, which is not a git directory.
 
 - issuer id: <uuid>
 - key id: <10 characters>
-- p8 path: `$KEYS_ROOT/appstoreconnect/AuthKey_<KEYID>.p8`
+- p8 path: `$KEYS_ROOT/store-api/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8`
 
 ## Google Play service account
 
-- json path: `$KEYS_ROOT/android/api-fastlane-supply/<service-account>.json`
+- json path: `$KEYS_ROOT/store-api/googleplay/<service-account>.json`
 
 ## Conversational language (optional)
 

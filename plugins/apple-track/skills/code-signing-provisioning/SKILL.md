@@ -38,7 +38,7 @@ whole process, not just paste commands.
   (Spaceship); certificates, keys and passwords themselves come from `apple-credentials`.
 - **Which key or certificate:** if `$KEYS_ROOT/APPLE.md` exists, look there first —
   the owner's map of the team, each certificate and its expiry, and which App Store
-  Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
+  Connect key under `$KEYS_ROOT/store-api/appstoreconnect/<name>/` serves what (no secrets).
   `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
 - **Profile policy and key backup:** which builds get a manual profile (only a Tauri
   Mac App Store build), the automatic iOS App Store export, where capabilities are

@@ -40,7 +40,7 @@ must print {{TEAM_ID}}.
 
 ## 3. App Store Connect API keys
 
-**Where:** `$KEYS_ROOT/appstoreconnect/<name>/`, one folder per purpose, each holding
+**Where:** `$KEYS_ROOT/store-api/appstoreconnect/<name>/`, one folder per purpose, each holding
 `api_key.json` (key_id, issuer_id, key_filepath) and `private_keys/AuthKey_<KEYID>.p8`.
 A key gives tools access to the account with no password and no 2FA.
 
@@ -49,7 +49,7 @@ A key gives tools access to the account with no password and no 2FA.
 **From the command line (headless `xcodebuild` sees no Xcode account):**
 
 ```bash
-K="$KEYS_ROOT/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8"
+K="$KEYS_ROOT/store-api/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8"
 xcodebuild … -allowProvisioningUpdates \
   -authenticationKeyPath "$K" -authenticationKeyID <KEYID> \
   -authenticationKeyIssuerID <ISSUER_ID>
@@ -139,7 +139,7 @@ for d in "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles" "$HOME/L
 
 ```bash
 security find-identity -v                                          # certificates
-ls "$KEYS_ROOT"/appstoreconnect/*/private_keys/*.p8                # API keys
+ls "$KEYS_ROOT"/store-api/appstoreconnect/*/private_keys/*.p8                # API keys
 defaults read com.apple.dt.Xcode IDEProvisioningTeamByIdentifier   # teams Xcode knows
 ```
 

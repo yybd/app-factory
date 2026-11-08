@@ -49,7 +49,7 @@ inventing claims. Confirm before installing tools.
   the current listing) signs in to App Store Connect — the key is `apple-credentials`'.
 - **Which key or certificate:** if `$KEYS_ROOT/APPLE.md` exists, look there first —
   the owner's map of the team, each certificate and its expiry, and which App Store
-  Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
+  Connect key under `$KEYS_ROOT/store-api/appstoreconnect/<name>/` serves what (no secrets).
   `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
 - **Hub (`$APP_HUB`):** optional — studio flow authors into
   `$APP_HUB/<slug>/store/apple/metadata/` and reads URLs from `DATA.md`; standalone

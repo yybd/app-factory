@@ -28,8 +28,9 @@ means you can't sign future updates and users are stranded:
 "$GK" -x sparkle_private_key.txt --account "<AppName>"   # export to a base64 text file
 ```
 
-The exported file is plain base64 text and IS the secret — store it in a password
-manager (Apple's **Passwords** app is a good choice: iCloud Keychain is
+The exported file is plain base64 text and IS the secret — keep it at
+`$KEYS_ROOT/signing/sparkle/sparkle_private_key.txt` (`chmod 600`, outside every repo),
+and also in a password manager (Apple's **Passwords** app is a good choice: iCloud Keychain is
 end-to-end encrypted; paste the key into a new entry's password field). It's a
 `genp` Keychain item, so it won't show in the Passwords app on its own — add it
 manually. Never put it in the repo. Once it's in your vault, delete the on-disk

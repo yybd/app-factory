@@ -39,12 +39,39 @@ ENV_ISSUER = "ASC_ISSUER_ID"
 ENV_P8 = "ASC_KEY_PATH"
 
 
+# The folders under $KEYS_ROOT, by what they hold. The current layout first; the one
+# before it (until 2026-11: `appstoreconnect/`, `android/<app>-keystore/`, …) is the LAST
+# fallback, so an installation that has not moved its files keeps working — and is told
+# it is on the legacy layout, because a fallback nobody is told about becomes the real
+# mechanism. docs/contracts/keys.md is the full map.
+LAYOUT = {
+    "appstoreconnect": ("store-api/appstoreconnect", "appstoreconnect"),
+    "appleads": ("store-api/appleads", "appleads"),
+    "apple-backups": ("signing/apple", "apple-certificates"),
+    "sparkle": ("signing/sparkle", "Sparkle"),
+}
+
+
 class Missing(Exception):
     """No credential found. Carries what was looked for and where."""
 
 
 def keys_root():
     return os.path.expanduser(os.environ.get("KEYS_ROOT") or "~/keys")
+
+
+def folder(kind, app=None):
+    """(path, legacy) for one kind of file under $KEYS_ROOT — the current layout's
+    folder when it exists, else the legacy one when THAT exists, else the current one
+    (where a new file should go). `legacy` is True only when the old folder answered."""
+    new, old = LAYOUT[kind]
+    new = os.path.join(keys_root(), new.format(app=app))
+    old = os.path.join(keys_root(), old.format(app=app))
+    if os.path.isdir(new):
+        return new, False
+    if os.path.isdir(old):
+        return old, True
+    return new, False
 
 
 def _from_env():
@@ -139,6 +166,23 @@ def notary_profile(required=False):
                   "under \"notary\" in credentials.json.")
 
 
+def notary_key():
+    """{key_id, issuer_id, p8, _from} for the API key notarization uses, when one is
+    recorded under "notary" in credentials.json — the alternative to a keychain
+    profile. The issuer defaults to the App Store Connect one (one per team)."""
+    d, store_path = _store()
+    n = (d or {}).get("notary") or {}
+    if not (n.get("key_id") and n.get("p8")):
+        return None
+    iss = n.get("issuer_id") or ((d.get("appstoreconnect") or {}).get("issuer_id"))
+    if not iss:
+        return None
+    p8 = os.path.expanduser(n["p8"])
+    if not os.path.isabs(p8):
+        p8 = os.path.join(keys_root(), p8)
+    return {"key_id": n["key_id"], "issuer_id": iss, "p8": p8, "_from": store_path}
+
+
 if __name__ == "__main__":
     try:
         k = asc_key()
@@ -149,3 +193,7 @@ if __name__ == "__main__":
         print(e)
     n = notary_profile()
     print(f"Notary profile: {n or '— none recorded'}")
+    nk = notary_key()
+    if nk:
+        print(f"Notary API key: {nk['key_id']}  .p8 {'(present)' if os.path.isfile(nk['p8']) else '(NOT FOUND)'}"
+              f"  — {nk['p8']}")

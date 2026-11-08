@@ -47,7 +47,7 @@ so it stays out of shell history. Result: a reusable profile — from then on,
    `~/.appstoreconnect/private_keys/AuthKey_<KEYID>.p8`. Keep it secret (it's a
    private key) — for CI, store it as an encrypted secret, not in the repo.
    A machine that keeps one key per purpose can use
-   `$KEYS_ROOT/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8` — `check`
+   `$KEYS_ROOT/store-api/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8` — `check`
    finds those too. Then record the key (Key ID, folder, purpose, date — never
    the `.p8` content) in `$KEYS_ROOT/APPLE.md`.
 4. Use it:

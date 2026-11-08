@@ -4,7 +4,7 @@ apple_creds.py — inventory and set up Apple certificates & auth credentials.
 
 Subcommands:
   check                       list signing certs by type (SHA-1, expiry), detect
-                              API keys (incl. $KEYS_ROOT/appstoreconnect/*/),
+                              API keys (incl. $KEYS_ROOT/store-api/appstoreconnect/*/),
                               note $KEYS_ROOT/APPLE.md, and summarize what's
                               present/missing per goal
   store-creds                 create a notary keychain profile FOR the user,
@@ -57,6 +57,13 @@ def miss(m): print(f"  ❌ {m}")
 def step(m): print(f"\n▶ {m}")
 
 
+def kdir(kind):
+    """The folder for one kind of file under $KEYS_ROOT, by the track's layout
+    (shared/credentials.py: the current layout, the legacy one as the last fallback)."""
+    import credentials
+    return credentials.folder(kind)
+
+
 def keys_root():
     """$KEYS_ROOT, or None — no default here: a guessed folder is not the owner's."""
     v = os.environ.get("KEYS_ROOT")
@@ -103,9 +110,9 @@ def backup_slug(name):
 
 def newest_backups(root):
     """slug → (date, path) for the newest <type>-<YYYY-MM-DD>.p12 under
-    $KEYS_ROOT/apple-certificates/. Dates come from the names; no file is opened."""
+    $KEYS_ROOT/signing/apple/. Dates come from the names; no file is opened."""
     best = {}
-    for f in glob.glob(os.path.join(root, "apple-certificates", "*.p12")):
+    for f in glob.glob(os.path.join(kdir("apple-backups")[0], "*.p12")):
         m = re.match(r"(.+)-(\d{4}-\d{2}-\d{2})\.p12$", os.path.basename(f))
         if m and (m.group(1) not in best or m.group(2) > best[m.group(1)][0]):
             best[m.group(1)] = (m.group(2), f)
@@ -118,7 +125,7 @@ def backup_fingerprints(root):
     Only the public certificate is extracted (`-nokeys`); the password is handed to
     openssl as `file:` and never read here. Empty when there is no password file or
     openssl cannot open the files — the caller then falls back to names and dates."""
-    d = os.path.join(root, "apple-certificates")
+    d = kdir("apple-backups")[0]
     pw = os.path.join(d, "p12-password.txt")
     if not os.path.isfile(pw):
         return {}
@@ -177,7 +184,7 @@ def find_api_keys():
 
 
 def find_keys_root_api_keys():
-    """Keys kept one folder per purpose: $KEYS_ROOT/appstoreconnect/<name>/.
+    """Keys kept one folder per purpose: $KEYS_ROOT/store-api/appstoreconnect/<name>/.
 
     Returns (name, key_id, p8 path) for each. The key id comes from the folder's
     api_key.json (only its `key_id` field is read) or else from the AuthKey_<ID>.p8
@@ -186,8 +193,10 @@ def find_keys_root_api_keys():
     if not root:
         return []
     found = []
-    for d in sorted(glob.glob(os.path.join(root, "appstoreconnect", "*", ""))):
+    for d in sorted(glob.glob(os.path.join(kdir("appstoreconnect")[0], "*", ""))):
         name = os.path.basename(os.path.dirname(d))
+        if os.path.islink(os.path.dirname(d)):       # a compatibility link to a renamed folder
+            continue
         p8s = sorted(glob.glob(os.path.join(d, "private_keys", "*.p8")) + glob.glob(os.path.join(d, "*.p8")))
         if not p8s:
             continue
@@ -243,7 +252,7 @@ def cmd_check(args):
                 note = f"expires {exp} — renew soon"
             print(f"  • [{label}] {n}  ({sha1[:8]}…{sha1[-4:]}, {note})")
 
-    step("Backup of the signing keys ($KEYS_ROOT/apple-certificates/)")
+    step("Backup of the signing keys ($KEYS_ROOT/signing/apple/)")
     if not root:
         print("  $KEYS_ROOT is not set — nowhere to look")
     else:
@@ -270,7 +279,7 @@ def cmd_check(args):
                     warn(f"{slug}: newest backup {os.path.basename(b[1])} pre-dates the certificate (issued {issued}) — re-export")
                 else:
                     ok(f"{slug}: {os.path.basename(b[1])}")
-        if backups and not os.path.isfile(os.path.join(root, "apple-certificates", "p12-password.txt")):
+        if backups and not os.path.isfile(os.path.join(kdir("apple-backups")[0], "p12-password.txt")):
             warn("p12-password.txt is not beside the backups")
         has_copy, detail = off_machine_copy(root)
         (ok if has_copy else warn)(f"off-machine copy of $KEYS_ROOT: {detail}"
@@ -300,7 +309,10 @@ def cmd_check(args):
             print(f"  • {k}")
     rooted = find_keys_root_api_keys()
     if rooted:
-        print("  under $KEYS_ROOT/appstoreconnect/ (one folder per purpose — APPLE.md says which serves what):")
+        asc_dir, legacy = kdir("appstoreconnect")
+        if legacy:
+            warn(f"keys are in the legacy layout ({os.path.relpath(asc_dir, root)}/) — move them to store-api/appstoreconnect/")
+        print("  under $KEYS_ROOT/store-api/appstoreconnect/ (one folder per purpose — APPLE.md says which serves what):")
         for name, kid, p8 in rooted:
             mark = "  ← the resolver's" if c and os.path.realpath(p8) == os.path.realpath(c["p8"]) else ""
             print(f"  • {name}: {kid} — {os.path.relpath(p8, root)}{mark}")
@@ -410,7 +422,7 @@ def build_apple_md(root):
     issuers = set()
     for name, _, _ in keys:
         try:
-            with open(os.path.join(root, "appstoreconnect", name, "api_key.json"), encoding="utf-8") as f:
+            with open(os.path.join(kdir("appstoreconnect")[0], name, "api_key.json"), encoding="utf-8") as f:
                 iss = json.load(f).get("issuer_id")
             if iss:
                 issuers.add(iss)
@@ -436,11 +448,12 @@ def build_apple_md(root):
         rows += [f"| `{name}` | `{kid}` | {_ask('what ' + kid + ' is used for')} |" for name, kid, _ in keys]
         key_table = "\n".join(rows)
     else:
-        key_table = _ask("no key under $KEYS_ROOT/appstoreconnect/ — where the App Store Connect API keys are, and what each serves")
+        key_table = _ask("no key under $KEYS_ROOT/store-api/appstoreconnect/ — where the App Store Connect API keys are, and what each serves")
 
-    def where(sub, what):
-        pth = os.path.join(root, sub)
-        return f"`$KEYS_ROOT/{sub}/`" if os.path.isdir(pth) else _ask(f"where the {what} is, if there is one")
+    def where(kind, what):
+        pth, _ = kdir(kind)
+        return (f"`$KEYS_ROOT/{os.path.relpath(pth, root)}/`" if os.path.isdir(pth)
+                else _ask(f"where the {what} is, if there is one"))
 
     profs = manual_profiles()
     if profs:
@@ -471,7 +484,7 @@ def build_apple_md(root):
         "CERT_TABLE": cert_table, "CERT_MISSING": cert_missing, "CERT_RENEW": cert_renew,
         "KEY_TABLE": key_table,
         "APPLEADS": where("appleads", "Apple Ads API key"),
-        "SPARKLE": where("Sparkle", "Sparkle EdDSA private key"),
+        "SPARKLE": where("sparkle", "Sparkle EdDSA private key"),
         "NOTARY": _ask("the notary keychain profile's name, or which API key notarization uses"),
         "PROFILE_TABLE": prof_table, "BACKUP_STATE": backup_state,
         "INCLUDE:POLICY": policy, "INCLUDE:BACKUP": backup,

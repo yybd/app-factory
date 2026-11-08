@@ -19,8 +19,9 @@ file. The first is nearly right and now has a name.
     1. the environment          PLAY_SERVICE_ACCOUNT
                                 CI sets variables; it does not keep a credentials file.
     2. $KEYS_ROOT/credentials.json      the documented answer.
-    3. $KEYS_ROOT/android/api-fastlane-supply/*.json
-                                the folder convention, when it holds exactly ONE file.
+    3. $KEYS_ROOT/store-api/googleplay/*.json
+                                the folder convention, when it holds exactly ONE file
+                                (the legacy layout's folder when the new one is absent).
                                 None or several is not an answer: the filename is issued
                                 by the Play Console and differs per studio, so guessing
                                 which account to publish under is the one mistake that
@@ -40,12 +41,37 @@ import sys
 ENV_SA = "PLAY_SERVICE_ACCOUNT"
 
 
+# The folders under $KEYS_ROOT, by what they hold. The current layout first; the one
+# before it (until 2026-11: `appstoreconnect/`, `android/<app>-keystore/`, …) is the LAST
+# fallback, so an installation that has not moved its files keeps working — and is told
+# it is on the legacy layout, because a fallback nobody is told about becomes the real
+# mechanism. docs/contracts/keys.md is the full map.
+LAYOUT = {
+    "googleplay": ("store-api/googleplay", "android/api-fastlane-supply"),
+    "keystore": ("signing/android/{app}", "android/{app}-keystore"),
+}
+
+
 class Missing(Exception):
     """No credential found. Carries what was looked for and where."""
 
 
 def keys_root():
     return os.path.expanduser(os.environ.get("KEYS_ROOT") or "~/keys")
+
+
+def folder(kind, app=None):
+    """(path, legacy) for one kind of file under $KEYS_ROOT — the current layout's
+    folder when it exists, else the legacy one when THAT exists, else the current one
+    (where a new file should go). `legacy` is True only when the old folder answered."""
+    new, old = LAYOUT[kind]
+    new = os.path.join(keys_root(), new.format(app=app))
+    old = os.path.join(keys_root(), old.format(app=app))
+    if os.path.isdir(new):
+        return new, False
+    if os.path.isdir(old):
+        return old, True
+    return new, False
 
 
 def _store():
@@ -73,10 +99,10 @@ def service_account(required=True):
     if sa:
         return _abs(sa), store_path
 
-    folder = os.path.join(keys_root(), "android", "api-fastlane-supply")
-    found = sorted(glob.glob(os.path.join(folder, "*.json")))
+    sa_dir, legacy = folder("googleplay")
+    found = sorted(glob.glob(os.path.join(sa_dir, "*.json")))
     if len(found) == 1:
-        return found[0], folder
+        return found[0], sa_dir + ("  (legacy layout: move it to store-api/googleplay/)" if legacy else "")
     several = len(found) > 1
 
     hub = os.environ.get("APP_HUB") or (
@@ -94,14 +120,14 @@ def service_account(required=True):
 
     if not required:
         return None, None
-    extra = (f"\n  {len(found)} .json files are in {folder}; which account to publish "
+    extra = (f"\n  {len(found)} .json files are in {sa_dir}; which account to publish "
              f"under is not a guess this should make. Name one in credentials.json."
              if several else "")
     raise Missing(
         "No Google Play service account found. Looked in, in order:\n"
         f"  1. ${ENV_SA} in the environment\n"
         f"  2. {os.path.join(keys_root(), 'credentials.json')}  (googleplay.service_account)\n"
-        f"  3. {folder}/*.json, when there is exactly one\n"
+        f"  3. {sa_dir}/*.json, when there is exactly one\n"
         "  4. the hub's DATA.md, for a studio installation\n" + extra + "\n\n"
         "  python3 factory/init_keys.py --create   writes the folder and a template\n"
         "  (run it in the app-factory checkout — ~/.claude/plugins/marketplaces/app-factory\n"
@@ -127,7 +153,7 @@ def upload_keystore(app=None, required=False):
     if got:
         return _abs(got)
     if app:
-        guess = os.path.join(keys_root(), "android", f"{app}-keystore", "keystore.properties")
+        guess = os.path.join(folder("keystore", app)[0], "keystore.properties")
         if os.path.isfile(guess):
             return guess
     if required:

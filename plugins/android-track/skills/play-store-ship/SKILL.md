@@ -45,7 +45,7 @@ binary SEND:         play-store-ship         (this skill: AAB → track → publ
 
 | Area | Verify | Owned by |
 |---|---|---|
-| **Signing key** | `keystore.properties` reachable (usually `$KEYS_ROOT/android/<app>-keystore/`), and the AAB it produces is signed | one-time keystore setup |
+| **Signing key** | `keystore.properties` reachable (usually `$KEYS_ROOT/signing/android/<app>/`), and the AAB it produces is signed | one-time keystore setup |
 | **versionCode** | strictly higher than every code already uploaded — **read it from `build.gradle`, not from notes** | this skill |
 | **Changelog** | a folder of `<locale>.txt` for this versionCode — `<hub>/<slug>/store/play/changelogs/<versionCode>/` with a hub, `<app-repo>/fastlane/metadata/android/changelogs/<versionCode>/` without one | `play-store-metadata` |
 | **Listing** | title / short / full description present per locale, if the listing itself is changing | `play-store-metadata` → `play-store-deliver` |

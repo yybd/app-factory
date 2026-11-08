@@ -22,14 +22,20 @@ python3 factory/init_keys.py --point ~/vault/studio-keys   # use one you already
 $KEYS_ROOT/
 ├── .gitignore              refuses everything, written FIRST
 ├── credentials.json        where each credential is — identifiers and PATHS only
-├── appstoreconnect/
-│   ├── AuthKey_<KEYID>.p8  the App Store Connect API key
-│   └── notarytool/         the notarisation profile, when one is kept as a file
-├── appleads/               OPTIONAL — Apple Ads API: api_key.json + private-key.pem
+├── APPLE.md                OPTIONAL — the Apple account's map, written by apple-credentials
+├── signing/                what signs
+│   ├── android/<app>/      keystore.properties + its .jks — one upload key per app
+│   ├── apple/              <type>-<YYYY-MM-DD>.p12 backups + p12-password.txt
+│   └── sparkle/            sparkle_private_key.txt — the Mac update key
+├── store-api/              what talks to a store
+│   ├── appstoreconnect/<name>/   api_key.json + private_keys/AuthKey_<KEYID>.p8,
+│   │                             one folder per purpose (uploads, notarytool, …)
+│   ├── googleplay/<service-account>.json   Google Play
+│   └── appleads/           OPTIONAL — Apple Ads API: api_key.json + private-key.pem
 │                           (aso-keywords reads search popularity; nothing needs it)
-└── android/
-    ├── api-fastlane-supply/<service-account>.json    Google Play
-    └── <app>-keystore/keystore.properties           one upload key per app
+├── services/               other services: google/, ai/<provider>/, <name>/
+├── projects/<name>/        secrets that belong to one project
+└── accounts/               recovery codes, account notes
 ```
 
 `.gitignore` is written before anything can be put in the folder, and refuses everything
@@ -44,10 +50,11 @@ to the folder.
 ```json
 {
   "appstoreconnect": { "issuer_id": "<uuid>", "key_id": "<10 chars>",
-                       "p8": "appstoreconnect/AuthKey_<KEYID>.p8" },
+                       "p8": "store-api/appstoreconnect/<name>/private_keys/AuthKey_<KEYID>.p8" },
   "notary":          { "keychain_profile": "<a name you chose>" },
-  "googleplay":      { "service_account": "android/api-fastlane-supply/<file>.json",
-                       "keystores": { "<app>": "android/<app>-keystore/keystore.properties" } }
+                  /* or: { "key_id": "<10 chars>", "p8": "store-api/appstoreconnect/notarytool/…/AuthKey_<KEYID>.p8" } */
+  "googleplay":      { "service_account": "store-api/googleplay/<file>.json",
+                       "keystores": { "<app>": "signing/android/<app>/keystore.properties" } }
 }
 ```
 
@@ -65,12 +72,33 @@ same in both, and each says which source answered:
    `PLAY_SERVICE_ACCOUNT`, `NOTARY_PROFILE`. CI sets variables; it does not keep a file.
 2. **`$KEYS_ROOT/credentials.json`.** The documented answer.
 3. **The folder convention**, where it is unambiguous. Exactly one service-account JSON
-   in `android/api-fastlane-supply/` is an answer; none or several is not, because the
+   in `store-api/googleplay/` is an answer; none or several is not, because the
    filename is issued by the Play Console and guessing which account a release goes out
    under is the one mistake that cannot be undone.
-4. **A data repo's `DATA.md`**, for an installation that predates this file. Still read,
+   The upload keystore of an app is looked for in `signing/android/<app>/`.
+4. **The legacy layout's folders**, last — see below.
+5. **A data repo's `DATA.md`**, for an installation that predates this file. Still read,
    so nothing breaks — and reported as legacy, because a fallback nobody is told about
    becomes the real mechanism.
+
+## The legacy layout
+
+Until 2026-11 the folders sat at the top level. The resolvers
+(`plugins/*/shared/credentials.py`, `LAYOUT`) still read them, **as the last fallback**,
+and say so when that is where the answer came from; `init_keys.py` reports them and
+never creates them.
+
+| legacy | current |
+|---|---|
+| `android/<app>-keystore/` | `signing/android/<app>/` |
+| `android/api-fastlane-supply/` | `store-api/googleplay/` |
+| `appstoreconnect/` | `store-api/appstoreconnect/` |
+| `appleads/` | `store-api/appleads/` |
+| `apple-certificates/` | `signing/apple/` |
+| `Sparkle/` | `signing/sparkle/` |
+
+A `credentials.json` that names a legacy path keeps working while the file is there —
+it is a path like any other. Move the files, then update the paths in it.
 
 ## What the skills do, and do not do
 

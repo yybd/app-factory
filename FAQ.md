@@ -96,7 +96,10 @@ they will never do without asking. Every upload is confirmed first; nothing push
 Into `$KEYS_ROOT`, which `factory/init_keys.py --create` sets up outside every repo and
 gitignores from the first byte. You fill it in by hand. Each track resolves a credential
 in one documented order: the environment, then `$KEYS_ROOT/credentials.json`, then a
-folder convention.
+folder convention — `signing/` for what signs (`android/<app>/`, `apple/`, `sparkle/`),
+`store-api/` for what talks to a store (`appstoreconnect/<name>/`, `googleplay/`,
+`appleads/`). The flat layout used before 2026-11 is still read, last, and reported as
+legacy. [`docs/contracts/keys.md`](docs/contracts/keys.md) has the map.
 
 **Does anything here see my keys?**
 The resolvers return a **path**; the file itself is read by `fastlane`, `notarytool` or

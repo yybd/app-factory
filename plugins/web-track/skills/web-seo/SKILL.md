@@ -43,7 +43,7 @@ This file is the method. What running it taught — the runs behind each rule �
 ## Prerequisites
 
 - **Tools:** Python 3 for `scripts/audit.py` (standard library only, nothing to install); the site repo's own `npm run seo` and `npm run verify:deploys`; `curl` for the live checks.
-- **Credentials:** Search Console and analytics credentials, only for the live reading (§3) — named by the descriptor's `search_console` / `analytics` entries (e.g. `$KEYS_ROOT/google/search-console.json`). No API client ships here; the audit needs none.
+- **Credentials:** Search Console and analytics credentials, only for the live reading (§3) — named by the descriptor's `search_console` / `analytics` entries (e.g. `$KEYS_ROOT/services/google/search-console.json`). No API client ships here; the audit needs none.
 - **MCP:** optional — Google's [`analytics-mcp`](https://github.com/googleanalytics/google-analytics-mcp) server, for reading GA4 in the live half (§3). It is installed on the machine, not shipped here; with no `mcp__analytics-mcp__*` tools in the session, take GA4's numbers from an export or the UI and say so.
 - **Hub (`$APP_HUB`):** optional — `<slug>/profile.md` is read to compare a page's title and first paragraph against the product's own words (§4); without it, compare against the page alone.
 - **Other tracks:** none — `copy-edit` (shared-track) owns the wording it points at, and `add-app-to-site` is the site repo's own skill, not a factory track.

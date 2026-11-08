@@ -14,6 +14,20 @@ skill does.
 
 ## Unreleased
 
+- **`$KEYS_ROOT` has a new layout: `signing/`, `store-api/`, `services/`, `projects/`,
+  `accounts/`.** The App Store Connect keys are in `store-api/appstoreconnect/<name>/`,
+  the Play service account in `store-api/googleplay/`, Apple Ads in `store-api/appleads/`,
+  each app's upload keystore in `signing/android/<app>/`, the Apple certificate backups
+  in `signing/apple/`, the Sparkle key in `signing/sparkle/`. The resolvers
+  (`plugins/*/shared/credentials.py`, `LAYOUT`) look there first and read the flat
+  layout used until now as the **last** fallback, saying so when that is what answered;
+  `factory/init_keys.py` creates the new one, writes a `credentials.json` template with
+  its paths, and reports a legacy folder it finds. `docs/contracts/keys.md` has the map
+  and the legacy table; every skill, reference, the FAQ and COMPATIBILITY name the new
+  paths. Also: `credentials.json` may record the notary credential as an API key
+  (`notary.key_id` + `p8`) instead of a keychain profile, and `notarize_dmg.py` uses it
+  when no credential is passed.
+
 - **`$KEYS_ROOT/APPLE.md` has a fixed structure, and `apple_creds.py init` writes it.**
   `apple-credentials/references/APPLE.md.template` is the map every installation shares
   (identity, certificates, API keys, other keys, profiles, profile policy, key backup,

@@ -55,7 +55,7 @@ just the command. Other skills defer here, so be the authoritative, clear source
 **If `$KEYS_ROOT/APPLE.md` exists, read it first.** It is the owner's map of the
 Apple account: the team ID (and which ID is *not* a team), every certificate with
 its SHA-1 and expiry, which App Store Connect API key under
-`$KEYS_ROOT/appstoreconnect/<name>/` serves what, the provisioning profiles, and
+`$KEYS_ROOT/store-api/appstoreconnect/<name>/` serves what, the provisioning profiles, and
 the signing traps already met. It holds no secrets — only IDs, dates and
 locations. Then run the check:
 ```bash
@@ -63,7 +63,7 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/apple-credentials/scripts/apple_creds.py ch
 ```
 It lists signing certificates grouped by type with SHA-1 and expiry, detects App
 Store Connect API keys (the track's resolver, the standard folders, and
-`$KEYS_ROOT/appstoreconnect/*/`), notes notary-profile setup, and summarizes
+`$KEYS_ROOT/store-api/appstoreconnect/*/`), notes notary-profile setup, and summarizes
 what's present vs missing for each goal (development / App Store / Developer ID).
 
 **Reconcile the two and report every disagreement** — the file is a record, and
@@ -137,7 +137,7 @@ which key exports iOS builds) are in `$KEYS_ROOT/APPLE.md`. In short:
   `codesign -d --entitlements -` on the app and each extension; `Provisioning Profile:
   "…: *"` in the build log means the capabilities were stripped silently.
 - **Key backup:** after every certificate creation or renewal, back up that
-  certificate's private key to `$KEYS_ROOT/apple-certificates/<type>-<YYYY-MM-DD>.p12`
+  certificate's private key to `$KEYS_ROOT/signing/apple/<type>-<YYYY-MM-DD>.p12`
   — one file per certificate, one password for all in `p12-password.txt` beside them
   (`chmod 600`) — verify the key matches the certificate, and keep the old file until
   its certificate expires. `.p8` keys and the Sparkle key have **no other
@@ -162,7 +162,7 @@ of change is wrong from that moment on, and nothing else will notice.
    every installation shares (identity → certificates → API keys → other keys →
    profiles → profile policy → key backup → known traps → quick status). It fills what
    the machine shows — team ID from the certificates' `OU`, the personal ID, the
-   certificates with SHA-1 and expiry, the keys under `$KEYS_ROOT/appstoreconnect/*/`
+   certificates with SHA-1 and expiry, the keys under `$KEYS_ROOT/store-api/appstoreconnect/*/`
    with the Issuer ID, the manual profiles, the backups matched by SHA-1, whether
    `$KEYS_ROOT` has an off-machine copy — and embeds the policy and backup text from
    `references/profiles-and-backup.md`, so the file stands on its own. It writes with
