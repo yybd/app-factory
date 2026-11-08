@@ -14,6 +14,8 @@ skill does.
 
 ## Unreleased
 
+## 0.15.0
+
 - **`$KEYS_ROOT` has a new layout: `signing/`, `store-api/`, `services/`, `projects/`,
   `accounts/`.** The App Store Connect keys are in `store-api/appstoreconnect/<name>/`,
   the Play service account in `store-api/googleplay/`, Apple Ads in `store-api/appleads/`,
