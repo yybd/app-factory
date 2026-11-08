@@ -14,6 +14,16 @@ skill does.
 
 ## Unreleased
 
+- **`apple-credentials` carries the studio's provisioning-profile policy and key
+  backup** (`plugins/apple-track/skills/apple-credentials/references/profiles-and-backup.md`): a manual profile only for a Tauri Mac
+  App Store build (found by name, one per app, regenerated when a capability is added);
+  iOS App Store export automatic for Capacitor and Tauri; capabilities in Xcode for
+  Capacitor and in `project.yml` for Tauri, verified with `codesign` after every build;
+  one `.p12` per certificate under `$KEYS_ROOT/apple-certificates/`, re-exported on
+  every renewal. `check` reports, per certificate, whether a backup at least as new
+  exists, and warns when `$KEYS_ROOT` has no copy off the system disk.
+  `code-signing-provisioning` and `ship-apple-app` point at it.
+
 - **`apple-credentials` reads and keeps `$KEYS_ROOT/APPLE.md`.** When the owner's map of
   the Apple account exists (team, certificates with expiry, which App Store Connect key
   under `$KEYS_ROOT/appstoreconnect/<name>/` serves what, profiles, traps), the skill

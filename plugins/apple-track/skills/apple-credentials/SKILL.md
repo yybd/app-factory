@@ -117,10 +117,39 @@ And the right auth credential using
   the result with `store-creds` or place the `.p8` per
   [references/auth-credentials.md](references/auth-credentials.md).
 
+### 4. Profiles, capabilities and key backup — the studio's policy
+The rules are in [references/profiles-and-backup.md](references/profiles-and-backup.md);
+this installation's specifics (which apps have a manual profile, the backup's date,
+which key exports iOS builds) are in `$KEYS_ROOT/APPLE.md`. In short:
+- **Manual profile only for a Tauri Mac App Store build** (embedded before signing).
+  Everything else is automatic — including the **iOS App Store export** (Capacitor and
+  Tauri): `ExportOptions.plist` with `method` `app-store-connect`, `signingStyle`
+  `automatic`, `teamID`, and `xcodebuild -exportArchive -allowProvisioningUpdates` with
+  an ASC API key (`-authenticationKeyPath/-authenticationKeyID/-authenticationKeyIssuerID`).
+  No manual iOS store profiles.
+- **A manual Mac App Store profile** lives in `~/Library/MobileDevice/Provisioning Profiles`
+  (never in `$KEYS_ROOT` — it is not a secret), one per app, a new one named
+  `<App> macOS AppStore`; the build script finds it **by name** (`MAS_PROFILE`
+  overrides). When the app gains a capability, regenerate it immediately and record it.
+- **Capabilities:** Capacitor → in Xcode (`ios/App` is tracked). Tauri → in the
+  project's patch script, writing `project.yml` `entitlements.properties` **and**
+  `SystemCapabilities` — never in Xcode (`gen/apple` is regenerated). After every build,
+  `codesign -d --entitlements -` on the app and each extension; `Provisioning Profile:
+  "…: *"` in the build log means the capabilities were stripped silently.
+- **Key backup:** after every certificate creation or renewal, back up that
+  certificate's private key to `$KEYS_ROOT/apple-certificates/<type>-<YYYY-MM-DD>.p12`
+  — one file per certificate, one password for all in `p12-password.txt` beside them
+  (`chmod 600`) — verify the key matches the certificate, and keep the old file until
+  its certificate expires. `.p8` keys and the Sparkle key have **no other
+  copy**. `check` reports, per certificate, whether a backup at least as new exists, and
+  whether `$KEYS_ROOT` has a copy off this disk — warn when it does not.
+- **Don't** choose the personal ID in the development certificate's name as the team;
+  don't use `fastlane match` for one developer on one Mac.
+
 ## Keep `$KEYS_ROOT/APPLE.md` current
 
 **Whenever this skill creates or renews a certificate, an API key, a notary
-profile or an App ID capability, update `$KEYS_ROOT/APPLE.md` in the same turn**
+profile, a manual provisioning profile, a key backup or an App ID capability, update `$KEYS_ROOT/APPLE.md` in the same turn**
 — the name, team, SHA-1, expiry, Key ID, folder, profile name, and the date of
 the change. **Never a secret:** no password, no `.p8`/`.p12` content, no private
 key — IDs, dates and locations only. A record that is not updated at the moment
@@ -135,7 +164,7 @@ If `$KEYS_ROOT` is not set, do not invent a location — say so and go on.
 ## What's safe vs ask-first
 Safe: `check`, reading `APPLE.md`, explaining, guiding creation, drafting
 commands, updating `APPLE.md` after a change this skill made. Ask first:
-creating `APPLE.md`,
+creating `APPLE.md`, exporting private keys to the backup `.p12` files,
 running `store-creds` (writes to the keychain), exporting a `.p12` (handles the
 private key), and anything touching the Apple account.
 
@@ -163,5 +192,8 @@ single source of truth.
 - [references/auth-credentials.md](references/auth-credentials.md) —
   app-specific passwords, notary keychain profiles, and App Store Connect API
   keys: what each is, which tool needs which, and how to set them up.
+- [references/profiles-and-backup.md](references/profiles-and-backup.md) — which
+  builds get a manual profile, iOS automatic export, where capabilities are declared
+  (Capacitor vs Tauri) and how to verify them, the key backup and restore, the don'ts.
 - [scripts/apple_creds.py](scripts/apple_creds.py) — `check`, `store-creds`,
   `setup`.

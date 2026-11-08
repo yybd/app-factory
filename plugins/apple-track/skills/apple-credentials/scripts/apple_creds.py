@@ -60,8 +60,20 @@ def keys_root():
     return os.path.expanduser(v) if v else None
 
 
-def cert_expiries():
-    """SHA-1 → expiry date (YYYY-MM-DD) for every certificate in the search list.
+def _cert_date(pem, field):
+    e = subprocess.run(["openssl", "x509", "-noout", f"-{field}"], input=pem,
+                       capture_output=True, text=True)
+    m = re.search(r"=(.+)", e.stdout or "")
+    if not m:
+        return None
+    try:
+        return datetime.datetime.strptime(m.group(1).strip(), "%b %d %H:%M:%S %Y %Z").date().isoformat()
+    except ValueError:
+        return None
+
+
+def cert_dates():
+    """SHA-1 → (issued, expires) as YYYY-MM-DD for every certificate in the search list.
 
     Public certificates only — `security find-certificate -p` prints the certificate,
     never the private key."""
@@ -69,16 +81,42 @@ def cert_expiries():
     out = {}
     for sha1, pem in re.findall(r"SHA-1 hash: ([0-9A-F]+)\s+(-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----)",
                                 r.stdout or "", re.S):
-        e = subprocess.run(["openssl", "x509", "-noout", "-enddate"], input=pem,
-                           capture_output=True, text=True)
-        m = re.search(r"notAfter=(.+)", e.stdout or "")
-        if m:
-            try:
-                d = datetime.datetime.strptime(m.group(1).strip(), "%b %d %H:%M:%S %Y %Z")
-                out[sha1] = d.date().isoformat()
-            except ValueError:
-                pass
+        out[sha1] = (_cert_date(pem, "startdate"), _cert_date(pem, "enddate"))
     return out
+
+
+def backup_slug(name):
+    """'Apple Development: X (ID)' → 'apple-development' — the backup file's prefix."""
+    return re.sub(r"[^a-z0-9]+", "-", name.split(":")[0].lower()).strip("-")
+
+
+def newest_backups(root):
+    """slug → (date, path) for the newest <type>-<YYYY-MM-DD>.p12 under
+    $KEYS_ROOT/apple-certificates/. Dates come from the names; no file is opened."""
+    best = {}
+    for f in glob.glob(os.path.join(root, "apple-certificates", "*.p12")):
+        m = re.match(r"(.+)-(\d{4}-\d{2}-\d{2})\.p12$", os.path.basename(f))
+        if m and (m.group(1) not in best or m.group(2) > best[m.group(1)][0]):
+            best[m.group(1)] = (m.group(2), f)
+    return best
+
+
+def off_machine_copy(root):
+    """(state, detail): whether Time Machine includes $KEYS_ROOT on a disk other than this one."""
+    ex = run(["tmutil", "isexcluded", root])
+    if "[Excluded]" in (ex.stdout or ""):
+        return False, "Time Machine excludes it"
+    di = run(["tmutil", "destinationinfo"])
+    names = re.findall(r"^Name\s*:\s*(.+)$", di.stdout or "", re.M)
+    if not names:
+        return False, "no Time Machine destination is configured"
+    boot = run(["diskutil", "info", "/"])
+    m = re.search(r"Volume Name:\s*(.+)", boot.stdout or "")
+    boot_name = m.group(1).strip() if m else None
+    others = [n.strip() for n in names if n.strip() != boot_name]
+    if not others:
+        return False, f"the only Time Machine destination is the system disk ({boot_name})"
+    return True, "Time Machine → " + ", ".join(others)
 
 
 def list_certs():
@@ -142,7 +180,8 @@ def cmd_check(args):
         print(f"  none at {os.path.join(root, 'APPLE.md')} — offer to create it from this output")
 
     by_type, present = list_certs()
-    expiries = cert_expiries()
+    dates = cert_dates()
+    expiries = {k: v[1] for k, v in dates.items()}
     today = datetime.date.today().isoformat()
     soon = (datetime.date.today() + datetime.timedelta(days=60)).isoformat()
     step("Signing certificates in keychain")
@@ -157,6 +196,28 @@ def cmd_check(args):
             elif exp and exp <= soon:
                 note = f"expires {exp} — renew soon"
             print(f"  • [{label}] {n}  ({sha1[:8]}…{sha1[-4:]}, {note})")
+
+    step("Backup of the signing keys ($KEYS_ROOT/apple-certificates/)")
+    if not root:
+        print("  $KEYS_ROOT is not set — nowhere to look")
+    else:
+        backups = newest_backups(root)
+        for items in by_type.values():
+            for n, sha1 in items:
+                slug = backup_slug(n)
+                issued = (dates.get(sha1) or (None, None))[0]
+                b = backups.get(slug)
+                if not b:
+                    miss(f"{slug}: no backup — export it (ask first; references/profiles-and-backup.md)")
+                elif issued and issued > b[0]:
+                    warn(f"{slug}: newest backup {os.path.basename(b[1])} pre-dates the certificate (issued {issued}) — re-export")
+                else:
+                    ok(f"{slug}: {os.path.basename(b[1])}")
+        if backups and not os.path.isfile(os.path.join(root, "apple-certificates", "p12-password.txt")):
+            warn("p12-password.txt is not beside the backups")
+        has_copy, detail = off_machine_copy(root)
+        (ok if has_copy else warn)(f"off-machine copy of $KEYS_ROOT: {detail}"
+                                   + ("" if has_copy else " — .p8 and Sparkle keys have no other copy"))
 
     step("App Store Connect API key")
     # The track's resolver is what every shipping script asks — the environment, then

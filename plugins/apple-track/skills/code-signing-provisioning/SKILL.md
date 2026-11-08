@@ -40,6 +40,11 @@ whole process, not just paste commands.
   the owner's map of the team, each certificate and its expiry, and which App Store
   Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
   `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
+- **Profile policy and key backup:** which builds get a manual profile (only a Tauri
+  Mac App Store build), the automatic iOS App Store export, where capabilities are
+  declared (Capacitor in Xcode, Tauri in `project.yml`) and how to verify them —
+  `apple-credentials`' [`profiles-and-backup.md`](../apple-credentials/references/profiles-and-backup.md); this installation's
+  specifics in `$KEYS_ROOT/APPLE.md`.
 - **Hub (`$APP_HUB`):** optional — only the conversational-language default in `DATA.md`.
 - **Other tracks:** none.
 
