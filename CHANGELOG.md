@@ -14,6 +14,8 @@ skill does.
 
 ## Unreleased
 
+## 0.12.0
+
 - **`page-builder`: say what it does before showing how well.** A product, and every
   part of one sold on its own, opens with a plain description of what it does (a concrete
   heading, one sentence, a short list of its tools in ordinary words) before screenshots,
