@@ -101,6 +101,29 @@ def newest_backups(root):
     return best
 
 
+def backup_fingerprints(root):
+    """SHA-1 → .p12 path, read from each backup's certificate.
+
+    Only the public certificate is extracted (`-nokeys`); the password is handed to
+    openssl as `file:` and never read here. Empty when there is no password file or
+    openssl cannot open the files — the caller then falls back to names and dates."""
+    d = os.path.join(root, "apple-certificates")
+    pw = os.path.join(d, "p12-password.txt")
+    if not os.path.isfile(pw):
+        return {}
+    out = {}
+    for f in glob.glob(os.path.join(d, "*.p12")):
+        c = subprocess.run(["openssl", "pkcs12", "-legacy", "-in", f, "-passin", f"file:{pw}", "-nokeys"],
+                           capture_output=True, text=True)
+        for pem in re.findall(r"-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----", c.stdout or "", re.S):
+            fp = subprocess.run(["openssl", "x509", "-noout", "-fingerprint", "-sha1"], input=pem,
+                                capture_output=True, text=True)
+            m = re.search(r"=([0-9A-F:]+)", fp.stdout or "")
+            if m:
+                out[m.group(1).replace(":", "")] = f
+    return out
+
+
 def off_machine_copy(root):
     """(state, detail): whether Time Machine includes $KEYS_ROOT on a disk other than this one."""
     ex = run(["tmutil", "isexcluded", root])
@@ -202,9 +225,20 @@ def cmd_check(args):
         print("  $KEYS_ROOT is not set — nowhere to look")
     else:
         backups = newest_backups(root)
+        by_sha1 = backup_fingerprints(root)
+        if by_sha1:
+            print("  (matched by SHA-1, read from each backup's certificate)")
         for items in by_type.values():
             for n, sha1 in items:
                 slug = backup_slug(n)
+                if by_sha1:
+                    f = by_sha1.get(sha1)
+                    if f:
+                        ok(f"{slug}: {os.path.basename(f)}")
+                    else:
+                        miss(f"{slug} ({sha1[:8]}…): no backup holds this certificate — export it "
+                             "(ask first; references/profiles-and-backup.md)")
+                    continue
                 issued = (dates.get(sha1) or (None, None))[0]
                 b = backups.get(slug)
                 if not b:

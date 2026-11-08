@@ -20,8 +20,8 @@ skill does.
   iOS App Store export automatic for Capacitor and Tauri; capabilities in Xcode for
   Capacitor and in `project.yml` for Tauri, verified with `codesign` after every build;
   one `.p12` per certificate under `$KEYS_ROOT/apple-certificates/`, re-exported on
-  every renewal. `check` reports, per certificate, whether a backup at least as new
-  exists, and warns when `$KEYS_ROOT` has no copy off the system disk.
+  every renewal. `check` names, per certificate in the keychain, the backup that holds
+  its SHA-1 (or flags that none does), and warns when `$KEYS_ROOT` has no copy off the system disk.
   `code-signing-provisioning` and `ship-apple-app` point at it.
 
 - **`apple-credentials` reads and keeps `$KEYS_ROOT/APPLE.md`.** When the owner's map of

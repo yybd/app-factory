@@ -141,7 +141,8 @@ which key exports iOS builds) are in `$KEYS_ROOT/APPLE.md`. In short:
   — one file per certificate, one password for all in `p12-password.txt` beside them
   (`chmod 600`) — verify the key matches the certificate, and keep the old file until
   its certificate expires. `.p8` keys and the Sparkle key have **no other
-  copy**. `check` reports, per certificate, whether a backup at least as new exists, and
+  copy**. `check` reports, per certificate in the keychain, the backup file that holds its
+  SHA-1 (or flags that none does), and
   whether `$KEYS_ROOT` has a copy off this disk — warn when it does not.
 - **Don't** choose the personal ID in the development certificate's name as the team;
   don't use `fastlane match` for one developer on one Mac.
