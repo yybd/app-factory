@@ -14,6 +14,16 @@ skill does.
 
 ## Unreleased
 
+- **`windows-local-build` works around Xcode 27's linker, and builds llama.cpp's Vulkan
+  backend.** Xcode 27's `ld` writes a corrupt LINKEDIT into release links with a macOS
+  deployment target of 12+, so host proc macros fail to load and a cross build stops
+  with `E0463` on a different crate each run. `win_local.sh build` now links host code
+  through a `cc -Wl,-no_fixup_chains` wrapper, and the skill warns that the same bug
+  silently damages Mac release binaries (`dyld_info -platform` shows it). A new
+  `win_local.sh vulkan-sdk` builds a Windows Vulkan SDK from Homebrew for
+  `llama-cpp-sys-2`'s `vulkan` feature, and `build` exports it. Also: a `cfg` in
+  `build.rs` describes the host — read `CARGO_CFG_TARGET_OS`.
+
 ## 0.14.0
 
 - **The listing URLs are checked on every update, not only the first.** A new App

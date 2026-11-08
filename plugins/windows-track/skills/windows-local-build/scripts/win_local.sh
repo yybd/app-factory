@@ -12,6 +12,8 @@
 #   win_local.sh snapshot                  save the VM as $WIN_SNAPSHOT (once, before a first install)
 #   win_local.sh fresh                     go back to $WIN_SNAPSHOT, to test a first install
 #   win_local.sh shares                    what the VM sees of the Mac — run this first
+#   win_local.sh vulkan-sdk                a Windows "Vulkan SDK" built from Homebrew, for
+#                                          llama.cpp's Vulkan backend (llama-cpp-sys-2 `vulkan`)
 #
 # Run it from the app's directory (the one holding package.json and src-tauri/), or
 # copy it into the repo. Everything app-specific is read from the project or set here:
@@ -22,9 +24,15 @@
 #   WIN_STAGE     a Mac folder the VM can see        (default: ~/Downloads/<bin>-vm)
 #   WIN_HOME_VM   how the VM sees the Mac's $HOME    (default: \\Mac\Home)
 #   WIN_SNAPSHOT  the clean snapshot's name          (default: clean)
+#   WIN_HOST_LINKER  linker for host build scripts and proc-macros (default: a wrapper
+#                 adding -no_fixup_chains — see below; "none" leaves cargo's default)
+#   WIN_VULKAN_SDK   the fake Vulkan SDK folder      (default: ~/Library/Caches/vulkan-sdk-windows)
+#   WIN_VULKAN    1 / 0: export VULKAN_SDK for the build (default: 1 when src-tauri/Cargo.toml
+#                 mentions vulkan and the folder exists)
 #
 # One-time setup on the Mac: brew install nsis llvm; cargo install --locked cargo-xwin;
 # rustup target add x86_64-pc-windows-msvc aarch64-pc-windows-msvc.
+# For the Vulkan backend also: brew install vulkan-headers shaderc spirv-headers ninja.
 
 # -h / --help prints the header above and touches nothing.
 case "${1:-}" in -h|--help|"") awk 'NR>1 && !/^#/{exit} NR>1{sub(/^# ?/,""); print}' "$0"; exit 0;; esac
@@ -42,6 +50,41 @@ fi
 # makensis crashes with std::bad_alloc when the locale is not UTF-8 — and a bare shell,
 # a launchd job or an agent's subprocess often has none. Nothing in the error says so.
 export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
+
+# Xcode 27's linker (ld-27037.1, macOS 27) writes a corrupt LINKEDIT ("mis-aligned
+# LINKEDIT string pool" in `dyld_info -platform`) into a RELEASE link when
+# MACOSX_DEPLOYMENT_TARGET is 12 or higher — and Tauri sets it from
+# bundle.macOS.minimumSystemVersion. Host proc-macro dylibs then fail to dlopen, and the
+# cross build stops with `E0463 can't find crate for <x>_macros` / `_derive`, naming a
+# different crate each run. Linking host artifacts without chained fixups avoids it.
+host_linker() {
+  [ "$(uname -s)" = Darwin ] || return 0
+  [ "${WIN_HOST_LINKER:-}" = none ] && return 0
+  local arch var; arch=$(uname -m); [ "$arch" = arm64 ] && arch=aarch64
+  var="CARGO_TARGET_$(echo "$arch" | tr a-z A-Z)_APPLE_DARWIN_LINKER"
+  [ -n "${!var:-}" ] && return 0            # the caller already chose one
+  local w="${WIN_HOST_LINKER:-$HOME/Library/Caches/win_local/cc-no-fixup-chains}"
+  if [ -z "${WIN_HOST_LINKER:-}" ] && [ ! -x "$w" ]; then
+    mkdir -p "$(dirname "$w")"
+    printf '#!/bin/sh\nexec /usr/bin/cc -Wl,-no_fixup_chains "$@"\n' > "$w"; chmod +x "$w"
+  fi
+  export "$var=$w"
+}
+
+VULKAN_DIR="${WIN_VULKAN_SDK:-$HOME/Library/Caches/vulkan-sdk-windows}"
+# llama-cpp-sys-2's `vulkan` feature runs CMake's FindVulkan, which wants an SDK laid out
+# the Windows way: Include/, Lib/vulkan-1.lib, Bin/glslc. `vulkan-sdk` builds one.
+# spirv-headers must be on the prefix path; vulkan-headers must NOT be (its include
+# folder shadows the one that holds spirv.hpp, and the shader generator stops on it).
+vulkan_env() {
+  local want="${WIN_VULKAN:-}"
+  [ -z "$want" ] && { grep -qi vulkan "$TAURI/Cargo.toml" 2>/dev/null && [ -d "$VULKAN_DIR" ] && want=1 || want=0; }
+  [ "$want" = 1 ] || return 0
+  [ -f "$VULKAN_DIR/Lib/vulkan-1.lib" ] || { echo "no Vulkan SDK in $VULKAN_DIR — win_local.sh vulkan-sdk" >&2; exit 1; }
+  export VULKAN_SDK="$VULKAN_DIR"
+  export CMAKE_PREFIX_PATH="$(brew --prefix)/opt/spirv-headers;$VULKAN_DIR"
+  echo "Vulkan SDK: $VULKAN_SDK"
+}
 
 need_project() { [ -d "$TAURI" ] || { echo "no src-tauri/ in $APP — run from the app, or set WIN_APP_DIR" >&2; exit 2; }; }
 
@@ -93,7 +136,7 @@ exe_for() { echo "$TAURI/target/$(triple "$1")/release/$(bin_name).exe"; }
 cmd="$1"; shift
 case "$cmd" in
   build)
-    need_project
+    need_project; host_linker; vulkan_env
     for a in $(arches "${1:-all}"); do
       echo "▶︎ build $a"
       (cd "$APP" && npx tauri build --runner cargo-xwin --target "$(triple "$a")" --bundles nsis)
@@ -133,6 +176,23 @@ snaps = json.load(sys.stdin)
 print(next((i for i, s in snaps.items() if s.get("name") == sys.argv[1]), ""))' "$SNAP")
     [ -n "$id" ] || { echo "no snapshot named '$SNAP' — win_local.sh snapshot" >&2; exit 1; }
     prlctl snapshot-switch "$VM" --id "$id" ;;
+  vulkan-sdk)
+    # brew install vulkan-headers shaderc spirv-headers ninja (and llvm, for llvm-dlltool).
+    b=$(brew --prefix)
+    for f in "$b/include/vulkan/vulkan.h" "$b/bin/glslc" "$b/opt/spirv-headers"; do
+      [ -e "$f" ] || { echo "missing $f — brew install vulkan-headers shaderc spirv-headers ninja" >&2; exit 1; }
+    done
+    command -v llvm-dlltool >/dev/null || { echo "no llvm-dlltool — brew install llvm" >&2; exit 1; }
+    mkdir -p "$VULKAN_DIR/Lib" "$VULKAN_DIR/Bin"
+    ln -sfn "$b/include" "$VULKAN_DIR/Include"
+    ln -sf "$b/bin/glslc" "$VULKAN_DIR/Bin/glslc"
+    # The import library is made from the loader's export list; the DLL itself ships with
+    # the GPU driver on the user's machine, so nothing from Windows is redistributed.
+    def="$VULKAN_DIR/Lib/vulkan-1.def"
+    [ -s "$def" ] || curl -fsSL -o "$def" \
+      https://raw.githubusercontent.com/KhronosGroup/Vulkan-Loader/main/loader/vulkan-1.def
+    llvm-dlltool -m i386:x86-64 -d "$def" -l "$VULKAN_DIR/Lib/vulkan-1.lib"
+    echo "$VULKAN_DIR — win_local.sh build picks it up when src-tauri/Cargo.toml mentions vulkan" ;;
   shares)
     echo "── mapped drives";   vm "net use"
     echo "── $HOME_VM";        vm "dir $HOME_VM" ;;

@@ -31,6 +31,103 @@ The fix is two variables, and the script sets them unconditionally:
 export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8
 ```
 
+### Xcode 27's linker and `E0463`
+
+**The symptom.** A cross build stops with
+
+```
+error[E0463]: can't find crate for `serde_derive`
+```
+
+— or `phf_macros`, `thiserror_impl`, another proc-macro crate each run. The crate is
+built; it cannot be **loaded**. A proc macro is a dylib the compiler `dlopen`s on the
+host, and the host linker wrote it broken.
+
+**The cause.** Xcode 27's `ld` (`ld-27037.1`, on macOS 27) produces a Mach-O with a
+corrupt LINKEDIT segment when it links **in release mode** with
+`MACOSX_DEPLOYMENT_TARGET` at 12 or higher — the targets for which it emits chained
+fixups. Tauri sets that variable from `bundle.macOS.minimumSystemVersion`, so a Tauri
+app with a minimum of 12+ hits it on every release build, the cross one included,
+because host proc macros are built with the same profile. `dyld_info` shows it:
+
+```bash
+dyld_info -platform path/to/libserde_derive-*.dylib
+# … mis-aligned LINKEDIT string pool
+```
+
+It reproduces outside Tauri, in a crate with nothing but `phf` (with `macros`) and
+`serde` (with `derive`): `MACOSX_DEPLOYMENT_TARGET=12.0 cargo build --release` fails,
+`11.0` builds, and a debug build at 12.0 builds.
+
+**The fix.** Link host artifacts without chained fixups. A two-line wrapper:
+
+```sh
+#!/bin/sh
+exec /usr/bin/cc -Wl,-no_fixup_chains "$@"
+```
+
+and `CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=<wrapper>` (`X86_64` on an Intel Mac).
+`win_local.sh build` writes the wrapper to `~/Library/Caches/win_local/` and sets the
+variable unless it is already set; `WIN_HOST_LINKER=<path>` picks another linker and
+`WIN_HOST_LINKER=none` turns it off — for a fixed Xcode, check with the `phf` crate
+above before dropping it. Only host code goes through it; the Windows target links with
+`lld-link` as before.
+
+**The Mac build is affected too, and silently.** The app's own Mac release binary
+goes through the same linker with the same deployment target. It still launches on the
+machine that built it, so nothing fails — but it is damaged, and may not load on
+another Mac or another macOS. Before a Mac release, run `dyld_info -platform` on the
+main binary and every bundled dylib, and build with the same wrapper
+(`CARGO_TARGET_AARCH64_APPLE_DARWIN_LINKER=<wrapper> npx tauri build`).
+
+### A `cfg` in `build.rs` describes the host
+
+`build.rs` is compiled for and run on the machine doing the build. In a cross build
+from a Mac, `#[cfg(target_os = "macos")]` inside it is **true** while the app is being
+built for Windows — so Mac-only link flags or frameworks get added to a Windows link,
+and the build fails. Ask Cargo about the target instead:
+
+```rust
+let target_os = std::env::var("CARGO_CFG_TARGET_OS").unwrap_or_default();
+if target_os == "macos" { /* … */ }
+```
+
+(`CARGO_CFG_TARGET_ARCH`, `CARGO_CFG_TARGET_ENV` likewise.) A `cfg` in the app's own
+code is fine — that code is compiled for the target.
+
+### llama.cpp's Vulkan backend, cross-built for Windows
+
+`llama-cpp-sys-2` with the `vulkan` feature builds llama.cpp through CMake, whose
+`FindVulkan` looks for a Vulkan SDK laid out the Windows way under `VULKAN_SDK`:
+headers in `Include/`, the import library `Lib/vulkan-1.lib`, the shader compiler
+`Bin/glslc`. LunarG's SDK for Windows is a Windows installer. A stand-in from Homebrew
+works:
+
+| Piece | From |
+|---|---|
+| `Include/` | a link to `$(brew --prefix)/include` (`vulkan-headers` puts `vulkan/` there) |
+| `Lib/vulkan-1.lib` | `llvm-dlltool -m i386:x86-64 -d vulkan-1.def -l Lib/vulkan-1.lib`, from `loader/vulkan-1.def` in Khronos' Vulkan-Loader repository |
+| `Bin/glslc` | a link to Homebrew's (`shaderc`) — it runs on the Mac and writes SPIR-V, which is the same everywhere |
+
+```bash
+brew install vulkan-headers shaderc spirv-headers ninja
+export VULKAN_SDK=~/Library/Caches/vulkan-sdk-windows
+export CMAKE_PREFIX_PATH="$(brew --prefix)/opt/spirv-headers;$HOME/Library/Caches/vulkan-sdk-windows"
+```
+
+**Do not add `$(brew --prefix)/opt/vulkan-headers` to `CMAKE_PREFIX_PATH`.** With it
+there, the shader generator's build does not find `spirv.hpp` (which comes from
+`spirv-headers`) and stops.
+
+`win_local.sh vulkan-sdk` builds the folder (`WIN_VULKAN_SDK` moves it), and `build`
+exports both variables when `src-tauri/Cargo.toml` mentions vulkan and the folder
+exists; `WIN_VULKAN=1` forces it, for a feature enabled in another crate, and
+`WIN_VULKAN=0` turns it off. The import library carries no code: `vulkan-1.dll`
+comes with the GPU driver on the user's machine.
+
+**x64 only, so far.** The `.lib` above is for x64. An arm64 build would need one made
+with `-m arm64` in its own folder; that has not been tried.
+
 ### `ring` on arm64, and why a desktop app wants native-tls anyway
 
 **`ring` does not build for `aarch64-pc-windows-msvc` under cargo-xwin.** It is

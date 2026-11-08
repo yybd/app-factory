@@ -21,7 +21,7 @@ every build in every repo until the month turns. A Tauri app does not need it. T
 installer **cross-compiles on the Mac**, and a Windows VM on the same Mac **installs
 and checks** it — both driven from one script.
 
-Three things carry the weight, and each has its reasons in
+Four things carry the weight, and each has its reasons in
 [references/local-build.md](references/local-build.md):
 
 1. **makensis needs a UTF-8 locale.** Without one it dies with `std::bad_alloc`,
@@ -31,6 +31,9 @@ Three things carry the weight, and each has its reasons in
 3. **The check runs without a window** (`--selftest`), because the VM is often
    someone's working Windows, and a test that opens windows over it is a test
    nobody runs.
+4. **Xcode 27's linker corrupts release links** when `MACOSX_DEPLOYMENT_TARGET` is 12
+   or higher. The cross build fails on it, and a **Mac** release build is damaged by it
+   silently. The script links host code through a wrapper that avoids it.
 
 ## Prerequisites
 
@@ -78,11 +81,43 @@ before the first run.
 If `makensis` crashes with `std::bad_alloc`, the build ran without the script, in a
 shell with no UTF-8 locale: `export LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8`.
 
+If the build stops with **`E0463 can't find crate for <x>_macros`** (or `_derive`),
+naming a different crate each run, the host linker is the Xcode 27 one with its
+LINKEDIT bug: the proc-macro dylibs it wrote do not load. The script avoids it by
+pointing `CARGO_TARGET_<host>_APPLE_DARWIN_LINKER` at a wrapper that runs
+`cc -Wl,-no_fixup_chains`; outside the script, set that yourself
+([details](references/local-build.md#xcode-27s-linker-and-e0463)).
+
+> **The same bug ships broken Mac apps.** A Mac release build of the app linked by
+> that linker still launches on the build machine, so nothing looks wrong. Check every
+> Mac release binary with `dyld_info -platform <binary>` — "mis-aligned LINKEDIT string
+> pool" means it is damaged — and build Mac releases with the same wrapper.
+
+A `#[cfg(target_os = "macos")]` in a **`build.rs`** describes the machine running the
+build script, not the target, so it is true in a cross build from a Mac and breaks it.
+Read `std::env::var("CARGO_CFG_TARGET_OS")` there instead.
+
 If **arm64** fails with `clang: error: no such file or directory: '/imsvc'`, the
 culprit is `ring`, pulled in by rustls. Switch the HTTP client to `native-tls` — which
 a desktop app wants anyway, because filtering networks that re-sign HTTPS with a root
 in the Windows store break a bundled root list
 ([details](references/local-build.md#ring-on-arm64-and-why-a-desktop-app-wants-native-tls-anyway)).
+
+#### llama.cpp with the Vulkan backend
+
+`llama-cpp-sys-2` with its `vulkan` feature needs a Vulkan SDK for Windows, which
+LunarG ships only as a Windows installer. One built from Homebrew works:
+
+```bash
+brew install vulkan-headers shaderc spirv-headers ninja
+win_local.sh vulkan-sdk       # ~/Library/Caches/vulkan-sdk-windows, once
+win_local.sh build x64        # exports VULKAN_SDK and CMAKE_PREFIX_PATH by itself
+```
+
+`build` sets the variables when `src-tauri/Cargo.toml` mentions vulkan (or
+`WIN_VULKAN=1`). Never put `vulkan-headers` on `CMAKE_PREFIX_PATH` — `spirv.hpp` is
+then not found. Tested for x64 only
+([details](references/local-build.md#llamacpps-vulkan-backend-cross-built-for-windows)).
 
 ### 3. Find out what the VM sees — before staging anything
 
@@ -161,12 +196,14 @@ is by hand: copy the installer into the VM through a shared folder, install it, 
 ## Scripts
 
 - [scripts/win_local.sh](scripts/win_local.sh) — build, test, install, open, close,
-  shot, offline/online, snapshot/fresh, shares; `--help` lists every variable.
+  shot, offline/online, snapshot/fresh, shares, vulkan-sdk; `--help` lists every
+  variable.
 
 ## References
 
 - [references/local-build.md](references/local-build.md) — the cross-compile chain
-  and its failures (including `ring` on arm64 and native-tls), Parallels' shares and `prlctl exec`'s quirks, the `--selftest`
+  and its failures (including Xcode 27's linker, `build.rs` cfgs, the Vulkan SDK, and
+  `ring` on arm64 and native-tls), Parallels' shares and `prlctl exec`'s quirks, the `--selftest`
   pattern in Rust, x64 under emulation, and what a VM cannot show.
 
 ## Boundaries
