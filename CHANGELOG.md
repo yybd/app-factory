@@ -14,6 +14,8 @@ skill does.
 
 ## Unreleased
 
+## 0.13.0
+
 - **Support mail: one address, and every message says where it came from.** The skills
   now read a hub's `DATA.md` section `### support mail` (the support address, the
   subject formats, a per-app table of support URLs) and apply it on every surface. No
