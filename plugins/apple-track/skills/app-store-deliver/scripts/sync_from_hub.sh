@@ -378,6 +378,22 @@ want_shot() {
   [[ -z "$platform" ]] && return 0
   if [[ "$platform" == "osx" ]]; then is_mac_shot "$1"; else ! is_mac_shot "$1"; fi
 }
+# One <App> folder only. After a rename the old folder stays beside the new one with
+# the same filenames (01.png …), the loop below copies both into one flat folder, and
+# the one read last wins — alphabetically, often the OLD name — so a deliver puts the
+# previous product's screenshots and preview back on the live listing.
+shopt -s nullglob
+app_dirs=()
+for d in "$media"/*/; do
+  caps=("$d"*/screenshots*/ "$d"*/app-preview/)
+  [[ ${#caps[@]} -gt 0 ]] && app_dirs+=("$(basename "$d")")
+done
+shopt -u nullglob
+if [[ ${#app_dirs[@]} -gt 1 ]]; then
+  echo "✗ $slug/media/apple holds captures in ${#app_dirs[@]} app folders: ${app_dirs[*]}" >&2
+  echo "  One is current. Move the others out of media/apple/ (e.g. media/archive/) and run again." >&2
+  exit 1
+fi
 shots_n=0; vids_n=0; skipped_n=0; duo_n=0; with_media=" "; no_media=()
 for loc in "${expected[@]}"; do
   destloc="$dst/screenshots/$loc"; copied=0

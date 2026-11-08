@@ -163,6 +163,12 @@ Guide the user through each, with exact navigation:
   before submitting — not at some earlier step. Once the version is
   `WAITING_FOR_REVIEW` its metadata is frozen (promotional text excepted), so a field
   found empty afterwards ships empty or costs a pull from the queue.
+  On an UPDATE as much as a first release, this gate is also where the **Support URL,
+  Marketing URL and Privacy URL** are proven current: it compares them store-vs-hub
+  (a new version copies the old ones) and fetches each — 200, no off-host redirect,
+  the `#contact` section present, the app's current name on the page. After a rename
+  this is what catches a listing still pointing at the old product's page. A
+  `URL BAD` line blocks the submission until the hub or the page is fixed.
 - **Submit for Review** (never auto-submit without the user's explicit go-ahead).
 - Choose manual vs automatic release.
 - If rejected: read the resolution-center message, map it to a guideline (the

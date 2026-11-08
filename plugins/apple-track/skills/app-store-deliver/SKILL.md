@@ -256,6 +256,20 @@ store-vs-hub for each. Exit 3 = the version is in review and its metadata is fro
   compare `sha1(Image.open(f).convert('RGB').tobytes())` against the hub file.
   Byte size matches nothing. Play's `pull_and_diff.sh` hashes content and has no
   such problem.
+  A quicker decider than pixels: every live screenshot and preview carries
+  `sourceFileChecksum`, the MD5 of the file as uploaded — compare it with the hub
+  file's MD5. And note that a whole run of STALE was once not re-encoding at all: the
+  guard keyed hub files by basename alone, so per-locale sets (01.png in every
+  locale) and an old `<App>` folder left after a rename overwrote each other. It now
+  matches a locale's own file first and refuses more than one `<App>` folder, as
+  `sync_from_hub.sh` does — after a rename, move the old folder to `media/archive/`.
+- `URL BAD` — a support, marketing or privacy URL from the hub failed the live check:
+  not 200, redirected off its host, no element for its `#fragment`, or the page never
+  mentions the app's current name (the listing name before its first ` – `). The URLs
+  are also compared store-vs-hub like any field, because a new version record copies
+  them from the previous one and a changed page would otherwise never reach the
+  store. **This runs on every update** — pages move and get renamed between releases.
+  Fix the hub (`store-metadata-writer`) or the page, then run again.
 
 It also prints the version's `appStoreState`. If it is `WAITING_FOR_REVIEW`,
 `IN_REVIEW` or `PENDING_APPLE_RELEASE`, **metadata is frozen** — uploading means

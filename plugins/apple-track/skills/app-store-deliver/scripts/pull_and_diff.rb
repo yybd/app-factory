@@ -77,8 +77,12 @@ def release_notes_path(tree, version, platform, loc)
   [File.join(dir, "#{loc}.#{plat}.txt"), File.join(dir, "#{loc}.txt")].find { |f| File.exist?(f) }
 end
 
+# The two URLs are here because a new version record copies them from the previous
+# one: a support or marketing page changed in the hub (a rename, a new domain) never
+# reaches the store unless something compares them, and nothing did.
 FIELDS = { "description" => "description", "keywords" => "keywords",
-           "promotionalText" => "promotional_text", "whatsNew" => "release_notes" }
+           "promotionalText" => "promotional_text", "whatsNew" => "release_notes",
+           "supportUrl" => "support_url", "marketingUrl" => "marketing_url" }
 
 diffs = []
 ASC.localizations(ver["id"]).each do |l|
@@ -124,15 +128,86 @@ ASC.body(ASC.rc.get("v1/apps/#{app_id}/appInfos"))["data"].each do |i|
 end
 
 # ---------------------------------------------------------------------------
+# URLS — every support, marketing and privacy URL the listing will carry, fetched.
+#
+# Matching the hub is not enough: after a rename the hub and the store can agree on a
+# page that still sells the old product, has moved, or lost its #contact section. Each
+# distinct URL must answer 200, may redirect only within its own host, must contain the
+# element its #fragment names, and must mention the app's current name — the listing
+# name up to its first " – ", " - " or ":" ("Acme Notes – Quick Capture" → "Acme
+# Notes"). Run on every update, not only the first: the pages change on their own.
+require "net/http"
+require "uri"
+def fetch(url, limit = 5)
+  uri = URI(url); res = nil
+  limit.times do
+    res = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                          open_timeout: 10, read_timeout: 15) { |h| h.get(uri.request_uri) }
+    break unless res.is_a?(Net::HTTPRedirection)
+    uri = URI.join(uri.to_s, res["location"])
+  end
+  [res, uri]
+end
+
+name_file = File.join(meta, "en-US", "name.txt")
+name_file = Dir.glob(File.join(meta, "*", "name.txt")).first unless File.exist?(name_file)
+brand = name_file && File.read(name_file, encoding: "utf-8").strip.split(/\s+[–-]\s+|:/).first.to_s.strip
+urls = {}
+Dir.glob(File.join(meta, "*", "{support,marketing,privacy}_url.txt")).each do |f|
+  u = File.read(f, encoding: "utf-8").strip
+  (urls[u] ||= []) << File.join(File.basename(File.dirname(f)), File.basename(f, ".txt")) unless u.empty?
+end
+urls.each do |url, where|
+  label = where.size > 2 ? "#{where.first} +#{where.size - 1}" : where.join(", ")
+  begin
+    res, final = fetch(url)
+    page = res.body.to_s.force_encoding("utf-8")
+    frag = URI(url).fragment
+    problem =
+      if !res.is_a?(Net::HTTPSuccess) then "answers #{res.code}"
+      elsif final.host != URI(url).host then "redirects off its host, to #{final}"
+      elsif frag && !page.match?(/id=["']#{Regexp.escape(frag)}["']/) then "has no ##{frag} on the page"
+      elsif brand && !brand.empty? && !page.downcase.include?(brand.downcase) then "never mentions \"#{brand}\""
+      end
+  rescue StandardError => e
+    problem = "cannot be fetched (#{e.class}: #{e.message[0, 80]})"
+  end
+  if problem
+    diffs << "url #{url}"
+    puts "  URL BAD   #{url} — #{problem} (#{label})"
+  else
+    puts "  url ok    #{url} (#{label})"
+  end
+end
+
+# ---------------------------------------------------------------------------
 # MEDIA — screenshots + App Previews, compared by size against the local tree.
 #
-# Matching is by BASENAME ACROSS ALL LOCALES on purpose: the delivery fans one
-# capture set out to every locale (sync_from_hub's --screenshot-fallback), so a
-# per-locale lookup would report six false "missing" for a set that is correct.
-local = {}   # basename => size
+# A locale's OWN file comes first: per-locale sets reuse the same names (01.png in
+# every locale), and a map keyed by basename alone kept whichever locale was read
+# last — every other locale then reported STALE against a correct store. The
+# basename-across-locales map stays as the fallback for a locale with no files of
+# its own, since the delivery fans one capture set out (--screenshot-fallback).
+#
+# The locale is the directory above screenshots*/ or app-preview/; the app folder
+# is the one above that. More than one app folder is refused: after a rename the
+# old <App> folder stays beside the new one with the same filenames, and both this
+# check and sync_from_hub.sh would read the old captures as current.
+local = {}       # basename => size (fallback)
+local_loc = {}   # locale => { basename => size }
+apps = {}
 Dir.glob(tree[:media_glob]).each do |f|
   next unless File.file?(f)
+  parts = f.split("/")
+  loc, app = parts[-3], parts[-4]
+  apps[app] = true
   local[File.basename(f)] = File.size(f)
+  (local_loc[loc] ||= {})[File.basename(f)] = File.size(f)
+end
+if apps.size > 1
+  puts "\n  ✗ media: #{apps.size} app folders hold captures (#{apps.keys.sort.join(', ')})."
+  puts "    One is current; move the others out of media/apple/ (e.g. media/archive/) and run again."
+  exit 2
 end
 
 if local.empty?
@@ -150,12 +225,13 @@ else
           size = a["fileSize"]
           key  = "#{loc}/#{name}"
           (seen[loc] ||= []) << name
-          if !local.key?(name)
+          mine = local_loc[loc]&.key?(name) ? local_loc[loc][name] : local[name]
+          if mine.nil?
             diffs << key
             puts "  ORPHAN    #{loc}/#{name} — on the store, not in the #{src} (#{kind})"
-          elsif size && local[name] != size
+          elsif size && mine != size
             diffs << key
-            puts "  STALE     #{loc}/#{name} — store #{size} B, #{src} #{local[name]} B (#{kind})"
+            puts "  STALE     #{loc}/#{name} — store #{size} B, #{src} #{mine} B (#{kind})"
           end
         end
       end
