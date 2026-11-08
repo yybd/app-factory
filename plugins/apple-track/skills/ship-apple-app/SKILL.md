@@ -129,6 +129,14 @@ Export produces `App.ipa` (iOS) or `App.pkg` (macOS).
 - **Attach the build to the version record.** Uploading does not select it; a version
   left with no build cannot be submitted, and the ASC website is the usual place this
   is done by hand. Headless, it is `select_build(build_id:)` on the edit version.
+- **A new version record starts with an EMPTY promotional text.** Creating it
+  (`POST appStoreVersions`) copies the previous version's description, keywords and
+  URLs into each localization, but not `promotionalText` — so the listing looks
+  complete everywhere except the one field at the top of the product page. Seen on
+  a real update (2026-11-08): a version made by a script that set only
+  `whatsNew` went into review with no promotional text in all five locales. So after
+  creating a version, never fill single fields by hand: deliver the whole listing
+  through `app-store-deliver`, whose `pull_and_diff.rb` reports the gap as a diff.
 - Upload the verified metadata/screenshots/**IAP** — and the header, search results
   and Duo assets, which go through the Asset Library rather than `deliver` — by **triggering the
   `app-store-deliver` skill** (the single send-surface) — don't deliver from here
@@ -151,6 +159,10 @@ Guide the user through each, with exact navigation:
 - Walkthrough: [references/appstoreconnect-walkthrough.md](references/appstoreconnect-walkthrough.md#7-finish-and-submit).
 
 ## Submit
+- **Gate: `pull_and_diff.rb` must exit 0 on the version being submitted**, run right
+  before submitting — not at some earlier step. Once the version is
+  `WAITING_FOR_REVIEW` its metadata is frozen (promotional text excepted), so a field
+  found empty afterwards ships empty or costs a pull from the queue.
 - **Submit for Review** (never auto-submit without the user's explicit go-ahead).
 - Choose manual vs automatic release.
 - If rejected: read the resolution-center message, map it to a guideline (the
