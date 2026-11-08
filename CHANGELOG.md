@@ -14,6 +14,31 @@ skill does.
 
 ## Unreleased
 
+## 0.14.0
+
+- **The listing URLs are checked on every update, not only the first.** A new App
+  Store version copies the support and marketing URLs from the previous one, so a page
+  changed in the hub — a rename, a new domain — never reached the store, and nothing
+  looked at whether the pages still worked.
+  - **`app-store-deliver`**: `pull_and_diff.rb` compares `supportUrl` and
+    `marketingUrl` store-vs-hub, and fetches every support, marketing and privacy URL:
+    it must answer 200, redirect only within its host, hold the element its
+    `#fragment` names, and mention the app's current name. A failure prints `URL BAD`
+    and fails the gate.
+  - **`ship-apple-app`**: names that gate as where the URLs are proven current on an
+    update, and makes `pull_and_diff.rb` exiting 0 a gate right before submitting.
+- **A new App Store version starts with no promotional text.** Creating the version
+  copies description, keywords and URLs but not `promotionalText`; a version filled
+  field by field went into review with it empty in every locale. `ship-apple-app` now
+  says to deliver the whole listing after creating a version.
+- **Media from before a rename can no longer reach the store.** `sync_from_hub.sh`
+  read every `<App>` folder under `media/apple/`, and an old folder left after a rename
+  — same filenames, sorting last — would have replaced the live screenshots and preview
+  with the previous product's. It and `pull_and_diff.rb` now refuse more than one
+  `<App>` folder. The guard also matched hub media by basename alone, so per-locale sets
+  reported STALE in every locale but one against a correct store; a locale's own file
+  now comes first.
+
 ## 0.13.0
 
 - **Support mail: one address, and every message says where it came from.** The skills
