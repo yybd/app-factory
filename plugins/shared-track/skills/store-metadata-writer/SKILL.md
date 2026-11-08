@@ -185,7 +185,7 @@ ONCE — store-neutral — so both stores stay in sync. Map each to its profile 
 | Keyword set (primary + secondaries) | the app's own vocabulary in **Key features** / **Positioning** — real terms, not invented |
 | Privacy URL | from `DATA.md` — **it must resolve**, wherever it is hosted |
 | Support URL | the app's row in `DATA.md`'s `### support mail` table (its page + `#contact`) — the generic default only when the section is absent |
-| Marketing URL | from `DATA.md`, or the app's own product page |
+| Marketing URL | the app's own page — its row in `### support mail` without `#contact`, per locale, each checked to answer 200 with no redirect. Never the studio home: `app-store-metadata` fails validation on it |
 | Review email (Apple) · contact email + website (Play) | the support address in `### support mail`; Play's contact website = the support URL |
 
 > **The Privacy URL must exist before you submit — a dead privacy URL fails App

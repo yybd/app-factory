@@ -60,7 +60,7 @@ not the source. Character counts are characters, not bytes.
 | `promotional_text.txt` | Promotional text | **170** | Per locale. Can be changed WITHOUT a new build. |
 | `release_notes.txt` | What's New | **4000** | Per locale. Required for updates (not first version). |
 | `support_url.txt` | Support URL | URL | Required. Must be reachable (Guideline 1.5). With a hub: the app's own page + `#contact`, from the per-app table in `DATA.md`'s `### support mail` section — never the studio home, so the mail that page sends already names the app. Apple keeps it per version: a change lands with the next submission. |
-| `marketing_url.txt` | Marketing URL | URL | Optional. |
+| `marketing_url.txt` | Marketing URL | URL | Optional for Apple; **required here when the hub's `DATA.md` support-mail table has a row for the app** — it is shown as *Developer Website*, and it is the app's own page (the support URL without `#contact`). Empty, or a home page that is not the app's, fails validation. Not editable on a version already for sale. |
 | `privacy_url.txt` | Privacy Policy URL | URL | Required when the app has accounts or collects data (most apps). |
 
 ## Shared (not per-locale) fields

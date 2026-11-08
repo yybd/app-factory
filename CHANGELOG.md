@@ -41,6 +41,11 @@ skill does.
   - **`web-seo`** and **`content-site-structure`**: a mail link with no subject, or with
     a subject not URL-encoded (a raw `)` ends a Markdown link), is a warning. `web-seo`
     checks only the hub's support address when it knows it.
+  - **`app-store-metadata` enforces the Marketing URL**: when the table has a row for
+    the app, an empty `marketing_url.txt` or a home page that is not the app's is a
+    validation error. It is the app's own page (the support URL without `#contact`);
+    a language version passes, another page warns. Seven studio listings named the
+    studio home.
   - `docs/contracts/hub.md`: the **Support mail** key. `factory/tests/test_support_mail.py`
     pins the reader and every check.
 

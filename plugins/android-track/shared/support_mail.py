@@ -132,8 +132,9 @@ def norm_url(u):
 def matches(have, want):
     """Is `have` the support URL `want` names — or a language version of the same page?
 
-    `https://www.example.io/he/#contact` matches `https://www.example.io/#contact`: same
-    host, the same #contact, and the table's path at the end of the localized one."""
+    `https://www.example.io/he/#contact` matches `https://www.example.io/#contact`, and
+    `/app/he/` matches `/app`: same host, same fragment, and a locale segment before or
+    after the table's path."""
     from urllib.parse import urlparse
     if norm_url(have) == norm_url(want):
         return True
@@ -141,7 +142,12 @@ def matches(have, want):
     if h.netloc.lower() != w.netloc.lower() or h.fragment != w.fragment:
         return False
     hp, wp = h.path.rstrip("/"), w.path.rstrip("/")
-    return hp == wp or hp.endswith(wp) and re.fullmatch(r"/[a-z]{2}(?:-[A-Za-z]{2,4})?", hp[: len(hp) - len(wp)] or "/x") is not None
+    loc = r"/[a-z]{2}(?:-[A-Za-z]{2,4})?"
+    if hp == wp:
+        return True
+    if hp.endswith(wp) and re.fullmatch(loc, hp[: len(hp) - len(wp)]):
+        return True                     # /he/<page>  — the locale before the page
+    return hp.startswith(wp) and re.fullmatch(loc, hp[len(wp):]) is not None   # <page>/he
 
 
 def is_home(u):

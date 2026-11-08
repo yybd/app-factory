@@ -274,6 +274,16 @@ warns when `support_url.txt` is not the app's row in `DATA.md`'s support-mail ta
 language version of the same page passes) and when the review email is not the rule's
 address. The app is read from the hub path; pass `--slug <slug>` for any other layout.
 
+**The Marketing URL is enforced.** Apple prints it as *Developer Website*, and it is the
+**app's own page** — the support URL from `DATA.md`'s table without `#contact`. When the
+table has a row for the app, an **empty** `marketing_url.txt` or a **home page that is
+not the app's** fails validation (an error, not a warning); a language version of the
+page passes (`/he/<page>`, `<page>/he/`); another page is a warning. Do not derive the
+per-locale URLs — the sites differ in trailing slash and locale suffix — check each with
+`curl -s -o /dev/null -w '%{http_code} %{redirect_url}' <url>` and take the one that
+answers 200 with no redirect. Apple refuses the change on a version already for sale
+(409): write it in the hub, and it ships with the next version.
+
 The validator checks URL *format*, not reachability. Separately confirm the
 **privacy URL actually resolves** before upload — a dead privacy page fails App
 Review. Verify with a browser User-Agent: a `403` / anti-bot block is **not** proof

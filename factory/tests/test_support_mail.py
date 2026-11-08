@@ -78,6 +78,10 @@ def main():
     check(sm.matches("https://gamma.test/he/#contact", "https://gamma.test/#contact"),
           "a language version of the same page matches")
     check(not sm.matches("https://gamma.test/", "https://gamma.test/#contact"), "the bare home does not")
+    check(sm.matches("https://apps.studio.test/alpha/he/", "https://apps.studio.test/alpha"),
+          "a locale after the page matches too")
+    check(not sm.matches("https://apps.studio.test/alphabet", "https://apps.studio.test/alpha"),
+          "…but a longer path is not a locale")
     check(sm.is_home("https://www.studio.test/") and not sm.is_home("https://studio.test/#contact"),
           "is_home: a bare root, not one with #contact")
     check(sm.web_mailto("a@b.test", "Alpha").endswith("subject=Alpha%20%E2%80%94%20Support%20%28web%29"),
@@ -105,6 +109,19 @@ def main():
         check("studio home page" in out, "validate warns on a support URL that is the studio home", out)
         check("me@gmail.test" in out and "help@studio.test" in out,
               "validate warns on a review email that is not the rule's", out)
+        check(rc != 0 and "marketing_url.txt is empty" in out,
+              "validate fails on an empty marketing URL when the app has a page", out)
+        write(os.path.join(md, "en-US", "marketing_url.txt"), "https://www.studio.test")
+        rc, out = run([validate, md], hub)
+        check(rc != 0 and "is a home page" in out, "validate fails on a marketing URL that is the studio home", out)
+        write(os.path.join(md, "en-US", "marketing_url.txt"), "https://apps.studio.test/alpha/de/")
+        rc, out = run([validate, md], hub)
+        check("marketing_url" not in out, "a language version of the app's page passes", out)
+        gm = os.path.join(hub, "gamma", "store", "apple", "metadata")
+        run([scaffold, gm, "--locales", "en-US"], hub)
+        write(os.path.join(gm, "en-US", "marketing_url.txt"), "https://gamma.test/")
+        rc, out = run([validate, gm], hub)
+        check("marketing_url" not in out, "an app whose own page is its domain's root passes", out)
 
         # play-store-metadata: the contact block
         play = os.path.join(hub, "alpha", "store", "play")

@@ -16,6 +16,11 @@ the app's row in the rule's per-app table is a warning — above all the studio 
 — and so is a review_information/email_address.txt that is not the rule's address. The
 app is found by --slug, or from a hub path (<slug>/store/apple/metadata). Without a hub
 or without the rule, these checks say so once and skip what they cannot know.
+
+Marketing URL (enforced): when the table has a row for the app, an empty
+marketing_url.txt or one that is the studio home page is an ERROR — it must be the
+app's own page, the support URL without #contact (a language version passes). A
+different page of the same app is a warning.
 """
 
 import argparse
@@ -234,6 +239,28 @@ def support_issues(root, locales, slug, sm):
             issues.append(("warn", loc,
                            f"support_url.txt is a home page ({have}) and '{slug or '?'}' has no row in "
                            "DATA.md's support-mail table — give the app a page with #contact and a row"))
+    # Marketing URL — Apple prints it as "Developer Website". It is the app's own page:
+    # the same page as the support URL, without #contact. Enforced, because a listing
+    # that names the studio home sends the one visitor who tapped it to a catalogue, and
+    # gives the app's page none of the only outside link it has. A language version of
+    # the same page passes; a different page of the same app is a warning, not an error.
+    page = want.split("#", 1)[0] if want else None
+    for loc in locales:
+        have = read(os.path.join(root, loc, "marketing_url.txt"))
+        if page and not have:
+            issues.append(("error", loc,
+                           f"marketing_url.txt is empty — it is the app's own page: {page}"))
+        elif have and page and support_mail.is_home(have) \
+                and not support_mail.matches(have.split("#", 1)[0], page):
+            # A bare root that is not the app's own page. Without a row nothing says
+            # whose home a root is — a product's own domain is a root too — so this
+            # is enforced only where the table names the page.
+            issues.append(("error", loc,
+                           f"marketing_url.txt is a home page ({have}), not the app's own page: {page}"))
+        elif have and page and not support_mail.matches(have.split("#", 1)[0], page):
+            issues.append(("warn", loc,
+                           f"marketing_url.txt is {have}; the app's page in DATA.md's table is {page}"))
+
     email = read(os.path.join(root, "review_information", "email_address.txt"))
     addr = sm.get("address")
     if email and addr and email.strip().lower() != addr.lower():
