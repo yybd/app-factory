@@ -14,6 +14,18 @@ skill does.
 
 ## Unreleased
 
+- **`apple-credentials` reads and keeps `$KEYS_ROOT/APPLE.md`.** When the owner's map of
+  the Apple account exists (team, certificates with expiry, which App Store Connect key
+  under `$KEYS_ROOT/appstoreconnect/<name>/` serves what, profiles, traps), the skill
+  reads it first, reconciles it with `apple_creds.py check`, and reports what disagrees;
+  it updates the file whenever it creates or renews a certificate, key, notary profile
+  or capability (IDs, dates, locations — never a secret), and offers to create it when
+  missing. The skills that defer to it point at the file as the first place to look.
+  `check` now shows each certificate's SHA-1 and expiry (flagging expired or within 60
+  days), lists keys under `$KEYS_ROOT/appstoreconnect/*/`, and finds installer
+  certificates — `-p codesigning` had hidden them, so both `.pkg` rows read "missing"
+  on a Mac that had one.
+
 - **`windows-local-build` works around Xcode 27's linker, and builds llama.cpp's Vulkan
   backend.** Xcode 27's `ld` writes a corrupt LINKEDIT into release links with a macOS
   deployment target of 12+, so host proc macros fail to load and a cross build stops

@@ -42,6 +42,10 @@ SEND (this skill):  app-store-deliver
   `spaceship` gem (ships with fastlane) for the helper scripts; `rsync` (system).
 - **Credentials:** an App Store Connect API key, from the track's resolver
   (`shared/credentials.rb` — see *Auth* below). Never Apple-ID/session auth.
+- **Which key or certificate:** if `$KEYS_ROOT/APPLE.md` exists, look there first —
+  the owner's map of the team, each certificate and its expiry, and which App Store
+  Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
+  `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
 - **Hub (`$APP_HUB`):** optional — with one, the listing is authored there and synced
   down; without one, the repo's own `fastlane/` IS the source of truth and nothing is
   copied. Every script here works in both modes; pass `--repo DIR` (or run from the

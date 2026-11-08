@@ -40,6 +40,10 @@ its source next to it, and a term with no signal is said to have none.
     key id, `private_key` file beside it) → Apple's own popularity for head terms;
   - an **App Store Connect key** that can read analytics (the apple-track resolver, or
     `--key-json`) → the app's search impressions and page views, for reviews.
+- **Which key or certificate:** if `$KEYS_ROOT/APPLE.md` exists, look there first —
+  the owner's map of the team, each certificate and its expiry, and which App Store
+  Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
+  `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
 - **Hub (`$APP_HUB`):** optional. With one, a study lives in `$APP_HUB/<slug>/aso/` and
   the listing in `$APP_HUB/<slug>/store/apple/metadata/`; without one, in the app repo's
   `aso/` and `fastlane/metadata/`.

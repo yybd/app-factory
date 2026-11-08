@@ -36,6 +36,8 @@ just the command. Other skills defer here, so be the authoritative, clear source
   keychain profile, app-specific password and App Store Connect API key (`.p8`) are
   created and stored; nothing is resolved from elsewhere.
 - **Hub (`$APP_HUB`):** optional — only the conversational-language default in `DATA.md`.
+- **`$KEYS_ROOT/APPLE.md`:** optional — the owner's map of team, certificates and
+  keys; read first when present, kept current by this skill (see below).
 - **Other tracks:** none.
 
 ## Two families (don't confuse them)
@@ -50,12 +52,26 @@ just the command. Other skills defer here, so be the authoritative, clear source
 ## Workflow
 
 ### 1. Check what already exists
+**If `$KEYS_ROOT/APPLE.md` exists, read it first.** It is the owner's map of the
+Apple account: the team ID (and which ID is *not* a team), every certificate with
+its SHA-1 and expiry, which App Store Connect API key under
+`$KEYS_ROOT/appstoreconnect/<name>/` serves what, the provisioning profiles, and
+the signing traps already met. It holds no secrets — only IDs, dates and
+locations. Then run the check:
 ```bash
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/apple-credentials/scripts/apple_creds.py check
 ```
-It lists signing certificates grouped by type, detects App Store Connect API
-keys in the standard locations, notes notary-profile setup, and summarizes
+It lists signing certificates grouped by type with SHA-1 and expiry, detects App
+Store Connect API keys (the track's resolver, the standard folders, and
+`$KEYS_ROOT/appstoreconnect/*/`), notes notary-profile setup, and summarizes
 what's present vs missing for each goal (development / App Store / Developer ID).
+
+**Reconcile the two and report every disagreement** — the file is a record, and
+the world moves without it: a certificate the file lists that the keychain no
+longer has, or whose expiry differs (renewed, or lapsed); one expiring within
+60 days; an API key whose folder or `.p8` moved; a key or certificate on disk
+that the file does not mention. Say which side looks right, and offer to
+correct the file.
 
 ### 2. Identify what's needed for the goal
 Map the user's goal to the right certificate using
@@ -101,15 +117,33 @@ And the right auth credential using
   the result with `store-creds` or place the `.p8` per
   [references/auth-credentials.md](references/auth-credentials.md).
 
+## Keep `$KEYS_ROOT/APPLE.md` current
+
+**Whenever this skill creates or renews a certificate, an API key, a notary
+profile or an App ID capability, update `$KEYS_ROOT/APPLE.md` in the same turn**
+— the name, team, SHA-1, expiry, Key ID, folder, profile name, and the date of
+the change. **Never a secret:** no password, no `.p8`/`.p12` content, no private
+key — IDs, dates and locations only. A record that is not updated at the moment
+of change is wrong from that moment on, and nothing else will notice.
+
+If the file does not exist and `$KEYS_ROOT` is set, **offer** to create it from
+the check's output (team ID, certificates with SHA-1 and expiry, each API key's
+folder, Key ID and purpose — ask the user what each key is for, the folder name is
+only a hint). `$KEYS_ROOT` is outside every repo; the file never moves into one.
+If `$KEYS_ROOT` is not set, do not invent a location — say so and go on.
+
 ## What's safe vs ask-first
-Safe: `check`, explaining, guiding creation, drafting commands. Ask first:
+Safe: `check`, reading `APPLE.md`, explaining, guiding creation, drafting
+commands, updating `APPLE.md` after a change this skill made. Ask first:
+creating `APPLE.md`,
 running `store-creds` (writes to the keychain), exporting a `.p12` (handles the
 private key), and anything touching the Apple account.
 
 ## How other skills use this
 `code-signing-provisioning` (signing model, profiles, errors), and
 `notarize-and-distribute` / `app-store-metadata` / `ship-apple-app` defer here
-for certificates and credentials. If this skill isn't installed, those skills
+for certificates and credentials, and point at `$KEYS_ROOT/APPLE.md` as the first
+place to look for which key or certificate to use. If this skill isn't installed, those skills
 fall back to inline Xcode/`notarytool` guidance — but when it's present, it's the
 single source of truth.
 

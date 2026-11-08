@@ -37,6 +37,10 @@ produce it, then come back and re-verify. This skill owns only the ship itself
   exception — it reads only `~/.appstoreconnect/private_keys/AuthKey_<KEY_ID>.p8`, so
   copy the resolved `.p8` there. Certificate and profiles via `apple-credentials` /
   `code-signing-provisioning`.
+- **Which key or certificate:** if `$KEYS_ROOT/APPLE.md` exists, look there first —
+  the owner's map of the team, each certificate and its expiry, and which App Store
+  Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
+  `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
 - **Hub (`$APP_HUB`):** optional — hub flow verifies the listing in
   `$APP_HUB/<slug>/store/apple/` and media in `$APP_HUB/<slug>/media/apple/`;
   standalone verifies the repo's own `fastlane/`.

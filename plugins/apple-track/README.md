@@ -32,7 +32,7 @@ edit a skill, not this table.*
 that enables this track. A skill's body is read only when the skill fires; its description
 is in context always.
 
-**What it needs on the machine**, from the scripts that call it: `fastlane`, `xcodebuild`, `xcrun`, `ffmpeg`, `ImageMagick`, `ruby`, `Pillow`, `openssl`, `sips`, `swift`.
+**What it needs on the machine**, from the scripts that call it: `fastlane`, `xcodebuild`, `xcrun`, `ffmpeg`, `ImageMagick`, `ruby`, `Pillow`, `openssl`, `security (keychain)`, `sips`, `swift`.
 
 **Operations that declare where their work lands** (`close.py --op`): `aso-keywords`.
 <!-- /generated:track -->

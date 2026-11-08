@@ -3,8 +3,10 @@
 apple_creds.py — inventory and set up Apple certificates & auth credentials.
 
 Subcommands:
-  check                       list signing certs by type, detect API keys,
-                              and summarize what's present/missing per goal
+  check                       list signing certs by type (SHA-1, expiry), detect
+                              API keys (incl. $KEYS_ROOT/appstoreconnect/*/),
+                              note $KEYS_ROOT/APPLE.md, and summarize what's
+                              present/missing per goal
   store-creds                 create a notary keychain profile FOR the user,
                               from an app-specific password OR an API key
   setup                       print how to create an app-specific password /
@@ -14,7 +16,9 @@ macOS only (uses `security`/`xcrun`). Stdlib otherwise.
 """
 
 import argparse
+import datetime
 import glob
+import json
 import os
 import re
 import subprocess
@@ -50,13 +54,44 @@ def miss(m): print(f"  ❌ {m}")
 def step(m): print(f"\n▶ {m}")
 
 
+def keys_root():
+    """$KEYS_ROOT, or None — no default here: a guessed folder is not the owner's."""
+    v = os.environ.get("KEYS_ROOT")
+    return os.path.expanduser(v) if v else None
+
+
+def cert_expiries():
+    """SHA-1 → expiry date (YYYY-MM-DD) for every certificate in the search list.
+
+    Public certificates only — `security find-certificate -p` prints the certificate,
+    never the private key."""
+    r = run(["security", "find-certificate", "-a", "-Z", "-p"])
+    out = {}
+    for sha1, pem in re.findall(r"SHA-1 hash: ([0-9A-F]+)\s+(-----BEGIN CERTIFICATE-----.*?-----END CERTIFICATE-----)",
+                                r.stdout or "", re.S):
+        e = subprocess.run(["openssl", "x509", "-noout", "-enddate"], input=pem,
+                           capture_output=True, text=True)
+        m = re.search(r"notAfter=(.+)", e.stdout or "")
+        if m:
+            try:
+                d = datetime.datetime.strptime(m.group(1).strip(), "%b %d %H:%M:%S %Y %Z")
+                out[sha1] = d.date().isoformat()
+            except ValueError:
+                pass
+    return out
+
+
 def list_certs():
-    r = run(["security", "find-identity", "-v", "-p", "codesigning"])
-    names = re.findall(r'\d+\)\s+[0-9A-F]+\s+"([^"]+)"', r.stdout or "")
+    # No `-p codesigning`: that policy hides installer identities (3rd Party Mac
+    # Developer Installer, Developer ID Installer), which made the .pkg rows report
+    # "missing" on a Mac that had them.
+    r = run(["security", "find-identity", "-v"])
+    ids = re.findall(r'\d+\)\s+([0-9A-F]+)\s+"([^"]+)"', r.stdout or "")
+    names = [n for _, n in ids]
     by_type = {}
-    for n in names:
+    for sha1, n in ids:
         label = next((d for p, d in CERT_TYPES if n.startswith(p)), "other / unknown")
-        by_type.setdefault(label, []).append(n)
+        by_type.setdefault(label, []).append((n, sha1))
     present_prefixes = {p for n in names for p, _ in CERT_TYPES if n.startswith(p)}
     return by_type, present_prefixes
 
@@ -69,14 +104,59 @@ def find_api_keys():
     return sorted(set(keys))
 
 
+def find_keys_root_api_keys():
+    """Keys kept one folder per purpose: $KEYS_ROOT/appstoreconnect/<name>/.
+
+    Returns (name, key_id, p8 path) for each. The key id comes from the folder's
+    api_key.json (only its `key_id` field is read) or else from the AuthKey_<ID>.p8
+    filename. The .p8 itself is never opened."""
+    root = keys_root()
+    if not root:
+        return []
+    found = []
+    for d in sorted(glob.glob(os.path.join(root, "appstoreconnect", "*", ""))):
+        name = os.path.basename(os.path.dirname(d))
+        p8s = sorted(glob.glob(os.path.join(d, "private_keys", "*.p8")) + glob.glob(os.path.join(d, "*.p8")))
+        if not p8s:
+            continue
+        kid = None
+        try:
+            with open(os.path.join(d, "api_key.json"), encoding="utf-8") as f:
+                kid = json.load(f).get("key_id")
+        except Exception:
+            pass
+        for p8 in p8s:
+            m = re.match(r"AuthKey_([A-Z0-9]+)\.p8$", os.path.basename(p8))
+            found.append((name, kid or (m.group(1) if m else "?"), p8))
+    return found
+
+
 def cmd_check(args):
+    root = keys_root()
+    step("Owner's map ($KEYS_ROOT/APPLE.md)")
+    if not root:
+        print("  $KEYS_ROOT is not set — no map to read or keep")
+    elif os.path.isfile(os.path.join(root, "APPLE.md")):
+        ok(f"{os.path.join(root, 'APPLE.md')} — read it and reconcile it with what follows")
+    else:
+        print(f"  none at {os.path.join(root, 'APPLE.md')} — offer to create it from this output")
+
     by_type, present = list_certs()
+    expiries = cert_expiries()
+    today = datetime.date.today().isoformat()
+    soon = (datetime.date.today() + datetime.timedelta(days=60)).isoformat()
     step("Signing certificates in keychain")
     if not by_type:
         miss("none found")
-    for label, names in by_type.items():
-        for n in names:
-            print(f"  • [{label}] {n}")
+    for label, items in by_type.items():
+        for n, sha1 in items:
+            exp = expiries.get(sha1)
+            note = f"expires {exp}" if exp else "expiry unknown"
+            if exp and exp < today:
+                note = f"EXPIRED {exp}"
+            elif exp and exp <= soon:
+                note = f"expires {exp} — renew soon"
+            print(f"  • [{label}] {n}  ({sha1[:8]}…{sha1[-4:]}, {note})")
 
     step("App Store Connect API key")
     # The track's resolver is what every shipping script asks — the environment, then
@@ -95,11 +175,17 @@ def cmd_check(args):
     else:
         print("  (none resolved — create one in App Store Connect → Users and Access →")
         print("   Integrations, then record it in $KEYS_ROOT/credentials.json or the environment)")
-    keys = find_api_keys()
-    if keys and not (c and c["p8"] in keys):
+    keys = [k for k in find_api_keys() if not (c and k == c["p8"])]
+    if keys:
         print("  also on disk, not recorded anywhere the scripts look:")
         for k in keys:
             print(f"  • {k}")
+    rooted = find_keys_root_api_keys()
+    if rooted:
+        print("  under $KEYS_ROOT/appstoreconnect/ (one folder per purpose — APPLE.md says which serves what):")
+        for name, kid, p8 in rooted:
+            mark = "  ← the resolver's" if c and os.path.realpath(p8) == os.path.realpath(c["p8"]) else ""
+            print(f"  • {name}: {kid} — {os.path.relpath(p8, root)}{mark}")
 
     step("Notary keychain profile")
     prof = None

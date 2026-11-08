@@ -36,6 +36,10 @@ whole process, not just paste commands.
   (teams/CI) and the Spaceship snippet that creates distribution profiles.
 - **Credentials:** an App Store Connect API key for the headless profile creation
   (Spaceship); certificates, keys and passwords themselves come from `apple-credentials`.
+- **Which key or certificate:** if `$KEYS_ROOT/APPLE.md` exists, look there first —
+  the owner's map of the team, each certificate and its expiry, and which App Store
+  Connect key under `$KEYS_ROOT/appstoreconnect/<name>/` serves what (no secrets).
+  `apple-credentials` reads it, reconciles it with the keychain, and keeps it current.
 - **Hub (`$APP_HUB`):** optional — only the conversational-language default in `DATA.md`.
 - **Other tracks:** none.
 
