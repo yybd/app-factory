@@ -144,6 +144,9 @@ Stdlib only, nothing installed. It reads `locales.json` and reports:
 - **Front-matter** — missing `title`, and duplicate `slug` within one language.
 - **Data completeness** — a localized field present in one language and missing in
   another.
+- **Mail links** — a `mailto:` with no subject, or a subject with a raw `(` (the `)`
+  then ends the Markdown link). The subject form is the hub's `DATA.md`
+  (`### support mail`): `<App> — <topic> (web)`, URL-encoded.
 
 Missing translations are **errors under `strict`, warnings under `fallback`, and
 silent under `hide`** — the manifest decides, not the script. Wire it into the repo's

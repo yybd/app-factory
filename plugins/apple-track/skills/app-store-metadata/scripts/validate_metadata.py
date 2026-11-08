@@ -10,6 +10,12 @@ Usage:
 subfolders), a fastlane/metadata folder, or a single per-app metadata folder.
 
 Exit code 0 if no errors, 1 if any error-level problems found.
+
+Support contact (the hub's DATA.md, "### support mail"): a support_url.txt that is not
+the app's row in the rule's per-app table is a warning — above all the studio home page
+— and so is a review_information/email_address.txt that is not the rule's address. The
+app is found by --slug, or from a hub path (<slug>/store/apple/metadata). Without a hub
+or without the rule, these checks say so once and skip what they cannot know.
 """
 
 import argparse
@@ -17,6 +23,13 @@ import json
 import os
 import re
 import sys
+
+sys.path.insert(0, os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "shared")))
+try:
+    import support_mail  # noqa: E402
+except ImportError:                     # an old copy of the track without shared/
+    support_mail = None
 
 # field file -> (max chars or None, severity_if_missing)
 PER_LOCALE_LIMITS = {
@@ -192,7 +205,47 @@ def find_metadata_roots(path):
     return out
 
 
-def validate_root(root):
+def slug_from_path(root):
+    """<hub>/<slug>/store/apple/metadata → <slug>; None when the path is not that shape."""
+    parts = os.path.abspath(root).rstrip(os.sep).split(os.sep)
+    if "store" in parts:
+        i = len(parts) - 1 - parts[::-1].index("store")
+        if i > 0:
+            return parts[i - 1]
+    return None
+
+
+def support_issues(root, locales, slug, sm):
+    """Support URL and review email against DATA.md's support-mail rule."""
+    issues = []
+    if not support_mail or sm is None:
+        return issues
+    want = support_mail.support_url(sm, slug)
+    for loc in locales:
+        have = read(os.path.join(root, loc, "support_url.txt"))
+        if not have:
+            continue
+        if want and not support_mail.matches(have, want):
+            what = "the studio home page" if support_mail.is_home(have) else f"'{have}'"
+            issues.append(("warn", loc,
+                           f"support_url.txt is {what}; DATA.md's support-mail table says {want} "
+                           "(the app's page + #contact, so the mail it sends names the app)"))
+        elif not want and support_mail.is_home(have) and sm.get("urls"):
+            issues.append(("warn", loc,
+                           f"support_url.txt is a home page ({have}) and '{slug or '?'}' has no row in "
+                           "DATA.md's support-mail table — give the app a page with #contact and a row"))
+    email = read(os.path.join(root, "review_information", "email_address.txt"))
+    addr = sm.get("address")
+    if email and addr and email.strip().lower() != addr.lower():
+        issues.append(("warn", "-",
+                       f"review_information/email_address.txt is {email}; DATA.md's support address is {addr}"))
+    elif os.path.isdir(os.path.join(root, "review_information")) and not email and addr:
+        issues.append(("warn", "-",
+                       f"review_information/email_address.txt is empty — DATA.md's support address is {addr}"))
+    return issues
+
+
+def validate_root(root, slug=None, sm=None):
     issues = []  # (severity, locale_or_'-', message)
     name = os.path.basename(root.rstrip("/"))
 
@@ -248,6 +301,8 @@ def validate_root(root):
     if not read(os.path.join(root, "primary_category.txt")):
         issues.append(("warn", "-", "primary_category.txt is empty"))
 
+    issues.extend(support_issues(root, recognized, slug or slug_from_path(root), sm))
+
     # In-App Purchases live beside the metadata tree in the hub layout
     # (<slug>/store/apple/{metadata,iap}), so look one level up as well.
     for cand in (os.path.join(root, "iap"),
@@ -263,6 +318,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("path")
     ap.add_argument("--json", action="store_true")
+    ap.add_argument("--slug", help="the app's hub slug, for the support-URL check "
+                                   "(default: read from a hub path)")
     args = ap.parse_args()
 
     roots = find_metadata_roots(args.path)
@@ -270,7 +327,11 @@ def main():
         print("No fastlane metadata found. Expected fastlane/metadata/ with locale folders.")
         sys.exit(1)
 
-    results = [validate_root(r) for r in roots]
+    sm = support_mail.load() if support_mail else None
+    slug = args.slug if len(roots) == 1 else None
+    results = [validate_root(r, slug, sm) for r in roots]
+    for w in (sm or {}).get("warnings", []):
+        print(f"⚪ support mail: {w}")
     if args.json:
         print(json.dumps(results, indent=2))
 

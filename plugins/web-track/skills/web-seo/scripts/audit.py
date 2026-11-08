@@ -62,6 +62,25 @@ sitemap_cmd = None
 analytics_src = None
 
 
+def support_address():
+    """The support address from the hub's DATA.md ("### support mail" → **address:**).
+
+    With it, only links to that address are checked — a payment provider's help address
+    on a terms page is not ours to give a subject. Without a hub, every mail link is."""
+    hub = os.environ.get("APP_HUB") or (
+        os.path.join(os.environ["DEV_ROOT"], "app-hub") if os.environ.get("DEV_ROOT") else None)
+    try:
+        text = open(os.path.join(hub, "DATA.md"), encoding="utf-8", errors="replace").read()
+    except (OSError, TypeError):
+        return None
+    sec = re.search(r"^#{2,4}\s*support mail\b(.*?)(?=^#{1,3}\s|\Z)", text, re.I | re.M | re.S)
+    m = sec and re.search(r"\*\*address:\*\*\s*`?([^\s`]+@[^\s`]+)", sec.group(1))
+    return m.group(1).rstrip(".,;`").lower() if m else None
+
+
+SUPPORT_ADDRESS = support_address()
+
+
 def load_descriptor(root=None, explicit=None):
     """Where the site is, and which hostnames it serves.
 
@@ -319,6 +338,26 @@ def main():
                 broken.append(href)
         if broken:
             add(ERROR, "broken-link", u, f"link(s) to nothing: {', '.join(sorted(set(broken))[:4])}")
+
+        # Mail links with no subject. A studio found ~360 links on its sites that opened
+        # a blank mail, so nothing said which app or page a message was about. The hub's
+        # DATA.md ("### support mail") sets the form — `<App> — <topic> (web)`, encoded,
+        # parentheses included; this only checks that a subject is there and encoded.
+        bare, raw = [], []
+        for href in re.findall(r'href=["\'](mailto:[^"\']*)["\']', v["html"]):
+            q = html.unescape(href).split("?", 1)
+            if SUPPORT_ADDRESS and q[0][7:].lower() != SUPPORT_ADDRESS:
+                continue        # someone else's address (a payment provider's) is not ours to fix
+            if len(q) < 2 or not re.search(r"(?:^|&)subject=[^&]+", q[1], re.I):
+                bare.append(q[0])
+            elif re.search(r"subject=[^&]*[()\s]", q[1], re.I):
+                raw.append(q[0])
+        if bare:
+            add(WARN, "mailto", u, f"{len(bare)} mail link(s) with no subject ({', '.join(sorted(set(bare))[:2])}) — "
+                                   "the mail will not say which app or page it came from")
+        if raw:
+            add(WARN, "mailto", u, "mail subject not URL-encoded (a raw space or parenthesis) — "
+                                   "encode it, %28web%29 included")
 
         missing = []
         for ref in re.findall(r'(?:src|href)="([^"]+\.(?:png|jpe?g|webp|svg|css|js|mp4|ico))"', v["html"]):

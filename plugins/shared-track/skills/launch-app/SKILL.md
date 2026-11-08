@@ -184,6 +184,16 @@ the four locales it called empty were full, the category it called unset was
 that was accurate was the one the owner had kept appending to. **Lists rot from the
 top, because work happens at the bottom and nobody renumbers.**
 
+### Support contact — one line, every route
+
+**Support contact in the app, on the site and in both stores, per `DATA.md`** (`### support
+mail`): a "Contact Support" item in the app that mails the rule's address with
+`<App> <version> — Support` (`app-store-review-compliance` checks it); the app's page
+with `#contact` and a row in the rule's table (the site's own skill); the App Store
+support URL and review email (`app-store-metadata` validates both); the Play contact
+email and website (`play-store-metadata`, set by `play-store-deliver`). The address is
+read from `DATA.md`, never written here.
+
 ### On entry, check this per route — not once
 
 "Is it live?" has a different answer for each route, and asking it only about a

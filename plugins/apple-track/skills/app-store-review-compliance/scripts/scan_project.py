@@ -21,6 +21,13 @@ import plistlib
 import re
 import sys
 
+sys.path.insert(0, os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "shared")))
+try:
+    import support_mail  # noqa: E402  — the hub's DATA.md "### support mail" rule
+except ImportError:
+    support_mail = None
+
 # --- API reference -> required Info.plist usage-description key (5.1.1) -------
 # Each: list of code substrings that imply the permission -> plist key(s).
 USAGE_STRING_APIS = {
@@ -386,6 +393,78 @@ def detect_platforms_and_targets(root):
     }
 
 
+# --- Support contact (the hub's DATA.md "### support mail" rule) ---------------
+# Real cases this exists for: an app shipping mailto: to a foreign domain, apps writing
+# to a personal address, About windows with `mailto:\(supportEmail)` and no subject —
+# so a message arrived and nothing said which app it was about.
+SUPPORT_EXTS = CODE_EXTS + (".strings", ".xcstrings", ".plist", ".stringsdict")
+MAILTO_RE = re.compile(r"mailto:([^\s\"'<>)]*)")
+EMAIL_RE = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}\b")
+SUBJECT_RE = re.compile(r"subject=|URLQueryItem\(\s*name:\s*\"subject\"|\"subject\"", re.I)
+CONTACT_LABEL_RE = re.compile(r"Contact Support|Contact Us|Email Support|Send Feedback|Report a Problem|Get Support", re.I)
+NOT_AN_ADDRESS = ("@2x", "@3x", "@main", "@objc", "@available", "@escaping")
+
+
+def scan_support_contact(root):
+    """Evidence for the in-app support contact: every mailto, whether a subject is set
+    near it, every literal address, and whether a 'Contact Support' item exists.
+
+    Compared against the hub's support address when DATA.md has one. Evidence, not a
+    verdict: a mailto built across many lines may set its subject further away."""
+    sm = support_mail.load() if support_mail else {"address": None, "warnings": []}
+    want = (sm.get("address") or "").lower()
+    mailtos, addresses, labels = [], {}, []
+    for path in iter_files(root, SUPPORT_EXTS):
+        try:
+            with open(path, "r", errors="ignore") as f:
+                lines = f.readlines()
+        except OSError:
+            continue
+        r = rel(root, path)
+        for i, line in enumerate(lines, 1):
+            for m in MAILTO_RE.finditer(line):
+                target = m.group(1)
+                window = "".join(lines[max(0, i - 4): i + 4])
+                mailtos.append({
+                    "file": r, "line": i, "text": line.strip()[:160],
+                    "target": target.split("?")[0] or "(built elsewhere)",
+                    "interpolated": "\\(" in target or "%@" in target or target == "",
+                    "has_subject": bool(SUBJECT_RE.search(window)),
+                })
+            for e in EMAIL_RE.findall(line):
+                if any(t in e for t in NOT_AN_ADDRESS) or e.lower().endswith((".png", ".jpg", ".swift")):
+                    continue
+                addresses.setdefault(e.lower(), {"file": r, "line": i, "text": line.strip()[:160]})
+            if CONTACT_LABEL_RE.search(line) and len(labels) < 5:
+                labels.append({"file": r, "line": i, "text": line.strip()[:160]})
+    findings = []
+    if not mailtos and not labels:
+        findings.append("no in-app support contact found — no mailto and no 'Contact Support' item "
+                        "(Help menu on macOS, Settings on iOS)")
+    for mt in mailtos:
+        if not mt["has_subject"]:
+            findings.append(f"{mt['file']}:{mt['line']} mailto with no subject — the mail will not say "
+                            "which app or version it is about")
+    if want:
+        for a, ev in addresses.items():
+            # Only an address that is plainly a contact — in a mailto, or on a line that
+            # says support/contact/feedback/help — not a credited author in an About box.
+            if a != want and re.search(r"mailto|support|contact|feedback|help", ev["text"], re.I):
+                findings.append(f"{ev['file']}:{ev['line']} address {a} is not the support address "
+                                f"in DATA.md ({sm['address']})")
+        if mailtos and want not in addresses:
+            findings.append(f"the support address from DATA.md ({sm['address']}) appears nowhere in the code")
+    return {
+        "expected_address": sm.get("address"),
+        "expected_subject": (support_mail.APP_SUBJECT if support_mail else "<App> <version> — Support"),
+        "mailtos": mailtos[:20],
+        "addresses_in_code": sorted(addresses),
+        "contact_items": labels,
+        "likely_findings": findings[:30],
+        "warnings": sm.get("warnings", []),
+    }
+
+
 def cross_check_usage_strings(root, info_plists, generated_usage_keys):
     """For each usage API referenced in code, is the key present in any plist
     file OR in the generated-plist build settings (INFOPLIST_KEY_*)?"""
@@ -433,7 +512,9 @@ def main():
         "required_reason_apis_used": grep_signals(root, REQUIRED_REASON_APIS),
         "ipad_multitasking_orientations": scan_ipad_multitasking(pbx_text, root),
         "feature_signals": grep_signals(root, FEATURE_SIGNALS),
+        "support_contact": scan_support_contact(root),
         "notes": [
+            "support_contact.likely_findings: no contact, a mailto with no subject, or an address other than DATA.md's support address — each is a finding against the studio's support-mail rule (and 1.5 when there is no way to reach the developer at all). Subject must be '<App> <version> — Support' with the version from the bundle.",
             "Evidence only — confirm each signal against the code before reporting.",
             "usage_string_checks: present_in_plist=false is a likely 5.1.1 finding.",
             "PRIVACY MANIFEST IS PLATFORM-SPECIFIC: the Required-Reason API manifest is enforced only on iOS/iPadOS/tvOS/watchOS/visionOS. For a macOS-only app, do NOT report a missing manifest as a blocker.",

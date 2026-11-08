@@ -148,6 +148,22 @@ fastlane supply --json_key "$(python3 ${CLAUDE_PLUGIN_ROOT}/shared/credentials.p
 Then the real run (drop `--validate_only`). Control graphics with
 `--skip_upload_images` / `--skip_upload_screenshots`. Choose the track at upload.
 
+### 2b. Contact email and website — required before publishing
+`supply` never sets the listing's contact details, which is how one app went out with
+a personal address and two with none. Set them from the hub's `DATA.md` (`### support
+mail`: the support address, and the app's support URL as the website) through
+`edits.details` — `--dry-run` first:
+
+```bash
+python3 ${CLAUDE_PLUGIN_ROOT}/skills/play-store-deliver/scripts/play_contact.py \
+  --package <pkg> --slug <slug> --dry-run
+```
+
+`--check` compares what Play has with `DATA.md` and exits non-zero on a difference.
+No address in `DATA.md` (and no `--email`) is a stop: the app is not published without
+one. Without a hub, pass `--email` and `--website`. Run it on every first release, and
+whenever `DATA.md`'s rule changes.
+
 ### 3. Deliver in-app products / subscriptions (Play Developer API)
 `supply` doesn't manage in-app products — deliver them via the **Google Play
 Developer API** (AndroidPublisher v3), authenticated with the same service-account
@@ -203,6 +219,8 @@ versionCode are reported as a warning, not a stop. Only the copying is condition
   (`hub adds` = safe, `CONFLICT`/`MISSING IN HUB` = stop; supply overwrites media).
 - [scripts/sync_from_hub.sh](scripts/sync_from_hub.sh) — mirror the hub Play store
   tree + changelog + graphics into `fastlane/metadata/android/`, and verify.
+- [scripts/play_contact.py](scripts/play_contact.py) — set the Play contact email and
+  website from `DATA.md`'s support-mail rule (`edits.details`); `--dry-run`, `--check`.
 - [scripts/play_iap.py](scripts/play_iap.py) — upsert + activate one Play one-time
   product from the hub (`monetization.onetimeproducts`); `--dry-run`, `--list`.
 - [references/play-iap.md](references/play-iap.md) — deliver in-app products /

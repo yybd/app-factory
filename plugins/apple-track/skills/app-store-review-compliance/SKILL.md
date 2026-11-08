@@ -35,7 +35,10 @@ problems in an audit also steer the app while it's being built.
 - **Tools:** none beyond Claude Code and Xcode; `scripts/scan_project.py` is stdlib
   Python 3.
 - **Credentials:** none.
-- **Hub (`$APP_HUB`):** optional — only the conversational-language default in `DATA.md`.
+- **Hub (`$APP_HUB`):** optional — the conversational-language default and the
+  **support-mail rule** in `DATA.md` (`### support mail`: the one support address and
+  the subject format). Without the rule the scanner falls back to the Contact email
+  and says so; without a hub it reports every address it sees and compares to none.
 - **Other tracks:** `play-store-compliance` (android-track) owns the Google Play side.
 
 ## Two ways this skill is used
@@ -82,6 +85,23 @@ entitlements, and feature flags (StoreKit, auth, account creation, external
 purchase URLs). Treat it as evidence to interpret — not a verdict. It can miss
 things and it can over-flag; confirm each signal against the actual code before
 reporting it.
+
+**Support contact** (`support_contact` in the JSON). The app must give its user a way to
+write to the developer, and the studio's rule in `DATA.md` says how: a **"Contact
+Support"** item (Help menu on macOS, Settings on iOS/Android) that opens mail to the
+**support address in `DATA.md`** — never an address of its own — with a subject that
+names the app and its version (`<App> <version> — Support`, version read from the
+bundle). Report each of these as 🟠 Likely rejection when there is no contact at all
+(1.5), and as a finding against the rule otherwise:
+
+- **no contact** — no `mailto` and no contact item anywhere;
+- **a bare `mailto:` with no subject** — `mailto:\(supportEmail)` in an About window is
+  the case this was written for: the mail arrives and nothing says which app sent it;
+- **a different address** — a per-app alias, a personal address, or another domain.
+
+The address and format are read from `DATA.md`, never written into this skill. The
+scanner looks for the subject near the `mailto`; one built further away reads as
+missing — confirm in the code before reporting it.
 
 ### 3. Map signals to guidelines
 

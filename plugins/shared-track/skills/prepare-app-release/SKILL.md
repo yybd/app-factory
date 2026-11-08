@@ -62,7 +62,9 @@ redoing work rather than merely doing it late.
 2. **Compliance** — `app-store-review-compliance` (Apple) · `play-store-compliance`
    (Play). Before the build, because these change the project: a target API level,
    a permission, a privacy string, a demo mode. Finding them after archiving means
-   archiving twice.
+   archiving twice. **Support contact in the app, on the site and in both stores, per
+   `DATA.md`** (`### support mail`) — the compliance scan reports the in-app side; the
+   store sides are checked by the metadata validators in step 5.
 3. **Media** — `appstore-media` / `play-store-media`, and the icons
    (`app-icon-generator` / `android-icon-generator`) if they changed. Only when the
    UI actually changed; re-shooting an unchanged screen is waste.

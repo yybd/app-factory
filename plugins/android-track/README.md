@@ -15,7 +15,7 @@ edit a skill, not this table.*
 | `android-icon-generator` | Generate a complete Android launcher-icon set from one source image — the adaptive icon (separate foreground and background layers, correct safe zo… | 1 |  |
 | `android-run-device` | Build a debug APK and run it on a connected Android phone or emulator — the development loop, not a store release. | 1 |  |
 | `play-store-compliance` | Audit an Android app against Google Play's policies and the Console declarations that gate a release, and fix what would get it rejected or removed… |  |  |
-| `play-store-deliver` | The single send-surface to Google Play — sync the app's Play listing metadata, graphics, changelogs, AND in-app products / subscriptions from the h… | 3 | 1 |
+| `play-store-deliver` | The single send-surface to Google Play — sync the app's Play listing metadata, graphics, changelogs, AND in-app products / subscriptions from the h… | 4 | 1 |
 | `play-store-media` | Produce and conform the graphics a Google Play listing requires — phone, 7" and 10" tablet screenshots, the 1024x500 feature graphic, the 512x512 i… |  |  |
 | `play-store-metadata` | Author and validate a Google Play listing's text: title, short and full description, release notes per versionCode, and the graphics the listing re… | 3 | 1 |
 | `play-store-reviews-responder` | Read Google Play user reviews and write and post replies to them, through the Play Developer API. | 1 |  |

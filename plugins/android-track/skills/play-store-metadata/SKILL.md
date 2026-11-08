@@ -166,6 +166,14 @@ python3 ${CLAUDE_PLUGIN_ROOT}/skills/play-store-metadata/scripts/validate_metada
 It checks character limits, required fields per locale, changelog limits, and
 graphic presence, and prints a report. Fix every error it flags.
 
+It also reports the **contact details**, which `supply` never sets and Play requires
+before an app is published: the contact email is the support address in the hub's
+`DATA.md` (`### support mail`), and the contact website is the app's support URL from
+that section's table (its page + `#contact`). No address is an error; no row for the
+app is a warning — add the row, do not use the studio home. No such section: the
+Contact email, with a warning. They are not files in the listing tree — they are read
+from `DATA.md` when `play-store-deliver` sets them, so there is nothing to drift.
+
 ### 7. ASO — Play has no keywords field
 Unlike the App Store (a hidden 100-character keywords field), Google Play indexes
 the **visible** text — the title, short description, and full description. So

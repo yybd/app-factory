@@ -82,6 +82,7 @@ than asking or inventing:
 - **Contact** (review information): name, `email_address`, `phone number`.
 - **Copyright** (e.g. `2026 <Studio Name>`) → Apple `copyright.txt`.
 - **Default URLs**: marketing / support / privacy (with `{app-slug}` substituted).
+- **Support mail** (`### support mail`): the one support address and the per-app support-URL table. The support URL is the **app's own page + `#contact`** from that table — not the generic default — and the App Store review email and the Play contact email are the rule's address. No row for the app: leave the URL open and ask for the row; no such section: the Contact email, with a warning.
 - **App Store Connect API key**: Issuer ID, Key ID, and the **`.p8` path** — used by
   the deliver/upload step. (Play key: when present.)
 - **`conversational language`**: the language every skill talks to the user in
@@ -183,7 +184,9 @@ ONCE — store-neutral — so both stores stay in sync. Map each to its profile 
 | Play short description | Derived **"Google Play short description"** (≤80) |
 | Keyword set (primary + secondaries) | the app's own vocabulary in **Key features** / **Positioning** — real terms, not invented |
 | Privacy URL | from `DATA.md` — **it must resolve**, wherever it is hosted |
-| Support / marketing URL | from `DATA.md`, or the app's own product page |
+| Support URL | the app's row in `DATA.md`'s `### support mail` table (its page + `#contact`) — the generic default only when the section is absent |
+| Marketing URL | from `DATA.md`, or the app's own product page |
+| Review email (Apple) · contact email + website (Play) | the support address in `### support mail`; Play's contact website = the support URL |
 
 > **The Privacy URL must exist before you submit — a dead privacy URL fails App
 > Review.** If the studio has a website repo (`$SITE`), that repo's own skill produces

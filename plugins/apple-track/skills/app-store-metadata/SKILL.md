@@ -61,6 +61,13 @@ inventing claims. Confirm before installing tools.
   **URLs** come from a studio hub's `DATA.md` when there is one — read them, don't ask. The app repo keeps
   only its `README.md` (identity + features, owned by `app-identity`); the per-locale
   metadata lives in the hub.
+- **Support URL and review email follow the support-mail rule** in `DATA.md`
+  (`### support mail`): `support_url.txt` is the **app's own page + `#contact`** from that
+  section's per-app table — never the studio home — and
+  `review_information/email_address.txt` is the rule's support address. The scaffold
+  writes both into the files it creates; the validator warns when either differs. No
+  rule in `DATA.md`: the review email falls back to the Contact email, with a warning;
+  no row for the app: leave the support URL empty and add the row — do not invent one.
 - **Standalone flow (no hub)** — author directly in the app repo's
   `fastlane/metadata/<locale>/…`, taking name/subtitle/description from the repo's
   `README.md` (owned by `app-identity`).
@@ -262,7 +269,10 @@ are the common metadata rejections/errors:
 python3 ${CLAUDE_PLUGIN_ROOT}/skills/app-store-metadata/scripts/validate_metadata.py <project-root-or-metadata-root>
 ```
 It checks character limits, required fields per locale, URL fields, and
-cross-locale completeness, and prints a report. Fix every error it flags.
+cross-locale completeness, and prints a report. Fix every error it flags. It also
+warns when `support_url.txt` is not the app's row in `DATA.md`'s support-mail table (a
+language version of the same page passes) and when the review email is not the rule's
+address. The app is read from the hub path; pass `--slug <slug>` for any other layout.
 
 The validator checks URL *format*, not reachability. Separately confirm the
 **privacy URL actually resolves** before upload — a dead privacy page fails App

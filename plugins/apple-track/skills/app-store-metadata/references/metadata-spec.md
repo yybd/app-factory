@@ -59,7 +59,7 @@ not the source. Character counts are characters, not bytes.
 | `description.txt` | Description | **4000** | Per locale. |
 | `promotional_text.txt` | Promotional text | **170** | Per locale. Can be changed WITHOUT a new build. |
 | `release_notes.txt` | What's New | **4000** | Per locale. Required for updates (not first version). |
-| `support_url.txt` | Support URL | URL | Required. Must be reachable (Guideline 1.5). |
+| `support_url.txt` | Support URL | URL | Required. Must be reachable (Guideline 1.5). With a hub: the app's own page + `#contact`, from the per-app table in `DATA.md`'s `### support mail` section — never the studio home, so the mail that page sends already names the app. Apple keeps it per version: a change lands with the next submission. |
 | `marketing_url.txt` | Marketing URL | URL | Optional. |
 | `privacy_url.txt` | Privacy Policy URL | URL | Required when the app has accounts or collects data (most apps). |
 
@@ -71,7 +71,7 @@ not the source. Character counts are characters, not bytes.
 | `primary_category.txt` | Primary category | Apple category key (e.g. `PRODUCTIVITY`, `UTILITIES`). |
 | `secondary_category.txt` | Secondary category | Optional. |
 | `*_first_sub_category.txt`, `*_second_sub_category.txt` | Sub-categories | Only some categories (e.g. Games) use these; leave empty otherwise. |
-| `review_information/*` | App Review contact + demo | `notes.txt` is where demo-mode/login steps go. Include `demo_user`/`demo_password` only if there's a login. |
+| `review_information/*` | App Review contact + demo | `notes.txt` is where demo-mode/login steps go. Include `demo_user`/`demo_password` only if there's a login. `email_address.txt` is the support address from `DATA.md`'s `### support mail` section (the Contact email when there is no such section). |
 
 ## Locale codes (App Store)
 

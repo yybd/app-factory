@@ -14,6 +14,12 @@ and `iap/` were each reported as a locale missing its title, short description a
 description, six errors for two directories that are not locales. And it checked
 `images/icon/` and `images/featureGraphic/` as *directories*, which `supply` never
 creates, so a correct tree always warned that both were empty.
+
+**Contact details** (the hub's DATA.md, "### support mail"). Play requires a contact
+email before an app is published, and `supply` never sets it — one app went out with a
+personal address and two with none. This reports what `play-store-deliver`'s
+`play_contact.py` will set: the support address, and the app's support URL as the
+contact website. No address is an error; no row for the app is a warning.
 """
 from __future__ import annotations
 
@@ -26,6 +32,49 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from play_layout import (CHANGELOG_LIMIT, LIMITS, REQUIRED,  # noqa: E402
                          SINGLE_IMAGES, resolve)
 
+sys.path.insert(0, os.path.normpath(os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "..", "..", "..", "shared")))
+try:
+    import support_mail  # noqa: E402
+except ImportError:                     # an old copy of the track without shared/
+    support_mail = None
+
+
+def slug_from_path(p: Path):
+    """<hub>/<slug>/store/play → <slug>; None when the path is not that shape."""
+    parts = p.resolve().parts
+    if "store" in parts:
+        i = len(parts) - 1 - parts[::-1].index("store")
+        return parts[i - 1] if i > 0 else None
+    return None
+
+
+def contact(slug):
+    """(errors, warnings) for the Play contact email and website, from DATA.md."""
+    if support_mail is None:
+        return 0, 0
+    sm = support_mail.load()
+    errors = warnings = 0
+    print("[contact details — set by play-store-deliver/play_contact.py, never by supply]")
+    for w in sm.get("warnings", []):
+        print(f"  WARN   {w}")
+        warnings += 1
+    if sm.get("address"):
+        print(f"  ok     contact email: {sm['address']}")
+    elif sm.get("source"):
+        print("  ERROR  contact email: DATA.md names no support address — Play requires one "
+              "before the app can be published")
+        errors += 1
+    url = support_mail.support_url(sm, slug)
+    if url:
+        print(f"  ok     contact website: {url}")
+    elif sm.get("urls"):
+        print(f"  WARN   contact website: no row for '{slug or '?'}' in DATA.md's support-mail "
+              "table (pass --slug for a non-hub path)")
+        warnings += 1
+    print()
+    return errors, warnings
+
 
 def char_len(p: Path) -> int:
     # Play does not count a trailing newline; strip a single one.
@@ -36,7 +85,7 @@ def shots_in(d: Path) -> int:
     return len([c for c in d.iterdir() if not c.name.startswith(".")]) if d.is_dir() else 0
 
 
-def validate(layout) -> int:
+def validate(layout, slug=None) -> int:
     if not layout.meta_root.is_dir():
         print(f"ERROR: no metadata directory at {layout.meta_root}")
         return 1
@@ -112,6 +161,10 @@ def validate(layout) -> int:
             print(f"  ok     images/phoneScreenshots/: {n}")
         print()
 
+    e, w = contact(slug)
+    errors += e
+    warnings += w
+
     print(f"Done. {errors} error(s), {warnings} warning(s).")
     return 1 if errors else 0
 
@@ -120,9 +173,11 @@ def main():
     ap = argparse.ArgumentParser(description="Validate Play listing metadata.")
     ap.add_argument("root", help="project root, fastlane/metadata/android, or <slug>/store/play")
     ap.add_argument("--media", help="where per-locale images/ live (default: derived)")
+    ap.add_argument("--slug", help="the app's hub slug, for the contact website "
+                                   "(default: read from a hub path)")
     a = ap.parse_args()
     layout = resolve(Path(a.root), Path(a.media).expanduser().resolve() if a.media else None)
-    sys.exit(validate(layout))
+    sys.exit(validate(layout, a.slug or slug_from_path(Path(a.root))))
 
 
 if __name__ == "__main__":

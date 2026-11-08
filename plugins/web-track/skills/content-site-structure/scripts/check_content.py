@@ -19,6 +19,9 @@ language set:
   captions    a video or audio file with no caption track in some declared language
   frontmatter a .md with no `title`, or two files sharing a `slug` in one language
   data        a localized field present in one language and missing in another
+  mailto      a mail link with no subject, or one whose subject is not URL-encoded —
+              a raw `)` ends a Markdown link (the form is in the hub's DATA.md,
+              "### support mail")
 
 **Stdlib only** — no install, so it runs in CI and on a machine that never ran `npm i`.
 The front-matter parser is deliberately minimal (top-level `key: value`); it reads
@@ -93,6 +96,21 @@ def check_media_refs(root: Path, md: Path, code: str, page: str) -> None:
         where = (root / "src" / rel, root / rel, root / "public" / rel, md.parent / rel)
         if not any(c.exists() for c in where):
             fail(f"media: {code}/{page}.md references '{ref}' — no such file")
+
+
+MAILTO = re.compile(r"mailto:([^\s\"'<>]*)")
+
+
+def check_mailto(md: Path, code: str, page: str) -> None:
+    """A mail link that opens a blank subject tells nobody which app or page it came from."""
+    for m in MAILTO.finditer(md.read_text(encoding="utf-8", errors="replace")):
+        target = m.group(1)
+        q = target.split("?", 1)
+        if len(q) < 2 or not re.search(r"(?:^|&(?:amp;)?)subject=[^&]+", q[1], re.I):
+            warn(f"mailto: {code}/{page}.md links to mailto:{q[0].rstrip(')')} with no subject")
+        elif "(" in q[1]:
+            warn(f"mailto: {code}/{page}.md has a raw '(' in a mail subject — encode it "
+                 "(%28 … %29), or the ')' ends the Markdown link")
 
 
 def check_captions(root: Path, codes: list[str]) -> None:
@@ -177,6 +195,7 @@ def main() -> int:
                 fail(f"slug: '{slug}' used by both {code}/{slugs[slug]}.md and {code}/{page}.md")
             slugs[slug] = page
             check_media_refs(root, path, code, page)
+            check_mailto(path, code, page)
 
     check_captions(root, codes)
 

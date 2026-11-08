@@ -11,6 +11,7 @@ fastlane `supply` reads and writes the tree below.
 - [Graphics](#graphics)
 - [ASO on Google Play (there is no keywords field)](#aso-on-google-play-there-is-no-keywords-field)
 - [fastlane supply setup](#fastlane-supply-setup)
+- [Contact details](#contact-details)
 - [Done on the Play Console website](#done-on-the-play-console-website)
 
 ## Directory layout — the `supply` shape, which is what uploads
@@ -133,6 +134,14 @@ keywords skill: on Play, ASO *is* the listing text.
 - A binary (AAB) must have been uploaded at least once before some listing fields
   apply. For a brand-new app, create the app entry on the website first.
 
+## Contact details
+
+Required before an app can be published, and **not** a `supply` field — they belong to
+the app (`edits.details`: `contactEmail`, `contactWebsite`, `contactPhone`), not to any
+locale. `play-store-deliver`'s `play_contact.py` sets them from the hub's `DATA.md`
+(`### support mail`): email = the support address, website = the app's support URL
+(the same page + `#contact` as the App Store support URL). Never a personal address.
+
 ## Done on the Play Console website
 fastlane can't do these — finish them on play.google.com/console:
 
@@ -140,5 +149,5 @@ fastlane can't do these — finish them on play.google.com/console:
 - **Content rating** — the IARC questionnaire.
 - **Pricing & distribution** — free/paid, countries.
 - **App content** declarations — target audience, ads, news, data handling, etc.
-- **Store settings** — category, tags, contact details.
+- **Store settings** — category, tags. (Contact details: `play_contact.py`, above.)
 - Creating the **app entry** itself if it doesn't exist.

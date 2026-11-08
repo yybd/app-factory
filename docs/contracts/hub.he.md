@@ -74,6 +74,7 @@
 | **פרטי קשר** — שם, אימייל, טלפון | `app-store-metadata`, `store-metadata-writer` | אי אפשר למלא את בלוק ה‑review information; ההגשה נדחית |
 | **Copyright** — למשל `2026 <Studio Name>` | `app-store-metadata` | `copyright.txt` חסר בליסטינג |
 | **כתובות ברירת מחדל** — שיווק / תמיכה / פרטיות, עם `{app-slug}` | `app-profile`, `store-metadata-writer` | כל אפליקציה נשאלת על הכתובות שלה ביד, והן מתפצלות |
+| **מייל תמיכה** — סעיף `### support mail`: כתובת התמיכה האחת, תבניות הנושא (`<App> <version> — Support` מתוך אפליקציה, `<App> — <topic> (web)` מדף, בקידוד URL), וטבלה של כתובת תמיכה לכל אפליקציה (הדף שלה + `#contact`) | `app-store-review-compliance`, `app-store-metadata`, `play-store-metadata`, `play-store-deliver`, `store-metadata-writer`, `app-profile`, `web-seo` | כל משטח בוחר כתובת משלו ואף הודעה לא אומרת על איזו אפליקציה היא; כתובת התמיכה ב‑App Store נופלת לדף הבית של הסטודיו, וכתובת הקשר ב‑Play לא נקבעת לעולם. בלי הסעיף הסקילים משתמשים באימייל של פרטי הקשר ומזהירים |
 | **מפתח App Store Connect** — issuer id, key id, ו**נתיב** ה‑`.p8` | `app-store-deliver`, `ship-apple-app` | אי אפשר להעלות שום דבר ל‑App Store Connect |
 | **חשבון שירות של Play** — נתיב ה‑JSON | `play-store-deliver`, `play-store-ship` | אי אפשר להעלות שום דבר ל‑Google Play |
 | **`conversational language`** *(אופציונלי)* | כל הסקילים | כלום — בלעדיו הסקילים עונים בשפה שאתה כותב בה |

@@ -94,7 +94,8 @@ Google had to invent, or that nothing links to.
 It checks titles, descriptions, canonicals, `h1`, structured data, Open Graph,
 `lang`, hreflang reciprocity, image alt text and dimensions, analytics coverage,
 sitemap membership, duplicate titles and descriptions across pages, orphan pages,
-**links and assets that point at nothing**, thin content, and per-property
+**links and assets that point at nothing**, **mail links with no subject** (or a
+subject not URL-encoded — the form is in the hub's `DATA.md`, `### support mail`), thin content, and per-property
 `robots.txt`/`sitemap.xml`. Errors are broken; warnings are weaker than they
 should be; notes are for awareness.
 

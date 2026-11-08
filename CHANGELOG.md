@@ -14,6 +14,34 @@ skill does.
 
 ## Unreleased
 
+- **Support mail: one address, and every message says where it came from.** The skills
+  now read a hub's `DATA.md` section `### support mail` (the support address, the
+  subject formats, a per-app table of support URLs) and apply it on every surface. No
+  skill holds an address or a domain; without the section they use the Contact email
+  and warn. From a studio whose apps wrote to four addresses, whose Play listing named a
+  personal one, and whose ~360 site links and 20 App Store support URLs sent mail with
+  no subject.
+  - **`app-store-review-compliance`**: `scan_project.py` reports `support_contact`,
+    flagging an app with no contact at all, a `mailto` with no subject (the
+    `mailto:\(supportEmail)` About window), and a contact address that is not the rule's
+    (a foreign domain, a personal address).
+  - **`app-store-metadata`**: the scaffold writes `support_url.txt` from the table (the
+    app's page + `#contact`, never the studio home) and the review email from the rule;
+    the validator warns when either differs. A language version of the same page passes.
+  - **`play-store-deliver`**: new `play_contact.py` sets the Play contact email and
+    website through `edits.details`, which `supply` never touches, and refuses to go on
+    with no email. **`play-store-metadata`**'s validator reports both, and fails when
+    the hub names no address.
+  - **`store-metadata-writer`**, **`app-profile`**: the support URL comes from the table,
+    not the generic default.
+  - **`launch-app`**, **`prepare-app-release`**: one line — support contact in the app,
+    on the site and in both stores, per `DATA.md`.
+  - **`web-seo`** and **`content-site-structure`**: a mail link with no subject, or with
+    a subject not URL-encoded (a raw `)` ends a Markdown link), is a warning. `web-seo`
+    checks only the hub's support address when it knows it.
+  - `docs/contracts/hub.md`: the **Support mail** key. `factory/tests/test_support_mail.py`
+    pins the reader and every check.
+
 ## 0.12.0
 
 - **`page-builder`: say what it does before showing how well.** A product, and every

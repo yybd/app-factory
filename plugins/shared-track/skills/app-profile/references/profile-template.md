@@ -31,7 +31,7 @@
 
 ## Links (studio defaults from `DATA.md`, `{app-slug}` substituted)
 - **Marketing URL:** {{MARKETING_URL}}
-- **Support URL:** {{SUPPORT_URL}}
+- **Support URL:** {{SUPPORT_URL}}  <!-- the app's row in DATA.md's "### support mail" table (its page + #contact), not the generic default -->
 - **Privacy URL:** {{PRIVACY_URL}}
 
 ## Key features
