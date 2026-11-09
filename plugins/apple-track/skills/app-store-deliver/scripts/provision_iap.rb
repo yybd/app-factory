@@ -22,7 +22,17 @@
 #                       (its 175-territory set), instead of every territory Apple lists
 #   --no-price          leave pricing alone
 #   --no-screenshot     skip the reviewer screenshot
+#   --open-version      the product is APPROVED, a locale's text changed, and there is
+#                       no draft version to put it in: open one (POST
+#                       inAppPurchaseVersions). It goes to review with the next app
+#                       version. Without this flag the script stops and says so.
 #   --dry-run           report what would change, write nothing
+#
+# Changing the text of an APPROVED product: App Store Connect keeps the approved
+# localizations read-only ("Cannot edit InAppPurchaseLocalization when it is in
+# ACTIVE state") and edits go to a draft — a second localization record per locale,
+# state PREPARE_FOR_SUBMISSION, inside a newer inAppPurchaseVersion. The script
+# always compares against and writes to that draft, never the approved record.
 #
 # Hub layout it reads (authored by app-store-metadata):
 #   <hub>/<slug>/store/apple/iap/<product-id>/
@@ -57,6 +67,7 @@ territory = flag("--territory", "USA")
 mirror    = flag("--mirror-from")
 no_price  = ARGV.include?("--no-price")
 no_shot   = ARGV.include?("--no-screenshot")
+open_ver  = ARGV.include?("--open-version")
 tree      = ASC.tree(slug, hub: flag("--hub"), repo: flag("--repo"))   # hub, or the repo's fastlane/
 root      = tree[:iap].call(pid)
 abort "no IAP tree in the #{tree[:name]} at: #{root}" unless Dir.exist?(root)
@@ -115,8 +126,29 @@ iap  = ASC.body(rc.get("v2/inAppPurchases/#{iid}"))
 rel  = ->(n) { iap.dig("data", "relationships", n, "links", "related")&.sub("https://api.appstoreconnect.apple.com/", "") }
 
 # ------------------------------------------------------------- 2. localizations
-have = (ASC.body(rc.get(rel.("inAppPurchaseLocalizations")))["data"] || [])
-         .to_h { |l| [l.dig("attributes", "locale"), l] }
+# A locale can hold TWO records: the approved one (read-only — PATCHing it fails with
+# "Cannot edit InAppPurchaseLocalization when it is in ACTIVE state") and a
+# PREPARE_FOR_SUBMISSION draft beside it, in a newer inAppPurchaseVersion. Keying the
+# list by locale kept whichever came last, and on a live product (2026-11-09) that was the
+# approved one. So: group by locale, and write only to a record that is not locked.
+LOCKED = %w[APPROVED WAITING_FOR_REVIEW].freeze
+OPEN_V = %w[PREPARE_FOR_SUBMISSION REJECTED DEVELOPER_REJECTED].freeze
+load_locs = lambda do
+  (ASC.body(rc.get(rel.("inAppPurchaseLocalizations"), { limit: 200 }))["data"] || [])
+    .group_by { |l| l.dig("attributes", "locale") }
+end
+# The draft version, if one is open — where a draft for an approved-only locale goes.
+load_draft = lambda do
+  link = rel.("versions")
+  vs = link ? (begin ASC.body(rc.get(link, { limit: 50 }))["data"] rescue nil end) || [] : []
+  vs.select { |v| OPEN_V.include?(v.dig("attributes", "state")) }
+    .max_by { |v| v.dig("attributes", "version").to_i }
+end
+have  = load_locs.()
+draft = nil
+draft_looked = false
+same = ->(r, n, d) { r && r.dig("attributes", "name") == n && r.dig("attributes", "description") == d }
+
 locales.each do |loc|
   name = rd.(File.join(root, loc, "display_name.txt"))
   desc = rd.(File.join(root, loc, "description.txt"))
@@ -124,16 +156,70 @@ locales.each do |loc|
   if name.length > 30 || (desc && desc.length > 45)
     abort "  [#{loc}] over limit — display_name #{name.length}/30, description #{desc&.length}/45"
   end
-  cur = have[loc]
-  if cur && cur.dig("attributes", "name") == name && cur.dig("attributes", "description") == desc
-    puts "  [#{loc}] already set"
+  # Once any locale is approved, the product is live and new text belongs in a draft.
+  live   = have.values.flatten.any? { |r| r.dig("attributes", "state") == "APPROVED" }
+  recs   = have[loc] || []
+  cur    = recs.find { |r| !LOCKED.include?(r.dig("attributes", "state")) }   # the editable one
+  locked = recs.find { |r| LOCKED.include?(r.dig("attributes", "state")) }
+
+  if cur
+    if same.(cur, name, desc)
+      puts "  [#{loc}] already set#{locked ? ' (in the draft)' : ''}"
+    elsif dry
+      puts "  [#{loc}] [dry-run] would update#{locked ? ' the draft' : ''}"
+    else
+      rc.patch("v1/inAppPurchaseLocalizations/#{cur['id']}",
+               { data: { type: "inAppPurchaseLocalizations", id: cur["id"],
+                         attributes: { name: name, description: desc }.compact } })
+      puts "  [#{loc}] updated#{locked ? ' (draft)' : ''}"
+    end
+  elsif locked || live
+    # Only an approved (or in-review) record — or a locale the approved product never
+    # had. Unchanged text needs no draft at all.
+    next puts("  [#{loc}] already set (#{locked.dig('attributes', 'state')})") if same.(locked, name, desc)
+    if locked&.dig("attributes", "state") == "WAITING_FOR_REVIEW"
+      abort "  [#{loc}] the text is in review (WAITING_FOR_REVIEW) and cannot be changed now — " \
+            "wait for the verdict, then re-run"
+    end
+    draft, draft_looked = load_draft.(), true unless draft_looked
+    if draft.nil?
+      if dry && !open_ver
+        puts "  [#{loc}] [dry-run] text changed on an APPROVED product and no draft version is open — " \
+             "a real run stops here; --open-version would open one"
+        next
+      end
+      unless open_ver
+        abort "  [#{loc}] the product is APPROVED and the text changed, but no draft version is open. " \
+              "Approved localizations are read-only; the change goes into a new version " \
+              "(POST inAppPurchaseVersions), which ships with the next app-version submission. " \
+              "Re-run with --open-version to open it, or open it in App Store Connect " \
+              "(edit the product's localization there) and re-run."
+      end
+      if dry
+        puts "  [#{loc}] [dry-run] would open a new IAP version, then write the draft"
+        next
+      end
+      created = ASC.body(rc.post("v1/inAppPurchaseVersions",
+        { data: { type: "inAppPurchaseVersions",
+                  relationships: { inAppPurchase: { data: { type: "inAppPurchases", id: iid } } } } }))
+      draft = created["data"]
+      puts "  ✓ opened IAP version #{draft.dig('attributes', 'version')} (#{draft.dig('attributes', 'state')})"
+      # Opening a version may copy the approved text forward into drafts — re-read and
+      # take that draft if it appeared, rather than adding a second one.
+      have = load_locs.()
+      redo
+    end
+    if dry
+      puts "  [#{loc}] [dry-run] would create a draft in version #{draft.dig('attributes', 'version')}"
+    else
+      rc.post("v2/inAppPurchaseLocalizations",
+              { data: { type: "inAppPurchaseLocalizations",
+                        attributes: { locale: loc, name: name, description: desc }.compact,
+                        relationships: { version: { data: { type: "inAppPurchaseVersions", id: draft["id"] } } } } })
+      puts "  [#{loc}] created (draft in version #{draft.dig('attributes', 'version')})"
+    end
   elsif dry
-    puts "  [#{loc}] [dry-run] would #{cur ? 'update' : 'create'}"
-  elsif cur
-    rc.patch("v1/inAppPurchaseLocalizations/#{cur['id']}",
-             { data: { type: "inAppPurchaseLocalizations", id: cur["id"],
-                       attributes: { name: name, description: desc }.compact } })
-    puts "  [#{loc}] updated"
+    puts "  [#{loc}] [dry-run] would create"
   else
     rc.post("v1/inAppPurchaseLocalizations",
             { data: { type: "inAppPurchaseLocalizations",

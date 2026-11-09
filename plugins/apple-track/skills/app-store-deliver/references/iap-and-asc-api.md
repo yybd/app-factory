@@ -54,10 +54,47 @@ def body(r); r.body.is_a?(Hash) ? r.body : JSON.parse(r.body); end
 | Reach a sub-resource | follow the IAP's `relationships.<name>.links.related` URL — do **not** hand-build `v1/inAppPurchases/{id}/<rel>` (404: "relationship does not exist") |
 | Localizations (list) | follow `relationships.inAppPurchaseLocalizations.links.related` |
 | Localization (create) | `POST v1/inAppPurchaseLocalizations` — attrs `{locale,name,description}`, relationship **`inAppPurchaseV2`** → `{type:"inAppPurchases", id}` |
-| Localization (update) | `PATCH v1/inAppPurchaseLocalizations/{locId}` — attrs `{name,description}` |
+| Localization (update) | `PATCH v1/inAppPurchaseLocalizations/{locId}` — attrs `{name,description}` — only a record that is **not** `APPROVED` / `WAITING_FOR_REVIEW` |
+| Versions (list) | follow `relationships.versions.links.related` → `inAppPurchaseVersions`, attrs `{version, state}` |
+| Version (open a draft) | `POST v1/inAppPurchaseVersions` — relationship `inAppPurchase` → `{type:"inAppPurchases", id}` |
+| Localization in a version | `GET v1/inAppPurchaseVersions/{vId}/localizations`; create with `POST v2/inAppPurchaseLocalizations`, relationship **`version`** → `{type:"inAppPurchaseVersions", id}` |
 | Review note | it's an **attribute** `reviewNote` on the IAP → `PATCH v2/inAppPurchases/{id}` `{attributes:{reviewNote}}` |
 | Review screenshot | relationship `appStoreReviewScreenshot` — **use `scripts/upload_iap_screenshot.rb`** (reserve→upload→commit on `inAppPurchaseAppStoreReviewScreenshots`; there is no Spaceship model, so it drives raw HTTP). It refuses illegal sizes and alpha up front, `--force` replaces an attached shot, and it polls `assetDeliveryState.state` to `COMPLETE` — a commit that returns 200 can still fail delivery |
 | Price | relationship `iapPriceSchedule` (schedule id == IAP id). Manual prices via `inAppPurchasePriceSchedules`; often already set in ASC — read before writing |
+
+## An approved product: two records per locale
+
+Once an IAP is `APPROVED`, its text is no longer edited in place. The product has
+**versions** (`inAppPurchaseVersions`, numbered, each with a `state`), and each version
+has its own localization records. The product's `inAppPurchaseLocalizations` list returns
+**all** of them, so one locale can appear **twice**:
+
+| Record | `state` | Version | Editable |
+|--------|---------|---------|----------|
+| the text that is live | `APPROVED` | 1, `APPROVED` | no |
+| the next text | `PREPARE_FOR_SUBMISSION` | 2, `PREPARE_FOR_SUBMISSION` | yes |
+
+PATCHing the approved record is refused:
+
+> Cannot edit InAppPurchaseLocalization when it is in ACTIVE state
+
+So **group by locale and write to the record that is not `APPROVED`** (nor
+`WAITING_FOR_REVIEW`, which is locked until the verdict). A hash keyed by locale keeps
+whichever record came last — on a live non-consumable (2026-11-09) that was
+the approved one, and the run failed. PATCHing the draft's id in each of the six locales
+worked; the drafts ship with the next app-version submission. A locale the approved
+version never had (en-GB there) appears only as a draft.
+
+**When only the approved record exists** and the text changed, there is nowhere to write
+until a draft version is open. The API (OpenAPI spec 4.6) has `POST v1/inAppPurchaseVersions`
+to open one and `POST v2/inAppPurchaseLocalizations` with a `version` relationship to add a
+locale to it. **Not yet seen on a live product:** whether opening a version copies the
+approved text forward into drafts (on that product version 2 held a draft for every locale,
+created before this script knew about versions), and what `POST v1/inAppPurchaseLocalizations`
+does for a locale that already has an approved record. `provision_iap.rb` therefore opens a
+version only with `--open-version`, re-reads the localizations afterwards (patching a draft
+if one was copied, creating one otherwise), and without the flag stops and says what is
+needed. Record what the first real run shows here.
 
 ## Working recipe (idempotent — localization + review note)
 
@@ -76,7 +113,9 @@ locs = body(rc.get(iap.dig("data","relationships","inAppPurchaseLocalizations","
 locales.each do |loc|
   name = File.read("#{iap_dir}/#{loc}/display_name.txt").strip
   desc = File.read("#{iap_dir}/#{loc}/description.txt").strip
-  if (m = locs.find { |x| x.dig("attributes","locale") == loc })
+  # never the APPROVED record — see "An approved product" above
+  if (m = locs.find { |x| x.dig("attributes","locale") == loc &&
+                          !%w[APPROVED WAITING_FOR_REVIEW].include?(x.dig("attributes","state")) })
     rc.patch("v1/inAppPurchaseLocalizations/#{m['id']}",
       {data:{type:"inAppPurchaseLocalizations", id:m['id'], attributes:{name:name, description:desc}}})
   else

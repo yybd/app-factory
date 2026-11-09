@@ -14,6 +14,14 @@ skill does.
 
 ## Unreleased
 
+- **`provision_iap.rb` can change the text of an APPROVED in-app purchase.** An approved
+  product keeps two localization records per locale — the approved one, read-only, and a
+  `PREPARE_FOR_SUBMISSION` draft in a newer `inAppPurchaseVersion`. The script kept one
+  record per locale, patched the approved one, and App Store Connect refused it ("Cannot
+  edit InAppPurchaseLocalization when it is in ACTIVE state"). It now compares against and
+  writes to the draft; when there is none and the text changed, it stops and says so, and
+  `--open-version` opens a new version to hold it.
+
 ## 0.15.0
 
 - **`$KEYS_ROOT` has a new layout: `signing/`, `store-api/`, `services/`, `projects/`,

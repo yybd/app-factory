@@ -428,6 +428,17 @@ reusable. The reference name and type of a product it creates come from `product
 Setting localizations + review note + price + screenshot flips the state to
 `READY_TO_SUBMIT`.
 
+**Changing the text of an APPROVED product** works through a draft, not in place. Once a
+product is approved, each locale can hold **two** localization records: the approved one,
+read-only, and a `PREPARE_FOR_SUBMISSION` draft beside it inside a newer
+`inAppPurchaseVersion`. PATCHing the approved record fails with *"Cannot edit
+InAppPurchaseLocalization when it is in ACTIVE state"*. The script compares against and
+writes to the draft; a locale whose approved text already matches the hub is left alone.
+When the text changed and **no draft version is open**, it stops and says so —
+`--open-version` opens one (`POST v1/inAppPurchaseVersions`), and the drafts then ship with
+the next app-version submission. Opening a version is outward-facing: confirm it with the
+owner first. First seen 2026-11-09.
+
 ### 5. Hand off the website-only leftovers
 Tell the user what the API can't set: age-rating questionnaire, pricing &
 availability display, the App Privacy nutrition label, export compliance, and
@@ -478,6 +489,9 @@ creating the app record if missing — then submit is `ship-apple-app`'s job.
   not `appInfos.first`.
 - **IAP single resource is `v2/inAppPurchases/{id}`**; sub-resources only resolve via
   the resource's `relationships.*.links.related` URLs. See the IAP reference.
+- **An approved IAP's localizations are read-only** — edit the `PREPARE_FOR_SUBMISSION`
+  draft of the same locale (a separate record id), never the `APPROVED` one. A list of
+  localizations keyed by locale silently keeps one of the two. See the IAP reference.
 
 ## Two modes: with a hub, and without one
 
