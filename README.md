@@ -1,5 +1,7 @@
 *English · [עברית](README.he.md)*
 
+<img src="docs/media/logo.svg" width="96" alt="App Factory logo">
+
 # App Factory
 
 **43 skills that build, describe, ship and announce apps** — to the App Store and

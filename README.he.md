@@ -1,5 +1,7 @@
 *[English](README.md) · עברית*
 
+<img src="docs/media/logo.svg" width="96" alt="הלוגו של App Factory">
+
 # App Factory
 
 **43 סקילים שבונים, מתארים, שולחים ומכריזים על אפליקציות** — ל-App Store, ל-Google Play,
