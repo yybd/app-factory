@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" width="1280" height="640">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#27325a"/><stop offset="1" stop-color="#131a33"/></linearGradient>
+    <radialGradient id="glow" cx="1" cy="0" r="0.75"><stop offset="0" stop-color="#1f3a26" stop-opacity=".75"/><stop offset="1" stop-color="#0d1117" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1280" height="640" fill="#0d1117"/>
+  <rect width="1280" height="640" fill="url(#glow)"/>
+  <g transform="translate(1022 64) scale(.328)">
+  <!-- the app-icon shape -->
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <!-- the factory: a chimney and a three-tooth sawtooth roof -->
+  <path d="M98 408V184h60v104l86-68v68l86-68v68l84-68v188z"
+        fill="#f4f1ea" stroke="#f4f1ea" stroke-width="12" stroke-linejoin="round"/>
+  <!-- three windows, each an app-icon shape -->
+  <g fill="#1b2443">
+    <rect x="176" y="324" width="50" height="50" rx="13"/>
+    <rect x="254" y="324" width="50" height="50" rx="13"/>
+    <rect x="332" y="324" width="50" height="50" rx="13"/>
+  </g>
+  <!-- what comes out of the chimney: apps, growing as they leave -->
+  <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <rect x="113" y="120" width="30" height="30" rx="8" fill="#ff8a3d" transform="rotate(-8 128 135)"/>
+    <g transform="rotate(10 172 86)">
+      <rect x="149" y="63" width="46" height="46" rx="12" fill="#ffc145"/>
+      <circle cx="172" cy="86" r="9" fill="#1b2443"/>
+    </g>
+    <g transform="rotate(-7 250 74)">
+      <rect x="218" y="42" width="64" height="64" rx="17" fill="#3ecfb2"/>
+      <path d="M241 59v30l24-15z" fill="#1b2443" stroke="#1b2443" stroke-width="5"/>
+    </g>
+    <g transform="rotate(9 362 108)">
+      <rect x="319" y="65" width="86" height="86" rx="23" fill="#ff8a3d"/>
+      <path d="M342 109l14 14 27-30" stroke="#f4f1ea" stroke-width="11"/>
+    </g>
+  </g>
+
+  <rect x="2" y="2" width="508" height="508" rx="114" fill="none" stroke="#ffffff" stroke-opacity=".16" stroke-width="4"/>
+  </g>
+  <text x="91" y="92" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="22" font-weight="700" letter-spacing="2.5" fill="#56d364">FOR CLAUDE CODE</text>
+  <text x="88" y="196" font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="104" font-weight="800" letter-spacing="-3" fill="#e6edf3">App Factory</text>
+  <g font-family="-apple-system, 'Helvetica Neue', Arial, sans-serif" font-size="33" fill="#8b949e" letter-spacing="-.3">
+    <text x="91" y="268"><tspan fill="#e6edf3" font-weight="700">43 skills</tspan> that build, describe, ship and announce apps, to the</text>
+    <text x="91" y="314"><tspan fill="#e6edf3" font-weight="700">App Store</tspan>, <tspan fill="#e6edf3" font-weight="700">Google Play</tspan>, <tspan fill="#e6edf3" font-weight="700">Mac</tspan> and <tspan fill="#e6edf3" font-weight="700">Windows</tspan> — loaded only where needed.</text>
+  </g>
+  <g font-family="ui-monospace, 'SF Mono', Menlo, monospace"><rect x="91.0" y="408" width="99.1" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="102.0" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">apple <tspan fill="#56d364" font-weight="700">16</tspan></text><rect x="198.1" y="408" width="108.7" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="209.1" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">android <tspan fill="#56d364" font-weight="700">9</tspan></text><rect x="314.7" y="408" width="99.1" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="325.7" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">shared <tspan fill="#56d364" font-weight="700">7</tspan></text><rect x="421.8" y="408" width="70.2" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="432.8" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">web <tspan fill="#56d364" font-weight="700">4</tspan></text><rect x="500.0" y="408" width="128.0" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="511.0" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">capacitor <tspan fill="#56d364" font-weight="700">2</tspan></text><rect x="635.9" y="408" width="99.1" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="646.9" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">design <tspan fill="#56d364" font-weight="700">1</tspan></text><rect x="743.0" y="408" width="108.7" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="754.0" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">windows <tspan fill="#56d364" font-weight="700">2</tspan></text><rect x="859.7" y="408" width="118.3" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="870.7" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">announce <tspan fill="#56d364" font-weight="700">1</tspan></text><rect x="986.0" y="408" width="166.5" height="38" rx="8" fill="#161b22" stroke="#30363d"/><text x="997.0" y="432" font-size="16" fill="#c9d1d9" xml:space="preserve">factory-setup <tspan fill="#56d364" font-weight="700">1</tspan></text></g>
+  <text x="91" y="556" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="22" fill="#8b949e">github.com/yybd/app-factory</text>
+  <rect x="974" y="530" width="216" height="38" rx="19" fill="none" stroke="#2ea043"/>
+  <text x="1082" y="556" text-anchor="middle" font-family="ui-monospace, 'SF Mono', Menlo, monospace" font-size="19" fill="#56d364">8 opt-in tracks</text>
+</svg>
