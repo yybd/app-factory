@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 320" role="img" aria-labelledby="t">
+  <title id="t">App Factory</title>
+  <style>
+    .w { fill: #131a33; font: 700 132px -apple-system, "Segoe UI", "Helvetica Neue", Arial, sans-serif; letter-spacing: -3px; }
+    @media (prefers-color-scheme: dark) { .w { fill: #f4f1ea; } }
+  </style>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#27325a"/>
+      <stop offset="1" stop-color="#131a33"/>
+    </linearGradient>
+  </defs>
+  <g transform="scale(.625)">
+    <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+    <path d="M98 408V184h60v104l86-68v68l86-68v68l84-68v188z"
+          fill="#f4f1ea" stroke="#f4f1ea" stroke-width="12" stroke-linejoin="round"/>
+    <g fill="#1b2443">
+      <rect x="176" y="324" width="50" height="50" rx="13"/>
+      <rect x="254" y="324" width="50" height="50" rx="13"/>
+      <rect x="332" y="324" width="50" height="50" rx="13"/>
+    </g>
+    <rect x="106" y="98" width="50" height="50" rx="13" fill="#ff8a3d" transform="rotate(-10 131 123)"/>
+    <rect x="168" y="50" width="32" height="32" rx="9" fill="#ff8a3d" opacity=".75" transform="rotate(12 184 66)"/>
+  </g>
+  <text class="w" x="380" y="206">App Factory</text>
+</svg>

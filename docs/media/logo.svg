@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="t">
+  <title id="t">App Factory</title>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#27325a"/>
+      <stop offset="1" stop-color="#131a33"/>
+    </linearGradient>
+  </defs>
+  <!-- the app-icon shape -->
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <!-- the factory: a chimney and a three-tooth sawtooth roof -->
+  <path d="M98 408V184h60v104l86-68v68l86-68v68l84-68v188z"
+        fill="#f4f1ea" stroke="#f4f1ea" stroke-width="12" stroke-linejoin="round"/>
+  <!-- three windows, each an app-icon shape -->
+  <g fill="#1b2443">
+    <rect x="176" y="324" width="50" height="50" rx="13"/>
+    <rect x="254" y="324" width="50" height="50" rx="13"/>
+    <rect x="332" y="324" width="50" height="50" rx="13"/>
+  </g>
+  <!-- what comes out of the chimney: apps -->
+  <rect x="106" y="98" width="50" height="50" rx="13" fill="#ff8a3d" transform="rotate(-10 131 123)"/>
+  <rect x="168" y="50" width="32" height="32" rx="9" fill="#ff8a3d" opacity=".75" transform="rotate(12 184 66)"/>
+</svg>
