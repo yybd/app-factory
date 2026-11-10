@@ -19,8 +19,21 @@
       <rect x="254" y="324" width="50" height="50" rx="13"/>
       <rect x="332" y="324" width="50" height="50" rx="13"/>
     </g>
-    <rect x="106" y="98" width="50" height="50" rx="13" fill="#ff8a3d" transform="rotate(-10 131 123)"/>
-    <rect x="168" y="50" width="32" height="32" rx="9" fill="#ff8a3d" opacity=".75" transform="rotate(12 184 66)"/>
+    <g stroke-linecap="round" stroke-linejoin="round" fill="none">
+      <rect x="113" y="120" width="30" height="30" rx="8" fill="#ff8a3d" transform="rotate(-8 128 135)"/>
+      <g transform="rotate(10 172 86)">
+        <rect x="149" y="63" width="46" height="46" rx="12" fill="#ffc145"/>
+        <circle cx="172" cy="86" r="9" fill="#1b2443"/>
+      </g>
+      <g transform="rotate(-7 250 74)">
+        <rect x="218" y="42" width="64" height="64" rx="17" fill="#3ecfb2"/>
+        <path d="M241 59v30l24-15z" fill="#1b2443" stroke="#1b2443" stroke-width="5"/>
+      </g>
+      <g transform="rotate(9 362 108)">
+        <rect x="319" y="65" width="86" height="86" rx="23" fill="#ff8a3d"/>
+        <path d="M342 109l14 14 27-30" stroke="#f4f1ea" stroke-width="11"/>
+      </g>
+    </g>
   </g>
   <text class="w" x="380" y="206">App Factory</text>
 </svg>
